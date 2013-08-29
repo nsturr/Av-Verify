@@ -8,12 +8,7 @@ def bits(total)
 	array = []
 
 	until total <= 0
-		bit = 1
-		# Find the highest power of 2 that's less or equal to total
-		until bit > total
-			bit *= 2
-		end
-		bit /= 2
+		bit = highest_power_of_two_below(total)
 		array << bit
 		total -= bit
 	end
@@ -26,19 +21,10 @@ end
 # Returns nil if query is not a power of 2
 def bit?(total, query)
 	# First make sure bit is a power of 2
-	test = query
-	until test <= 1 do
-		return nil if test % 2 != 0
-		test /= 2
-	end
+	return nil unless power_of_two?(query)
 	# Now check to see if it's in the bitfield
 	until total <= 0
-		bit = 1
-		# Find the highest power of 2 that's less or equal to total
-		until bit > total
-			bit *= 2
-		end
-		bit /= 2
+		bit = highest_power_of_two_below(query)
 		return true if bit == query
 		total -= bit
 	end
@@ -64,12 +50,25 @@ def bparse(string)
 	bits.each do |bit|
 		# First make sure that each bit is a power of 2 by repeatedly dividing
 		# by 2 until you get 1, and returning nil if there's any remainder.
-		test = bit
-		until test <= 1 do
-			return nil if test % 2 != 0
-			test /= 2
-		end
+		return nil unless power_of_two? bit
 		total += bit
 	end
 	total
+end
+
+def power_of_two?(number)
+	test = number
+	until test <= 1 do
+		return false if test % 2 != 0
+		test /= 2
+	end
+	true
+end
+
+def highest_power_of_two_below(number)
+	bit = 1
+	until bit > total
+		bit *= 2
+	end
+	bit / 2
 end
