@@ -40,7 +40,7 @@ def bparse(string)
 	# just return it
 	return string.to_i if string.match(/^\d+$/)
 	# Secondly, if the string doesn't match #|#|# then return nil (for error)
-	return nil unless string.match(/^\d+(?:\|\d+)*$/)
+	return nil unless string.match(bpattern)
 	strings = string.split("|")
 	bits = []
 	strings.each {|s| bits << s.to_i}
@@ -67,7 +67,7 @@ end
 
 def highest_power_of_two_below(number)
 	bit = 1
-	until bit > total
+	until bit > number
 		bit *= 2
 	end
 	bit / 2
