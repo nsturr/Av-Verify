@@ -1,3 +1,46 @@
+class Bits < Array
+
+	def self.pattern
+		/^\d+(?:\|\d+)*$/
+	end
+
+	def initialize(total)
+		until total <= 0
+			bit = highest_power_of_two_below(total)
+			self << bit
+			total -= bit
+		end
+
+		# Return bits in lowest to highest order
+		self.reverse!
+	end
+
+	def bit?(n)
+		raise ArgumentError.new("not a power of two (#{n})") unless power_of_two?(n)
+		self.include?(n)
+	end
+
+	private
+
+		def power_of_two?(number)
+			test = number
+			until test <= 1 do
+				return false if test % 2 != 0
+				test /= 2
+			end
+			true
+		end
+
+		def highest_power_of_two_below(number)
+			bit = 1
+			until bit > number
+				bit *= 2
+			end
+			bit / 2
+		end
+
+end
+
 # Just returns the regexp pattern to match a bitfield
 def bpattern
 	/^\d+(?:\|\d+)*$/
