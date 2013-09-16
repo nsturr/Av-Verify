@@ -4,15 +4,30 @@ class Bits < Array
 		/^\d+(?:\|\d+)*$/
 	end
 
-	def initialize(total)
-		until total <= 0
-			bit = highest_power_of_two_below(total)
-			self << bit
-			total -= bit
-		end
+	# def initialize(total)
+	# 	@error = false
 
-		# Return bits in lowest to highest order
-		self.reverse!
+	# 	until total <= 0
+	# 		bit = highest_power_of_two_below(total)
+	# 		self << bit
+	# 		total -= bit
+	# 	end
+
+	# 	# Return bits in lowest to highest order
+	# 	self.reverse!
+	# end
+
+	def initialize(bits)
+		bits.each do |bit|
+			self << bit
+			@error ||= true unless power_of_two?(bit)
+		end
+		@error ||= false
+		self
+	end
+
+	def error?
+		@error
 	end
 
 	def bit?(n)
