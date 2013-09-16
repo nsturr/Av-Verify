@@ -12,13 +12,21 @@
 
 class Bits < Array
 
+	@@powers_of_two = [1] # Stored in descending order
+
 	def self.pattern
 		/^\d+(?:\|\d+)*$/
 	end
 
 	def initialize(bits)
+		# Because to_i returns 0 if element is NaN, you still have to check for
+		# non-number inputs before calling this method
+		if bits.is_a? String
+			bits = bits.split("|")
+			bits.map!(&:to_i)
+		end
+
 		bits.each do |bit|
-			raise ArgumentError.new("not a Fixnum (#{bit})") unless bit.is_a? Fixnum
 			self << bit
 			@error ||= true unless power_of_two?(bit)
 		end
@@ -37,21 +45,24 @@ class Bits < Array
 
 	private
 
-		def power_of_two?(number)
-			test = number
-			until test <= 1 do
-				return false if test % 2 != 0
-				test /= 2
+		def self.power_of_two?(number)
+			return true if @@powers_of_two.include? number
+
+			until @@powers_of_two.first >= number
+				@@powers_of_two.unshift(@@powers_of_two.first * 2)
 			end
-			true
+			number == @@powers_of_two.first
 		end
 
-		def highest_power_of_two_below(number)
-			bit = 1
-			until bit > number
-				bit *= 2
+		def self.highest_power_of_two_below(number)
+			if (number / 2) > @@powers_of_two.first
+				while (number / 2) > @@powers_of_two.first
+					@@powers_of_two.unshift(@@powers_of_two.first * 2)
+				end
+				@@powers_of_two.first
+			else
+				@@powers_of_two.find { |el| el < number }
 			end
-			bit / 2
 		end
 
 end
