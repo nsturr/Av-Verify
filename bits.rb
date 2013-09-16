@@ -1,29 +1,29 @@
+# Bits is essentially an array with a few helper methods
+# Bits::pattern returns the regex for detecting a bitfield
+# Bits#initialize...
+#   raises an exception if any element is not a Fixnum
+#   sorts its element in ascending order
+#   sets self.error to true if any of the bits aren't powers of two
+# Bits#error? returns self.error
+# Bits#bit? equivalent to include? but raises exception if argument
+#   is not a power of two
+#
+# TODO: incorporate bparse
+
 class Bits < Array
 
 	def self.pattern
 		/^\d+(?:\|\d+)*$/
 	end
 
-	# def initialize(total)
-	# 	@error = false
-
-	# 	until total <= 0
-	# 		bit = highest_power_of_two_below(total)
-	# 		self << bit
-	# 		total -= bit
-	# 	end
-
-	# 	# Return bits in lowest to highest order
-	# 	self.reverse!
-	# end
-
 	def initialize(bits)
 		bits.each do |bit|
+			raise ArgumentError.new("not a Fixnum (#{bit})") unless bit.is_a? Fixnum
 			self << bit
 			@error ||= true unless power_of_two?(bit)
 		end
 		@error ||= false
-		self
+		self.sort!
 	end
 
 	def error?
