@@ -1,21 +1,19 @@
-# Bits is essentially an array with a few helper methods
-# Bits::pattern returns the regex for detecting a bitfield
+# Bits is an array with the following differences:
 # Bits#initialize...
 #   raises an exception if any element is not a Fixnum
-#   sorts its element in ascending order
+#   sorts its elements in ascending order
 #   sets self.error to true if any of the bits aren't powers of two
-# Bits#error? returns self.error
-# Bits#bit? equivalent to include? but raises exception if argument
-#   is not a power of two
-#
-# TODO: incorporate bparse
+# Bits#bit? is equivalent to Array#include? but raises an error
+#   if the argument is not a power of two
+# Stores powers of two as it calculates them, not that it's taxing
+#   to recalculate them every time power_of_two? is called anyway...
 
 class Bits < Array
 
 	@@powers_of_two = [1] # Stored in descending order
 
-	def self.powers_of_two
-		@@powers_of_two
+	def self.powers_of_two # Only every used to confirm that storing
+		@@powers_of_two      # precalculated powers of 2 is working
 	end
 
 	def self.pattern
@@ -82,45 +80,3 @@ class Bits < Array
 		end
 
 end
-
-# Sums a bitfield in string form. Returns the sum if the string is valid
-# i.e. all the numbers are powers of two and are separated by pipes.
-# returns nil otherwise
-# Passing an empty string will return nil too. Pass 0 instead.
-# def bparse(string)
-# 	# Firstly, if the string is a single number (i.e. bits already summed)
-# 	# just return it
-# 	return string.to_i if string.match(/^\d+$/)
-# 	# Secondly, if the string doesn't match #|#|# then return nil (for error)
-# 	return nil unless string.match(Bits.pattern)
-# 	strings = string.split("|")
-# 	bits = []
-# 	strings.each {|s| bits << s.to_i}
-
-# 	total = 0 # The value to be returned
-
-# 	bits.each do |bit|
-# 		# First make sure that each bit is a power of 2 by repeatedly dividing
-# 		# by 2 until you get 1, and returning nil if there's any remainder.
-# 		return nil unless power_of_two? bit
-# 		total += bit
-# 	end
-# 	total
-# end
-
-# def power_of_two?(number)
-# 	test = number
-# 	until test <= 1 do
-# 		return false if test % 2 != 0
-# 		test /= 2
-# 	end
-# 	true
-# end
-
-# def highest_power_of_two_below(number)
-# 	bit = 1
-# 	until bit > number
-# 		bit *= 2
-# 	end
-# 	bit / 2
-# end

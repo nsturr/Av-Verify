@@ -411,8 +411,9 @@ class Area
 				value = m[1].to_i
 			elsif m = items[2].match(/^(\d+(?:\|\d+)+)$/)
 				warn(line_num, apply_line, "Bitfields are only used for Apply 50: Immunity") unless apply == 50
-				value = bparse(m[1])
-				err(line_num, apply_line, "Bitfield is not a power of 2") if value.nil?
+				value = Bits.new(m[1])
+				err(line_num, apply_line, "Bitfield is not a power of 2") if value.error?
+				value = value.sum
 			else
 				err(line_num, apply_line, "Invalid (non-numeric, incomplete bitfield) apply value")
 			end
@@ -516,8 +517,8 @@ class Area
 					err(current_line, line, "Duplicate \"Areaflags\" line in #AREADATA")
 				end
 				items = line.split(" ", 3)
-				if items[1] =~ /^\d+(?:\|\d+)*$/
-					err(current_line, line, "Areaflags not a power of 2") if bparse(items[1]).nil?
+				if items[1] =~ Bits.pattern
+					err(current_line, line, "Areaflags not a power of 2") if Bits.new(items[1]).error?
 				else
 					err(current_line, line, "Bad \"Areaflags\" line in #AREADATA")
 				end
@@ -778,7 +779,7 @@ class Area
 				# Firstly, try to match the <act> <aff> <align> S line
 				# If it matches exactly, it's a safe bet that the description section lacks a
 				# ~ and we just bled into it.
-				if line =~ /^\d+(?:\|\d+)* +\d+(?:\|\d+)* +-?\d+ +S/
+				if line =~ /^#{Bits.insert} +#{Bits.insert} +-?\d+ +S/
 					err(current_line, line, "This doesn't look like part of a description. Forget a terminating ~ above?")
 					# Set code block to expect the next line (which is the line we just found)
 					# and redo the block on the current line
@@ -799,13 +800,13 @@ class Area
 				items = line.split
 				warn(current_line, line, "ACT_NPC is not set") unless items[0].start_with?("1")
 				if items.length == 4
-					if items[0] =~ bpattern
-						err(current_line, line, "Act flag is not a power of 2") if bparse(items[0]).nil?
+					if items[0] =~ Bits.pattern
+						err(current_line, line, "Act flag is not a power of 2") if Bits.new(items[0]).error?
 					else
 						err(current_line, line, "Bad act flags")
 					end
-					if items[1] =~ (bpattern)
-						err(current_line, line, "Affect flag is not a power of 2") if bparse(items[1]).nil?
+					if items[1] =~ Bits.pattern
+						err(current_line, line, "Affect flag is not a power of 2") if Bits.new(items[1]).error?
 					else
 						err(current_line, line, "Bad affect flags")
 					end
@@ -906,7 +907,7 @@ class Area
 					kspawn = items[1..4]
 					if kspawn.length == 4
 						err(current_line, line, "Invalid (negative or non-numeric) kspawn condition") unless kspawn[0] =~ /^\d+$/
-						err(current_line, line, "Invalid (incomplete or not power of 2) kspawn type bitfield") if bparse(kspawn[1]).nil?
+						err(current_line, line, "Invalid (incomplete or not power of 2) kspawn type bitfield") if Bits.new(kspawn[1]).error?
 						err(current_line, line, "Invalid (non-numeric) kspawn vnum") unless kspawn[2] =~ /^-1$|^\d+$/
 						err(current_line, line, "Invalid (non-numeric or less than -1) kspawn location") unless kspawn[3] =~ /^-1$|^\d+$/
 						mob[:kspawn] = kspawn
@@ -1019,7 +1020,7 @@ class Area
 				end
 			when :action
 				ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
-				if m = line.match(/^(\d+) +\d+(?:\|\d+)* +\d+(?:\|\d+)*$/)
+				if m = line.match(/^(\d+) +#{Bits.insert} +#{Bits.insert}$/)
 					type = m[1].to_i
 					obj[:type] = type
 					err(current_line, line, "Doesn't look like part of an adesc. Forget a ~ somewhere?")
@@ -1035,11 +1036,11 @@ class Area
 					next
 				end
 				expect += 1
-				if m = line.match(/^(\d+) +(\d+(?:\|\d+)*) +(\d+(?:\|\d+)*)$/)
+				if m = line.match(/^(\d+) +(#{Bits.insert}) +(#{Bits.insert})$/)
 					type = m[1].to_i
 					obj[:type] = type
-					err(current_line, line, "Extra flag is not a power of 2") if bparse(m[2]).nil?
-					err(current_line, line, "Wear flag is not a power of 2") if bparse(m[3]).nil?
+					err(current_line, line, "Extra flag is not a power of 2") if Bits.new(m[2]).error?
+					err(current_line, line, "Wear flag is not a power of 2") if Bits.new(m[3]).error?
 				else
 					err(current_line, line, "Line should follow syntax: <type:#> <extraflag:#> <wearflag:#>")
 				end
@@ -1054,7 +1055,7 @@ class Area
 				if items.length == 4
 					values = []
 					0.upto(3) do |i|
-						if items[i].match(/^(?:-?\d+|\d+(?:\|\d+)*)$/)
+						if items[i].match(/^(?:-?\d+|#{Bits.insert})$/)
 							values[i] = items[i]
 						else
 							err(current_line, line, "Invalid format for object value#{i}")
@@ -1204,7 +1205,7 @@ class Area
 				ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
 				# If this line matches, it's practically guaranteed that we've left the description
 				# and entered the next field due to lack of ~
-				if line =~ /^\d+ +\d+(?:\|\d+)* +\d+ *$/
+				if line =~ /^\d+ +#{Bits.insert} +\d+ *$/
 					err(current_line, line, "This doesn't look like part of a description. Forget a terminating ~ above?")
 					expect += 1
 					redo
@@ -1226,8 +1227,8 @@ class Area
 				expect += 1
 				items = line.split
 				err(current_line, line, "Too many fields on roomflag/sector line") if items.length > 3
-				if items[1] =~ bpattern
-					err(current_line, line, "Room flag is not a power of 2") if bparse(items[1]).nil?
+				if items[1] =~ Bits.pattern
+					err(current_line, line, "Room flag is not a power of 2") if Bits.new(items[1]).error?
 				else
 					err(current_line, line, "Invalid roomflag field")
 				end
@@ -1258,22 +1259,22 @@ class Area
 						err(current_line, line, "Invalid field (expecting D#, A, C, E, or S)")
 					end
 				elsif line.start_with?("A")
-					if m = line.match(/^A +(\d+(?:\|\d+)*)/)
+					if m = line.match(/^A +(#{Bits.insert})/)
 						#past_doors = true
-						align_excl = bparse(m[1])
-						room[:align_excl] = align_excl
-						err(current_line, line, "Alignment restriction flag is not a power of 2") if align_excl.nil?
-						err(current_line, line, "Invalid text after room alignment restriction") unless line =~ /^A +\d+(?:\|\d+)*$/
+						align_excl = Bits.new(m[1])
+						room[:align_excl] = align_excl.to_a
+						err(current_line, line, "Alignment restriction flag is not a power of 2") if align_excl.error?
+						err(current_line, line, "Invalid text after room alignment restriction") unless line =~ /^A +#{Bits.insert}$/
 					else
 						err(current_line, line, "Invalid alignment restriction line")
 					end
 				elsif line.start_with?("C")
-					if m = line.match(/^C +(\d+(?:\|\d+)*)/)
+					if m = line.match(/^C +(#{Bits.insert})/)
 						#past_doors = true
-						class_excl = bparse m[1]
-						room[:class_excl] = class_excl
-						err(current_line, line, "Class restriction flag is not a power of 2") if class_excl.nil?
-						err(current_line, line, "Invalid text after room class restriction") unless line =~ /^C +\d+(?:\|\d+)*$/
+						class_excl = Bits.new(m[1])
+						room[:class_excl] = class_excl.to_a
+						err(current_line, line, "Class restriction flag is not a power of 2") if class_excl.error?
+						err(current_line, line, "Invalid text after room class restriction") unless line =~ /^C +#{Bits.insert}$/
 					else
 						err(current_line, line, "Invalid class restriction line")
 					end
