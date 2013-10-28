@@ -23,8 +23,8 @@ Usage: <code>ruby vprog.rb filename.prg [nowarning|showdeprecated|showunknown|no
 
 ### Immediate
 
-* Break the many Struct objects into proper classes of their own
-* Clean up the "connections" parsing
+* Break the many Struct objects into proper classes of their own (this is in progress)
+* Clean up the "connections" parsing, as it's too brittle
 
 ### Long term
 
