@@ -1,0 +1,3 @@
+class Rooms < VnumSection
+
+end

@@ -1,0 +1,3 @@
+class Objects < VnumSection
+
+end

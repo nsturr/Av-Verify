@@ -1,0 +1,3 @@
+class Mobiles < VnumSection
+
+end
