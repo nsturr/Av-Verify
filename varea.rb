@@ -82,7 +82,7 @@ class Area
 	Exit = Struct.new(:dir, :lock, :key, :dest)
 	Reset = Struct.new(:line, :type, :vnum, :room, :limit)
 
-	def initialize(filename, flags)
+	def initialize(filename, flags=[])
 		# How 'bout a little FILE, Scarecrow! >:D
 		@name = File.basename(filename)
 
@@ -122,38 +122,41 @@ class Area
 	end
 
 	def verify_all
-		verify_area
-		verify_areadata
-		verify_helps
-		verify_mobiles
-		verify_objects
-		verify_rooms
-		verify_resets
-		verify_shops
-		verify_specials
-	end
-
-	def verify_area
-		sect = find_section("area")
-
-		if sect
-			puts "##{sect[:name]} found on line #{sect[:line]}" if @flags.include?(:debug)
-			parse_section_area sect
-		else
-			puts "#AREA section not found, skipping." if @flags.include?(:debug)
+		@main_sections.each do |section|
+			section.parse
 		end
+		# verify_area
+		# verify_areadata
+		# verify_helps
+		# verify_mobiles
+		# verify_objects
+		# verify_rooms
+		# verify_resets
+		# verify_shops
+		# verify_specials
 	end
 
-	def verify_areadata
-		sect = find_section("areadata")
+	# def verify_area
+	# 	sect = find_section("area")
 
-		if sect
-			puts "##{sect[:name]} found on line #{sect[:line]}" if @flags.include?(:debug)
-			parse_section_areadata sect
-		else
-			puts "#AREADATA section not found, skipping." if @flags.include?(:debug)
-		end
-	end
+	# 	if sect
+	# 		puts "##{sect[:name]} found on line #{sect[:line]}" if @flags.include?(:debug)
+	# 		parse_section_area sect
+	# 	else
+	# 		puts "#AREA section not found, skipping." if @flags.include?(:debug)
+	# 	end
+	# end
+
+	# def verify_areadata
+	# 	sect = find_section("areadata")
+
+	# 	if sect
+	# 		puts "##{sect[:name]} found on line #{sect[:line]}" if @flags.include?(:debug)
+	# 		parse_section_areadata sect
+	# 	else
+	# 		puts "#AREADATA section not found, skipping." if @flags.include?(:debug)
+	# 	end
+	# end
 
 	def verify_helps
 		sect = find_section("helps")
@@ -368,32 +371,67 @@ class Area
 			# at the very beginning of an area file, if any
 			next if content.empty?
 
-			first_line = content.match(/^#.*?$/).to_s.rstrip
-			# Slice off the #SECTION line at the beginning of each section, so the methods
-			# that parse each section don't need to worry about them.
-			if first_line.downcase.start_with?("#area ", "#area\t") #apparently we have to worry about tabs too...
-				# Excluding #AREA of course because it's supposed to be a single line.
-				name = "AREA"
-			else
-				first_line = content.slice!(/\A.*(?:\n|\Z)/).rstrip
-				name = first_line.match(/[a-zA-Z\$]+/).to_s
-				# Determine that all section names are valid
-				unless SECTIONS.include? name.downcase
-					err(line_start_section, nil, "Invalid section name ##{name}")
-					next # Don't bother parsing this section if it's not a recognized one
-				end
+			# first_line = content.match(/^#.*?$/).to_s.rstrip
+			# # Slice off the #SECTION line at the beginning of each section, so the methods
+			# # that parse each section don't need to worry about them.
+			# if first_line.downcase.start_with?("#area ", "#area\t") #apparently we have to worry about tabs too...
+			# 	# Excluding #AREA of course because it's supposed to be a single line.
+			# 	name = "AREA"
+			# else
+			# 	first_line = content.slice!(/\A.*(?:\n|\Z)/).rstrip
+			# 	name = first_line.match(/[a-zA-Z\$]+/).to_s
+			# 	# Determine that all section names are valid
+			# 	unless SECTIONS.include? name.downcase
+			# 		err(line_start_section, nil, "Invalid section name ##{name}")
+			# 		next # Don't bother parsing this section if it's not a recognized one
+			# 	end
 
-				# unless first_line =~ /^#[a-zA-Z\$]+$/
-				if first_line.include?(" ")
-					err(line_start_section, first_line, "Invalid text on same line as section name")
-				end
-				line_start_section += 1 # Compensate for the line we're snipping off.
-			end
+			# 	# unless first_line =~ /^#[a-zA-Z\$]+$/
+			# 	if first_line.include?(" ")
+			# 		err(line_start_section, first_line, "Invalid text on same line as section name")
+			# 	end
+			# 	line_start_section += 1 # Compensate for the line we're snipping off.
+			# end
 
-			sections << Section.new(line_start_section, name, content)
+			#sections << Section.new(line_start_section, name, content)
+			sections << (make_section(content, line_start_section) || next)
 		end
 
+		p sections
+
 		sections
+	end
+
+	def make_section(content, line_num)
+		# Identify area name
+		first_line = content.match(/^#.*?$/).to_s.rstrip
+		# AREA section has its contents on the same line as the section name
+		if first_line.downcase.start_with?("#area ", "#area\t")
+			name = "AREA"
+		else
+			# Other sections technically can have contents on same line as section,
+			# name, but I'm enforcing good syntax anyway.
+			first_line = content.slice!(/\A.*(?:\n|\Z)/).rstrip
+			name = first_line.match(/[a-zA-Z\$]+/).to_s
+
+			if first_line.include?(" ")
+				err(line_start_section, first_line, "Invalid text on same line as section name")
+			end
+			line_num += 1
+		end
+
+		unless SECTIONS.include? name.downcase
+			err(line_num, nil, "Invalid section name ##{name}") and return
+		end
+
+		section = case name.downcase
+							when "area"
+								AreaHeader.new(content, line_num)
+							when "areadata"
+								AreaData.new(content, line_num)
+							end
+		p section
+		return section
 	end
 
 	# Accepts the Apply flag line ("A apply value")
