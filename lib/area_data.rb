@@ -3,7 +3,7 @@ require_relative 'parsable.rb'
 class AreaData
   include Parsable
 
-  def initialize contents, line_number
+  def initialize(contents, line_number=1)
     @line_number = line_number
     @current_line = line_number
     @contents = contents
@@ -101,7 +101,7 @@ class AreaData
 
   def parse_flags_line line
     # Areaflags should match: F #|#
-    if used_lines.include? "F"
+    if @used_lines.include? "F"
       err(@current_line, line, "Duplicate \"Areaflags\" line in #AREADATA")
     else
       @used_lines << "F"
@@ -131,7 +131,7 @@ class AreaData
     # Kspawn should match: K # # # # text~
     # The text can span multiple lines, which makes this silly tricky,
     # not to mention ugly...
-    if used_lines.include? "K"
+    if @used_lines.include? "K"
       err(current_line, line, "Duplicate \"Kspawn\" line in #AREADATA")
     else
       @used_lines << "K"
@@ -149,7 +149,7 @@ class AreaData
 
   def parse_modifier_line line
     # Modifiers should match: M # # # # # # 0 0
-    if used_lines.include? "M"
+    if @used_lines.include? "M"
       err(current_line, line, "Duplicate \"Area modifier\" line in #AREADATA")
     else
       @used_lines << "M"
@@ -161,7 +161,7 @@ class AreaData
 
   def parse_group_exp_line line
     # Group exp should match: G # # # # # # # 0
-    if used_lines.include? "G"
+    if @used_lines.include? "G"
       err(current_line, line, "Duplicate \"Group exp\" line in #AREADATA")
     else
       @used_lines << "G"
