@@ -3,7 +3,7 @@ require_relative 'parsable.rb'
 class AreaHeader
   include Parsable
 
-  def initialize contents, line_number
+  def initialize(contents, line_number=1)
     @line_number = line_number
     @contents = contents.rstrip
   end
