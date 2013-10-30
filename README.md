@@ -2,6 +2,8 @@
 
 Area and Prog verifiers for AVATAR Mud, implemented in Ruby.
 
+This branch is undergoing refactoring to break everything into more managable classes.
+
 ## vArea
 
 Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
@@ -23,7 +25,6 @@ Usage: <code>ruby vprog.rb filename.prg [nowarning|showdeprecated|showunknown|no
 
 ### Immediate
 
-* Break the many Struct objects into proper classes of their own
 * Clean up the "connections" parsing
 
 ### Long term
