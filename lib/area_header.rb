@@ -1,11 +1,13 @@
-require_relative 'parsable.rb'
+require_relative 'section.rb'
 
-class AreaHeader
-  include Parsable
+class AreaHeader < Section
 
-  def initialize(contents, line_number=1)
-    @line_number = line_number
-    @contents = contents.rstrip
+  def initialize(contents, line_number)
+    super(contents, line_number)
+  end
+
+  def name
+    "AREA"
   end
 
   def parse

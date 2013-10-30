@@ -124,6 +124,7 @@ class Area
 	def verify_all
 		@main_sections.each do |section|
 			section.parse
+			@errors += section.errors
 		end
 		# verify_area
 		# verify_areadata
@@ -371,29 +372,6 @@ class Area
 			# at the very beginning of an area file, if any
 			next if content.empty?
 
-			# first_line = content.match(/^#.*?$/).to_s.rstrip
-			# # Slice off the #SECTION line at the beginning of each section, so the methods
-			# # that parse each section don't need to worry about them.
-			# if first_line.downcase.start_with?("#area ", "#area\t") #apparently we have to worry about tabs too...
-			# 	# Excluding #AREA of course because it's supposed to be a single line.
-			# 	name = "AREA"
-			# else
-			# 	first_line = content.slice!(/\A.*(?:\n|\Z)/).rstrip
-			# 	name = first_line.match(/[a-zA-Z\$]+/).to_s
-			# 	# Determine that all section names are valid
-			# 	unless SECTIONS.include? name.downcase
-			# 		err(line_start_section, nil, "Invalid section name ##{name}")
-			# 		next # Don't bother parsing this section if it's not a recognized one
-			# 	end
-
-			# 	# unless first_line =~ /^#[a-zA-Z\$]+$/
-			# 	if first_line.include?(" ")
-			# 		err(line_start_section, first_line, "Invalid text on same line as section name")
-			# 	end
-			# 	line_start_section += 1 # Compensate for the line we're snipping off.
-			# end
-
-			#sections << Section.new(line_start_section, name, content)
 			sections << (make_section(content, line_start_section) || next)
 		end
 
@@ -430,7 +408,6 @@ class Area
 							when "areadata"
 								AreaData.new(content, line_num)
 							end
-		p section
 		return section
 	end
 
@@ -462,163 +439,6 @@ class Area
 			return [apply, value] unless apply.nil? || value.nil?
 		end
 		nil
-	end
-
-	def parse_section_area(section)
-		line_num = section[:line]
-		line = section[:data].rstrip
-		bracket_open = line.index("{")
-		bracket_close = line.index("}")
-
-		# Check the proper dimensions of the {LvlRng} section
-		if bracket_open && bracket_close
-			warn(line_num, line, "Level range should be 8 chars long, including braces") if bracket_close - bracket_open != 7
-		else
-			warn(line_num, line, "Level range not enclosed in braces { }")
-		end
-
-		if line.include? "\n"
-			err(line_num, line, "#AREA section spans more than one line")
-		end
-		if line.count("~") > 1
-			err(line_num, line, "#AREA section contains more than one ~")
-		elsif line.count("~") == 0
-			err(line_num, line, "#AREA section contains no ~")
-		end
-	end
-
-	def parse_section_areadata(section)
-		# Contains the separate lines that have been counted so far (to check for repeats)
-		# Can contain the chars P F O K M G S
-		used_lines = []
-		# This is set true if a K line is missing its tilde, indicating that it spans
-		# multiple lines
-		kspawn_multiline = false
-
-		current_line = section[:line]
-
-		section[:data].rstrip.each_line do |line|
-			line.rstrip!
-			if line.empty?
-				current_line += 1
-				next
-			end
-
-			# If we're following a kspawn line without a tilde, then this line is purely
-			# text and shouldn't be parsed. If this line does contain a tilde, though,
-			# then the text ends.
-			if kspawn_multiline == true
-				if line.include?("~")
-					kspawn_multiline = false
-					# However nothing but whitespace can follow that tilde!
-					err(current_line, line, "Invalid text on kspawn line after terminating ~") if line =~ /~.*?\S/
-				end
-				# If we haven't found any tildes in this line, then the text must be continuing.
-				# Onward to the next line!
-				current_line += 1
-				next
-			end
-
-			# If the "S" section has been parsed, then this line comes after the section
-			# formally ends.
-			if used_lines.include? "S"
-				err(current_line, line, "Section continues after 'S' delimeter")
-				break #Only need to throw this error once
-			end
-
-			case line[0]
-			when "P"
-				# Plane should match: P # #
-				if used_lines.include? "P"
-					err(current_line, line, "Duplicate \"Plane\" line in #AREADATA")
-				else
-					items = line.split(" ", 4)
-					if items.length > 3
-						err(current_line, line, "Invalid text after #AREADATA plane line")
-					end
-					if items.length > 1 && items[1] =~ /^-?\d+$/
-						err(current_line, line, "Invalid area plane: 0") if items[1].to_i == 0
-						err(current_line, line, "Areadata plane out of bounds #{PLANE_MIN} to #{PLANE_MAX}") unless items[1].to_i.between?(PLANE_MIN, PLANE_MAX)
-					else
-						err(current_line, line, "Invalid (non-numeric) area plane")
-					end
-					# Only bother checking for the zone field if there are enough bits in the line
-					if items.length > 2
-						if items[2] =~ /^-?\d+$/
-							err(current_line, line, "Areadata zone out of bounds 0 to #{ZONE_MAX}") unless items[2].to_i.between?(0, ZONE_MAX)
-						else
-							err(current_line, line, "Invalid (non-numeric) area zone")
-						end
-					end
-					used_lines << "P"
-				end
-			when "F"
-				# Areaflags should match: F #|#
-				if used_lines.include? "F"
-					err(current_line, line, "Duplicate \"Areaflags\" line in #AREADATA")
-				end
-				items = line.split(" ", 3)
-				if items[1] =~ Bits.pattern
-					err(current_line, line, "Areaflags not a power of 2") if Bits.new(items[1]).error?
-				else
-					err(current_line, line, "Bad \"Areaflags\" line in #AREADATA")
-				end
-				err(current_line, line, "Invalid text after #AREADATA area flags") if items.length > 2
-				used_lines << "F"
-			when "O"
-				# Outlaw should match: O # # # # #
-				if used_lines.include? "O"
-					err(current_line, line, "Duplicate \"Outlaw\" line in #AREADATA")
-				end
-				unless line =~ /^O(\s+-?\d+){5}$/
-					err(current_line, line, "Bad \"Outlaw\" line in #AREADATA")
-				end
-				used_lines << "O"
-			when "K"
-				# Kspawn should match: K # # # # text~
-				# The text can span multiple lines, which makes this silly tricky,
-				# not to mention ugly...
-				if used_lines.include? "K"
-					err(current_line, line, "Duplicate \"Kspawn\" line in #AREADATA")
-				end
-
-				unless line =~ /^K\s+\d+\s+\d+\s+-?\d+\s+-?\d+/
-					err(current_line, line, "Bad \"Kspawn\" line in #AREADATA")
-				end
-
-				if line.include?("~")
-					err(current_line, line, "Misplaced tildes in Kspawn line") unless line =~ /^K[^~]*~$/
-				else
-					kspawn_multiline = true
-				end
-
-				used_lines << "K"
-			when "M"
-				# Modifiers should match: M # # # # # # 0 0
-				if used_lines.include? "M"
-					err(current_line, line, "Duplicate \"Area modifier\" line in #AREADATA")
-				end
-				unless line =~ /^M(\s+(-|\+)?\d+){8}$/
-					err(current_line, line, "Bad \"Area modifier\" line in #AREADATA")
-				end
-				used_lines << "M"
-			when "G"
-				# Group exp should match: G # # # # # # # 0
-				if used_lines.include? "G"
-					err(current_line, line, "Duplicate \"Group exp\" line in #AREADATA")
-				end
-				unless line =~ /^G(\s+\d+){8}$/
-					err(current_line, line, "Bad \"Group exp\" line in #AREADATA")
-				end
-				used_lines << "G"
-			when "S"
-				used_lines << "S"
-			else
-				err(current_line, line, "Invalid AREADATA line")
-			end
-			current_line += 1
-		end
-		err(current_line, nil, "Kspawn line lacks terminating ~") if kspawn_multiline
 	end
 
 	def parse_section_helps(section)

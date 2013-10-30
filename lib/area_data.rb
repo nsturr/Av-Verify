@@ -1,16 +1,16 @@
-require_relative 'parsable.rb'
+require_relative 'section.rb'
 
-class AreaData
-  include Parsable
+class AreaData < Section
 
   def initialize(contents, line_number=1)
-    @line_number = line_number
-    @current_line = line_number
-    @contents = contents
-    @errors = []
+    super(contents, line_number)
 
     @used_lines = []
     @kspawn_multiline = false
+  end
+
+  def name
+    "AREADATA"
   end
 
   def parse
@@ -58,6 +58,8 @@ class AreaData
         parse_modifier_line line
       when "G"
         parse_group_exp_line line
+      when "S"
+        @used_lines << "S"
       else
         err(current_line, line, "Invalid AREADATA line")
       end
