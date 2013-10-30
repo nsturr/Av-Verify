@@ -59,6 +59,9 @@ require_relative 'bits'
 # puts "Oh my god my hair is on fire! Better send " + "Snikt".BR + " a tell!"
 require_relative 'avcolors'
 
+require './lib/area_header.rb'
+require './lib/area_data.rb'
+
 class Area
 	attr_reader :name, :errors, :mobiles, :objects, :rooms, :resets, :specials
 
@@ -540,7 +543,7 @@ class Area
 				if used_lines.include? "K"
 					err(current_line, line, "Duplicate \"Kspawn\" line in #AREADATA")
 				end
-				
+
 				unless line =~ /^K\s+\d+\s+\d+\s+-?\d+\s+-?\d+/
 					err(current_line, line, "Bad \"Kspawn\" line in #AREADATA")
 				end
