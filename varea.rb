@@ -389,13 +389,13 @@ class Area
 		else
 			# Other sections technically can have contents on same line as section,
 			# name, but I'm enforcing good syntax anyway.
-			first_line = content.slice!(/\A.*(?:\n|\Z)/).rstrip
+			first_line = content.slice(/\A.*(?:\n|\Z)/).rstrip
 			name = first_line.match(/[a-zA-Z\$]+/).to_s
 
 			if first_line.include?(" ")
 				err(line_start_section, first_line, "Invalid text on same line as section name")
 			end
-			line_num += 1
+			# line_num += 1
 		end
 
 		unless SECTIONS.include? name.downcase

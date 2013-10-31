@@ -14,14 +14,14 @@ class AreaData < Section
   end
 
   def parse
+    slice_first_line
     section_end = false
+
     @contents.rstrip.each_line do |line|
+      @current_line += 1
       line.rstrip!
 
-      if line.empty?
-        current_line += 1
-        next
-      end
+      next if line.empty?
 
       # If we're following a kspawn line without a tilde, then this line is purely
       # text and shouldn't be parsed. If this line does contain a tilde, though,
@@ -30,18 +30,18 @@ class AreaData < Section
         if line.include?("~")
           @kspawn_multiline = false
           # However nothing but whitespace can follow that tilde!
-          err(current_line, line, "Invalid text on kspawn line after terminating ~") if line =~ /~.*?\S/
+          err(@current_line, line, "Invalid text on kspawn line after terminating ~") if line =~ /~.*?\S/
         end
         # If we haven't found any tildes in this line, then the text must be continuing.
         # Onward to the next line!
-        @current_line += 1
+        # @current_line += 1
         next
       end
 
       # If the "S" section has been parsed, then this line comes after the section
       # formally ends.
       if section_end
-        err(current_line, line, "Section continues after 'S' delimeter")
+        err(@current_line, line, "Section continues after 'S' delimeter")
         break #Only need to throw this error once
       end
 
@@ -64,19 +64,19 @@ class AreaData < Section
         err(current_line, line, "Invalid AREADATA line")
       end
 
-      @current_line += 1
+      # @current_line += 1
 
       err(@current_line, nil, "Kspawn line lacks terminating ~") if @kspawn_multiline
-      err(@current_line, nil, "#AREADATA lacks terminating S") unless section_end
-      @errors
     end
+    err(@current_line, nil, "#AREADATA lacks terminating S") unless section_end
+    @errors
   end # parse
 
   private
 
   def parse_plane_line line
     # Plane should match: P # #
-    if used_lines.include? "P"
+    if @used_lines.include? "P"
       err(@current_line, line, "Duplicate \"Plane\" line in #AREADATA")
     else
       @used_lines << "P"
@@ -121,11 +121,11 @@ class AreaData < Section
   def parse_outlaw_line line
     # Outlaw should match: O # # # # #
     if @used_lines.include? "O"
-      err(current_line, line, "Duplicate \"Outlaw\" line in #AREADATA")
+      err(@current_line, line, "Duplicate \"Outlaw\" line in #AREADATA")
     else
       @used_lines << "O"
       unless line =~ /^O(\s+-?\d+){5}$/
-        err(current_line, line, "Bad \"Outlaw\" line in #AREADATA")
+        err(@current_line, line, "Bad \"Outlaw\" line in #AREADATA")
       end
     end
   end
@@ -135,15 +135,15 @@ class AreaData < Section
     # The text can span multiple lines, which makes this silly tricky,
     # not to mention ugly...
     if @used_lines.include? "K"
-      err(current_line, line, "Duplicate \"Kspawn\" line in #AREADATA")
+      err(@current_line, line, "Duplicate \"Kspawn\" line in #AREADATA")
     else
       @used_lines << "K"
       unless line =~ /^K\s+\d+\s+\d+\s+-?\d+\s+-?\d+/
-        err(current_line, line, "Bad \"Kspawn\" line in #AREADATA")
+        err(@current_line, line, "Bad \"Kspawn\" line in #AREADATA")
       end
 
       if line.include?("~")
-        err(current_line, line, "Misplaced tildes in Kspawn line") unless line =~ /^K[^~]*~$/
+        err(@current_line, line, "Misplaced tildes in Kspawn line") unless line =~ /^K[^~]*~$/
       else
         @kspawn_multiline = true
       end
@@ -153,11 +153,11 @@ class AreaData < Section
   def parse_modifier_line line
     # Modifiers should match: M # # # # # # 0 0
     if @used_lines.include? "M"
-      err(current_line, line, "Duplicate \"Area modifier\" line in #AREADATA")
+      err(@current_line, line, "Duplicate \"Area modifier\" line in #AREADATA")
     else
       @used_lines << "M"
       unless line =~ /^M(\s+(-|\+)?\d+){8}$/
-        err(current_line, line, "Bad \"Area modifier\" line in #AREADATA")
+        err(@current_line, line, "Bad \"Area modifier\" line in #AREADATA")
       end
     end
   end
@@ -165,11 +165,11 @@ class AreaData < Section
   def parse_group_exp_line line
     # Group exp should match: G # # # # # # # 0
     if @used_lines.include? "G"
-      err(current_line, line, "Duplicate \"Group exp\" line in #AREADATA")
+      err(@current_line, line, "Duplicate \"Group exp\" line in #AREADATA")
     else
       @used_lines << "G"
       unless line =~ /^G(\s+\d+){8}$/
-        err(current_line, line, "Bad \"Group exp\" line in #AREADATA")
+        err(@current_line, line, "Bad \"Group exp\" line in #AREADATA")
       end
     end
   end
