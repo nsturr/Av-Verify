@@ -1,5 +1,7 @@
 module Parsable
 
+  attr_reader :errors
+
   Error = Struct.new(:line, :type, :context, :description)
 
   def err(line, context, description)
@@ -27,6 +29,10 @@ module Parsable
 
   def errors
     @errors || []
+  end
+
+  def valid?
+    self.errors.any? { |error| error[:type] == :error }
   end
 
 end

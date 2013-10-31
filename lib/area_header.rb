@@ -4,10 +4,7 @@ class AreaHeader < Section
 
   def initialize(contents, line_number)
     super(contents, line_number)
-  end
-
-  def name
-    "AREA"
+    @name = "AREA"
   end
 
   def parse

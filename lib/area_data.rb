@@ -4,17 +4,14 @@ class AreaData < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
+    @name = "AREADATA"
 
     @used_lines = []
     @kspawn_multiline = false
-  end
-
-  def name
-    "AREADATA"
+    slice_first_line
   end
 
   def parse
-    slice_first_line
     section_end = false
 
     @contents.rstrip.each_line do |line|
@@ -61,7 +58,7 @@ class AreaData < Section
       when "S"
         section_end = true
       else
-        err(current_line, line, "Invalid AREADATA line")
+        err(@current_line, line, "Invalid AREADATA line")
       end
 
       # @current_line += 1
@@ -69,7 +66,6 @@ class AreaData < Section
       err(@current_line, nil, "Kspawn line lacks terminating ~") if @kspawn_multiline
     end
     err(@current_line, nil, "#AREADATA lacks terminating S") unless section_end
-    @errors
   end # parse
 
   private

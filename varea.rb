@@ -61,6 +61,7 @@ require_relative 'avcolors'
 
 require './lib/area_header.rb'
 require './lib/area_data.rb'
+require './lib/helps.rb'
 
 class Area
 	attr_reader :name, :errors, :mobiles, :objects, :rooms, :resets, :specials
@@ -123,6 +124,7 @@ class Area
 
 	def verify_all
 		@main_sections.each do |section|
+			puts "Found ##{section.name} on line #{section.line_number}" if @flags.include?(:debug)
 			section.parse
 			@errors += section.errors
 		end
@@ -375,7 +377,7 @@ class Area
 			sections << (make_section(content, line_start_section) || next)
 		end
 
-		p sections
+		# p sections
 
 		sections
 	end
@@ -407,6 +409,8 @@ class Area
 								AreaHeader.new(content, line_num)
 							when "areadata"
 								AreaData.new(content, line_num)
+							when "helps"
+								Helps.new(content, line_num)
 							end
 		return section
 	end
