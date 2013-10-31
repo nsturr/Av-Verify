@@ -14,7 +14,7 @@ class AreaData < Section
   end
 
   def parse
-
+    section_end = false
     @contents.rstrip.each_line do |line|
       line.rstrip!
 
@@ -40,7 +40,7 @@ class AreaData < Section
 
       # If the "S" section has been parsed, then this line comes after the section
       # formally ends.
-      if @used_lines.include? "S"
+      if section_end
         err(current_line, line, "Section continues after 'S' delimeter")
         break #Only need to throw this error once
       end
@@ -59,7 +59,7 @@ class AreaData < Section
       when "G"
         parse_group_exp_line line
       when "S"
-        @used_lines << "S"
+        section_end = true
       else
         err(current_line, line, "Invalid AREADATA line")
       end
@@ -67,6 +67,7 @@ class AreaData < Section
       @current_line += 1
 
       err(@current_line, nil, "Kspawn line lacks terminating ~") if @kspawn_multiline
+      err(@current_line, nil, "#AREADATA lacks terminating S") unless section_end
       @errors
     end
   end # parse
