@@ -30,4 +30,28 @@ module TheTroubleWithTildes
     end
   end
 
+  # TODO: incorporate this, as it'll be cleaner than using all the separate ones
+  def validate_tilde(line, line_number, options={})
+    options = {name: "Line"}.merge(options)
+    if options[:absent]
+      err(line_number, line, "#{options[:name]} has no terminating ~")
+      options[:absent].call if options[:absent].is_a? Proc
+    end
+
+    if options[:absent_or_spans]
+      err(line_number, line, "#{options[:name]} has no terminating ~ or spans multiple lines")
+      options[:absent_or_spans].call if options[:absent_or_spans].is_a? Proc
+    end
+
+    if options[:extra_text]
+      err(line_number, line, "#{opeions[:name]} has invalid text after terminating ~")
+      options[:extra_text].call if options[:extra_text].is_a? Proc
+    end
+
+    if options[:not_alone]
+      ugly(line_number, line, "#{options[:name]}'s terminating ~ should be on its own line")
+      options[:not_alone].call if options[:not_alone].is_a? Proc
+    end
+  end
+
 end
