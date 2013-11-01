@@ -98,30 +98,84 @@ class Mobile < LineByLineObject
       # and redo the block on the current line
       @expectation = :act_aff_align
       return :redo
+    else
+      @description ||= ""
+      @description << line
     end
-    if trailing_tilde? line
-      ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
+    if has_tilde? line
+      @expectation = :act_aff_align
+      if trailing_tilde? line
+        ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
+      else
+        err(@current_line, line, tilde(:extra_text, "Description"))
+      end
     end
-    @expectation = :act_aff_align if has_tilde? line
   end
 
   def parse_act_aff_align line
+    return if invalid_blank_line? line
+
+    err(@current_line, line, "Line lacks terminating S") unless line.end_with?("S")
+    items = line.split
+    if items.length == 4
+      if items[0] =~ Bits.pattern
+        @act = Bits.new(items[0])
+        warn(@current_line, line, "ACT_NPC is not set") unless @act.bit? 1
+        err(@current_line, line, "Act flag is not a power of 2") if @act.error?
+      else
+        err(@current_line, line, "Bad act flags")
+      end
+      if items[1] =~ Bits.pattern
+        @aff = Bits.new(items[1])
+        err(@current_line, line, "Affect flag is not a power of 2") if @aff.error?
+      else
+        err(@current_line, line, "Bad affect flags")
+      end
+      if m = items[2].match(/(-?\d+\b)/)
+        @align = m[1].to_i
+        err(@current_line, line, "Alignment out of bounds -1000 to 1000") unless @align.between?(-1000, 1000)
+      else
+        err(@current_line, line, "Bad alignment")
+      end
+    else
+      err(@current_line, line, "Line should read: <act> <aff> <align> S")
+    end
 
     @expectation = :level
   end
 
   def parse_level line
-
+    return if invalid_blank_line? line
+    if m = line.match(/^(\d+) +\d+ +\d+$/)
+      @level = m[1].to_i
+    else
+      unless line =~ /^\d+\b/
+        err(@current_line, line, "Bad \"level\" field")
+      else
+        err(@current_line, line, "Line should follow syntax: <level:#> 0 0")
+      end
+    end
     @expectation = :constant
   end
 
   def parse_constant line
-
+    return if invalid_blank_line? line
+    # Technically the line doesn't have to read 0d0+0 0d0+0 0 0, any numbers
+    # will do, though they have no effect.
+    unless line =~ /^\d+d\d+\+\d+ +\d+d\d+\+\d+ +\d+ +\d+$/i
+      err(@current_line, line, "Line should read: 0d0+0 0d0+0 0 0")
+    end
     @expectation = :sex
   end
 
   def parse_sex line
-
+    return if invalid_blank_line? line
+    if m = line.match(/^\d+ +\d+ +(\d+)$/)
+      @sex = m[1].to_i
+      err(@current_line, line, "Sex out of bounds 0 to 2") unless @sex.between?(0,SEX_MAX)
+    else
+      err(@current_line, line, "Line should follow syntax: 0 0 <sex:#>")
+    end
     @expectation = :misc
   end
 
