@@ -62,6 +62,7 @@ require_relative 'avcolors'
 require './lib/area_header.rb'
 require './lib/area_data.rb'
 require './lib/helps.rb'
+require './lib/mobiles.rb'
 
 class Area
 	attr_reader :name, :errors, :mobiles, :objects, :rooms, :resets, :specials
