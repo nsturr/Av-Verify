@@ -54,7 +54,7 @@
 # date after a game update, look in this file first.
 require_relative 'avconstants'
 # Handy methods for breaking down pipe|separated|bitfields:
-require_relative 'bits'
+require_relative 'lib/bits'
 # Adds ANSI color codes to terminal output in AVATAR parlance. I.e.:
 # puts "Oh my god my hair is on fire! Better send " + "Snikt".BR + " a tell!"
 require_relative 'avcolors'
