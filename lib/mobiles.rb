@@ -1,6 +1,7 @@
 require_relative "vnum_section.rb"
 require_relative "modules/tilde.rb"
 require_relative "modules/has_apply_flag.rb"
+require_relative "modules/has_quoted_keywords.rb"
 require_relative "line_by_line_object.rb"
 require_relative "bits.rb"
 
@@ -26,6 +27,7 @@ end
 
 class Mobile < LineByLineObject
   include HasApplyFlag
+  include HasQuotedKeywords
 
   ATTRIBUTES = [:vnum, :name, :short_desc, :long_desc, :description, :act, :aff,
     :align, :level, :sex, :race, :klass, :apply, :team, :kspawn]
@@ -68,7 +70,8 @@ class Mobile < LineByLineObject
     else
       err(@current_line, line, tilde(:absent_or_spans, "Mob name"))
     end
-    @name = line[/\A[^~]*/].split
+
+    @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "mob")
     @expectation = :short_desc
   end
 

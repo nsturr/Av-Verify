@@ -74,7 +74,7 @@ class Objekt < LineByLineObject
     else
       err(@current_line, line, tilde(:absent_or_spans, "Object name"))
     end
-    @name = line[/\A[^~]*/].split
+    @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "object")
     @expectation = :short_desc
   end
 
