@@ -1,6 +1,22 @@
 require_relative 'section.rb'
 require_relative 'modules/tilde.rb'
 
+# Helps section and HelpEntry classes contained within this file
+
+# Helps section follows this pattern:
+#
+# #HELPS
+# \d+ keyword 'multiple keywords'~
+# Text for 0 or more lines
+# ~
+# 0$~
+#
+# The delimeter 0$~ sometimes has a space between the 0 and the $
+# The tilde closing off a help file text can be on the same line as the
+# text, but will throw a warning (it's ugly). There can be many blocks
+# of help files between #HELPS and 0$~ as long as they have both a
+# header with a level and a body.
+
 class Helps < Section
 
   attr_reader :help_files
@@ -12,16 +28,14 @@ class Helps < Section
     @name = "HELPS"
 
     @help_files = []
-
     slice_first_line # Takes off section name header
-
     split_help_files
   end
 
   def split_help_files
 
     # grabs the delimeter and whatever (erroneous) content is after it
-    @delimeter = slice_delimeter("0 ?\\$~")
+    @delimeter = slice_delimeter
 
     expect_header = true
     help_body = ""
@@ -56,8 +70,8 @@ class Helps < Section
     if @delimeter.nil?
       err(@current_line, nil, "#HELPS section lacks terminating 0$~")
     else
-      unless @delimeter.rstrip =~ /\A0 ?\$~\z/
-        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter, "\\A0 ?\\$~")
+      unless @delimeter.rstrip =~ /#{Helps.delimeter(:start)}\z/
+        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter)
         err(line_num, bad_line, "#HELPS section continues after terminating 0$~")
       end
     end
@@ -83,7 +97,8 @@ class HelpFile
 
     first_line = @contents.slice!(/\A.*(?:\n|\Z)/).strip
 
-    first_line.match(/\A(\d+)\s+/) do |m|
+    # N.B. Help file level can be negative
+    first_line.match(/\A(-?\d+)\s+/) do |m|
       @level = m[1].to_i
 
       keywords = m.post_match
@@ -107,7 +122,7 @@ class HelpFile
 
     end # if first line starts with a number
     if self.level.nil?
-      err(@current_line, first_line, "Malformed help header; should start with a number")
+      err(@current_line, first_line, "Help file doesn't start with a level")
     end
 
     # First line done with. Onto the body.

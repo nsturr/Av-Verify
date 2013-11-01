@@ -24,18 +24,18 @@ class Section
     @contents.slice!(/\A.*(?:\n|\Z)/)
   end
 
-  def slice_delimeter(delim)
-    @contents.slice!(/^#{delim}.*\z/m)
+  def slice_delimeter
+    @contents.slice!(/^#{self.class.delimeter}.*\z/m)
   end
 
   # returns an array of offending line and line number
-  def invalid_text_after_delimeter(line_number, text, delim)
-    unless text =~ /#{delim}\s*?$/
+  def invalid_text_after_delimeter(line_number, text)
+    unless text =~ /#{self.class.delimeter(:string)}\s*?$/
       offending_text = text[/\A.*$/]
     else
       offending_text = text.rstrip
       # This slices off the delimeter line, leaving the \n at the end, which is good
-      offending_text.slice!(/#{delim}.*$/)
+      offending_text.slice!(/#{self.class.delimeter(:string)}.*$/)
       # This finds up to the first line with non-whitespace on it
       offending_text = offending_text[/\A.*?\S[^\n]*$/m]
       line_number += offending_text.count("\n")
