@@ -9,13 +9,18 @@ class LineByLineObject
   def initialize(contents, line_number=1)
     @contents = contents.rstrip
     @line_number = line_number
-    @expect = 0
+    @current_line = line_number
+    @errors = []
+    @expectation = :vnum
   end
 
   def parse
-    puts "#{@contents[/\A.*$/]} : #{@line_number}"
-    line_type = self.class.LINES[@expect]
-    self.send("parse_#{line_type}")
+    @contents.each_line do |line|
+      # puts "#{@expectation}: #{line}"
+      self.send("parse_#{@expectation}", line.rstrip)
+      @current_line += 1
+    end
+    # puts "##{@vnum} : #{@line_number} : #{name.join(" ")}"
   end
 
 end

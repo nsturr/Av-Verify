@@ -14,12 +14,15 @@ module TheTroubleWithTildes
 
   def nab_tilde line
     line.slice!(/\s*~.*\z/)
+    line
   end
 
   def tilde(sym, description="Line")
     case sym
     when :absent
-      "#{description} lacks terminating ~"
+      "#{description} has no terminating ~"
+    when :absent_or_spans
+      "#{description} has no terminating ~ or spans multiple lines"
     when :extra_text
       "#{description} has invalid text after terminating ~"
     when :not_alone
