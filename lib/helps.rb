@@ -5,6 +5,8 @@ class Helps < Section
 
   attr_reader :help_files
 
+  @section_delimeter = "0 ?\\$~"
+
   def initialize(contents, line_number)
     super(contents, line_number)
     @name = "HELPS"

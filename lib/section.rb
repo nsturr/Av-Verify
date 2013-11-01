@@ -5,15 +5,19 @@ class Section
 
   attr_reader :line_number, :name
 
+  def self.delimeter(*options)
+    if @section_delimeter
+      delim = @section_delimeter
+      delim += "\\A" if options.include? :start
+      options.include?(:string) ? delim : /#{delim}/
+    end
+  end
+
   def initialize(contents, line_number=1)
     @line_number = line_number
     @current_line = line_number
     @contents = contents.rstrip
     @errors = []
-  end
-
-  def parse
-    puts "#{self.class} doesn't implement a parse method. Notify your nearest Scevine immediately."
   end
 
   def slice_first_line

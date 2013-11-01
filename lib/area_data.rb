@@ -2,6 +2,8 @@ require_relative 'section.rb'
 
 class AreaData < Section
 
+  @section_delimeter = "^S"
+
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @name = "AREADATA"
