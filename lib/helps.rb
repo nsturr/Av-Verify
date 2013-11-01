@@ -11,17 +11,15 @@ class Helps < Section
 
     @help_files = []
 
-    # This just takes off the section name header
-    slice_first_line
-    #@current_line += 1
-
-    # grabs the delimeter and whatever (erroneous) content is after it
-    @delimeter = slice_delimeter("0 ?\\$~")
+    slice_first_line # Takes off section name header
 
     split_help_files
   end
 
   def split_help_files
+
+    # grabs the delimeter and whatever (erroneous) content is after it
+    @delimeter = slice_delimeter("0 ?\\$~")
 
     expect_header = true
     help_body = ""
@@ -52,14 +50,13 @@ class Helps < Section
       @errors += help_file.errors
     end
 
+    @current_line += 1
     if @delimeter.nil?
-
+      err(@current_line, nil, "#HELPS section lacks terminating 0$~")
     else
       unless @delimeter.rstrip =~ /\A0 ?\$~\z/
-        # TODO: ensure that this always locates the invalid text
-        # (It doesn't if the invalid text is on another line after the delim)
-        line = @delimeter[/\A.*$/]
-        err(@current_line, line, "Invalid text after terminating 0$~")
+        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter, "\\A0 ?\\$~")
+        err(line_num, bad_line, "#HELPS section continues after terminating 0$~")
       end
     end
 
