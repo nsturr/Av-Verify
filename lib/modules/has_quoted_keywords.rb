@@ -7,7 +7,7 @@ module HasQuotedKeywords
     until keyword_line.empty?
       # This regex matches either the first whole word, or the first single-quoted
       # block of words, including ones that are missing a closing quote
-      parsed_keywords << keyword_line.slice!(/\A(?:\w+|'.*?(?:'|\z))\s*/).rstrip
+      parsed_keywords << keyword_line.slice!(/\A(?:[^\s']+|'.*?(?:'|\z))\s*/).rstrip
     end
 
     validate_keywords(parsed_keywords, line)
