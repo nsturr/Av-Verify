@@ -2,6 +2,8 @@
 
 Area and Prog verifiers for AVATAR Mud, implemented in Ruby.
 
+Switch over to the "classify" branch for the (yet unfinished) newer version, which is more modular.
+
 ## vArea
 
 Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
