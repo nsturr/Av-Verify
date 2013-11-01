@@ -1,5 +1,6 @@
 require_relative 'section.rb'
 require_relative 'modules/tilde.rb'
+require_relative 'modules/has_quoted_keywords.rb'
 
 # Helps section and HelpEntry classes contained within this file
 
@@ -83,6 +84,7 @@ end
 class HelpFile
   include Parsable
   include TheTroubleWithTildes
+  include HasQuotedKeywords
 
   attr_reader :level, :keywords, :body, :line_number
 
@@ -109,16 +111,8 @@ class HelpFile
       end
       nab_tilde(keywords)
 
-      # Start grabbing keywords
-      parsed_keywords = []
-      until keywords.empty?
-        # This regex matches either the first whole word, or the first single-quoted
-        # block of words, including ones that are missing a closing quote
-        parsed_keywords << keywords.slice!(/\A(?:\w+|'.*?(?:'|\z))\s*/).rstrip
-      end
-
-      @keywords = parsed_keywords
-      validate_keywords(first_line)
+      # see HasQuotedKeywords module for details
+      @keywords = parse_quoted_keywords(keywords, first_line)
 
     end # if first line starts with a number
     if self.level.nil?
@@ -136,20 +130,6 @@ class HelpFile
       ugly(@current_line, end_line, tilde(:not_alone))
     end
 
-  end
-
-  def validate_keywords(line)
-    # words that should never be keywords---they're probably part of a quoted block
-    # that was missing its quotes
-    watch_words = %w( and he her hers his if in it of on or she the with )
-
-    if @keywords.any? { |keyword| keyword.count("'") == 1 }
-      err(@current_line, line, "Keywords missing closing quote")
-    end
-
-    if @keywords.any? { |keyword| watch_words.include? keyword.downcase }
-      warn(@current_line, line, "Common word detected as a keyword. Missing quotes?")
-    end
   end
 
 end
