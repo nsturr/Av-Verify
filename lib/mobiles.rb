@@ -20,14 +20,10 @@ end
 
 class Mobile < LineByLineObject
 
-  LINES = [:vnum, :name, :short_desc, :long_desc, :description, :act, :aff,
+  ATTRIBUTES = [:vnum, :name, :short_desc, :long_desc, :description, :act, :aff,
     :align, :level, :sex, :race, :klass, :apply, :team, :kspawn]
 
-  def self.LINES
-    LINES
-  end
-
-  attr_reader(:line_number, *LINES)
+  attr_reader(:line_number, *ATTRIBUTES)
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
@@ -47,17 +43,13 @@ class Mobile < LineByLineObject
   end
 
   def parse_name line
-    if line.empty?
-      err(@current_line, nil, "Invalid blank line in mob keywords")
-      @current_line += 1
+    return if invalid_blank_line? line
+    if has_tilde? line
+      err(@current_line, line, tilde(:extra_text, "Mob name")) unless trailing_tilde? line
     else
-      if has_tilde? line
-        err(@current_line, line, tilde(:extra_text, "Mob name")) unless trailing_tilde? line
-      else
-        err(@current_line, line, tilde(:absent_or_spans, "Mob name"))
-      end
-      @name = line[/\A[^~]*/].split
+      err(@current_line, line, tilde(:absent_or_spans, "Mob name"))
     end
+    @name = line[/\A[^~]*/].split
     @expectation = :short_desc
   end
 
@@ -79,6 +71,10 @@ class Mobile < LineByLineObject
   def parse_long_desc line
     ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
     @long_line += 1
+
+    @long_desc ||= ""
+    @long_desc << line
+
     if has_tilde? line
       @expectation = :description
       if line =~ /~./
