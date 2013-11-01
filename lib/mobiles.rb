@@ -1,5 +1,6 @@
 require_relative "vnum_section.rb"
 require_relative "modules/tilde.rb"
+require_relative "line_by_line_object.rb"
 
 class Mobiles < VnumSection
 
@@ -16,23 +17,63 @@ class Mobiles < VnumSection
 
 end
 
-class Mobile
-  include Parsable
-  include TheTroubleWithTildes
+class Mobile < LineByLineObject
 
-  attr_reader :line_number, :vnum, :name, :short_desc, :long_desc,
-    :description, :act, :aff, :align, :level, :sex, :race, :class,
-    :apply, :team, :kspawn
+  LINES = [:vnum, :name, :short_desc, :long_desc, :description, :act, :aff,
+    :align, :level, :sex, :race, :klass, :apply, :team, :kspawn]
 
-  def initialize(contents, line_number=1)
-    @contents = contents
-    @line_number = line_number
-
-    puts "#{contents[/\A.*$/]} : #{line_number}"
+  def self.LINES
+    LINES
   end
 
-  def parse
+  attr_reader(:line_number, *LINES)
 
+  def parse_vnum
+  end
+
+  def parse_keywords
+  end
+
+  def parse_name
+  end
+
+  def parse_short_desc
+  end
+
+  def parse_long_desc
+  end
+
+  def parse_description
+  end
+
+  def parse_act
+  end
+
+  def parse_aff
+  end
+
+  def parse_align
+  end
+
+  def parse_level
+  end
+
+  def parse_sex
+  end
+
+  def parse_race
+  end
+
+  def parse_klass
+  end
+
+  def parse_apply
+  end
+
+  def parse_team
+  end
+
+  def parse_kspawn
   end
 
 end
