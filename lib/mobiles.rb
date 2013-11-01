@@ -1,11 +1,14 @@
 require_relative "vnum_section.rb"
 require_relative "modules/tilde.rb"
+require_relative "modules/has_apply_flag.rb"
 require_relative "line_by_line_object.rb"
 require_relative "bits.rb"
 
 class Mobiles < VnumSection
 
   @section_delimeter = "^#0\\b" # N.B. some valid vnums regrettably begin with a 0
+
+  attr_reader :mobiles
 
   def self.child_class
     Mobile
@@ -14,11 +17,13 @@ class Mobiles < VnumSection
   def initialize(contents, line_number)
     super(contents, line_number)
     @name = "MOBILES"
+    @mobiles = {}
   end
 
 end
 
 class Mobile < LineByLineObject
+  include HasApplyFlag
 
   ATTRIBUTES = [:vnum, :name, :short_desc, :long_desc, :description, :act, :aff,
     :align, :level, :sex, :race, :klass, :apply, :team, :kspawn]
@@ -28,6 +33,18 @@ class Mobile < LineByLineObject
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @long_line = 0 # For determining how many lines the long_desc spans
+
+    # Need the following instantiated as we'll be shifting onto them later
+    @long_desc = ""
+    @description = ""
+    @apply = Hash.new(0)
+  end
+
+  def parse
+    super
+    if @expectation == :multiline_kspawn
+      err(@current_line, nil, "Killspawn lacks terminating ~ between lines #{@last_multiline} and #{@current_line}")
+    end
   end
 
   def parse_vnum line
@@ -72,7 +89,6 @@ class Mobile < LineByLineObject
     ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
     @long_line += 1
 
-    @long_desc ||= ""
     @long_desc << line
 
     if has_tilde? line
@@ -99,7 +115,6 @@ class Mobile < LineByLineObject
       @expectation = :act_aff_align
       return :redo
     else
-      @description ||= ""
       @description << line
     end
     if has_tilde? line
@@ -179,12 +194,98 @@ class Mobile < LineByLineObject
     @expectation = :misc
   end
 
+  # This method parses Race, Class, Team, Apply, and Kspawn lines, as
+  # they can occur in any order (for kspawn, it hands off to another method)
   def parse_misc line
+    return if invalid_blank_line? line
+
+    case line.lstrip[0]
+    when "R"
+      err(@current_line, line, "Mob's race already defined") && return if self.race
+      if m = line.match(/^R +(-?\d+)/)
+        @race = m[1].to_i
+        err(@current_line, line, "Mob race out of bounds 0 to #{RACE_MAX}") unless @race.between?(0, RACE_MAX)
+      else
+        err(@current_line, line, "Invalid (non-numeric) \"race\" field")
+      end
+      err(@current_line, line, "Invalid text after \"race\" field") unless line =~ /^R +-?\d+$/
+
+    when"C"
+      err(@current_line, line, "Mob's class already defined") && return if self.klass
+      if m = line.match(/^C +(-?\d+)/)
+        @klass = m[1].to_i
+        err(@current_line, line, "Mob class out of bounds 0 to #{CLASS_MAX}") unless @klass.between?(0, CLASS_MAX)
+      else
+        err(@current_line, line, "Invalid (non-numeric) \"class\" field")
+      end
+      err(@current_line, line, "Invalid text after \"class\" field") unless line =~ /^C +-?\d+$/
+
+    when "L"
+      err(@current_line, line, "Mob's team already defined") && return if self.team
+      if m = line.match(/^L +(-?\d+)/)
+        @team = m[1].to_i
+        err(@current_line, line, "Mob team out of bounds 0 to #{TEAM_MAX}") unless @team.between?(0, TEAM_MAX)
+        err(@current_line, line, "Invalid text after \"team\" field") unless line =~ /^L +-?\d+$/
+      else
+        err(@current_line, line, "Invalid (non-numeric) \"team\" field")
+      end
+
+    when "A"
+      # see HasApplyFlag module for this
+      apply_key, apply_value = parse_apply_flag(line, @current_line)
+      unless apply_key.nil?
+        @apply[apply_key] += apply_value
+      end
+
+    when "K"
+      err(@current_line, line, "Mob's kspawn already defined") && return if self.kspawn
+      @last_multiline = @current_line
+      # Split line into: K condition type spawn mob text...
+      # Also toss out the leading 'K'
+      condition, type, spawn, room, text = line.split(" ", 6)[1..-1]
+      @kspawn = {
+        condition: condition,
+        type: Bits.new(type),
+        spawn: spawn,
+        room: room,
+        text: text
+      }
+
+      if [condition, type, spawn, room].any? { |el| el.nil? }
+        err(@current_line, line, "Not enough tokens in kspawn line")
+      else
+        unless self.kspawn[:condition] =~ /^\d+$/
+          err(@current_line, line, "Invalid (negative or non-numeric) kspawn condition")
+        end
+
+        if self.kspawn[:type].error?
+          err(@current_line, line, "Invalid (incomplete or not power of 2) kspawn type bitfield")
+        end
+
+        unless self.kspawn[:spawn] =~ /^-1$|^\d+$/
+          err(@current_line, line, "Invalid (non-numeric) kspawn vnum")
+        end
+
+        unless self.kspawn[:room] =~ /^-1$|^\d+$/
+          err(@current_line, line, "Invalid (non-numeric or less than -1) kspawn location")
+        end
+      end
+
+      # The line's last field is text with can span multiple lines. If there's no tilde,
+      # expect the next line to just be more text that can be ignored until a tilde
+      # is found.
+      @expectation = :multiline_kspawn unless line.end_with?("~")
+    else
+      err(@current_line, line, "Invalid extra field (expecting R, C, L, A, or K)")
+    end
 
   end
 
-  def parse_kspawn line
-
+  def parse_multiline_kspawn line
+    self.kspawn[:text] << "\n" + line
+    ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
+    # This type is only ever expected if a killspawn text field spans multiple lines
+    @expectation = :misc if line.end_with?("~")
   end
 
 end
