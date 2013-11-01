@@ -8,8 +8,6 @@ class Mobiles < VnumSection
 
   @section_delimeter = "^#0\\b" # N.B. some valid vnums regrettably begin with a 0
 
-  attr_reader :mobiles
-
   def self.child_class
     Mobile
   end
@@ -18,6 +16,10 @@ class Mobiles < VnumSection
     super(contents, line_number)
     @name = "MOBILES"
     @mobiles = {}
+  end
+
+  def mobiles
+    @entries
   end
 
 end
@@ -34,7 +36,7 @@ class Mobile < LineByLineObject
     super(contents, line_number)
     @long_line = 0 # For determining how many lines the long_desc spans
 
-    # Need the following instantiated as we'll be shifting onto them later
+    # Need the following instantiated as we'll be adding to them later
     @long_desc = ""
     @description = ""
     @apply = Hash.new(0)

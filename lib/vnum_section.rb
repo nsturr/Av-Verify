@@ -4,7 +4,8 @@ class VnumSection < Section
 
   def initialize(contents, line_number)
     super(contents, line_number)
-    @entries = []
+    @raw_entries = [] # Unparsed, has no VNUM yet, etc.
+    @entries = {} # Parsed and validated, keyed by VNUM
     slice_first_line
     split_entries
   end
@@ -23,15 +24,16 @@ class VnumSection < Section
         err(@current_line, entry[/\A.*$/], "Invalid #{self.class.name} VNUM")
         next
       end
-      @entries << self.class.child_class.new(entry, @current_line)
+      @raw_entries << self.class.child_class.new(entry, @current_line)
       @current_line += entry.count("\n")
     end
   end
 
   def parse
 
-    @entries.each do |entry|
+    @raw_entries.each do |entry|
       entry.parse
+      @entries[entry.vnum] = entry
       @errors += entry.errors
     end
 
