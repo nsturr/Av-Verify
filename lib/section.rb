@@ -8,7 +8,7 @@ class Section
   def self.delimeter(*options)
     if @section_delimeter
       delim = @section_delimeter
-      delim += "\\A" if options.include? :start
+      delim.prepend("\\A") if options.include? :start
       options.include?(:string) ? delim : /#{delim}/
     end
   end
