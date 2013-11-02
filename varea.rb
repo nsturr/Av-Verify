@@ -63,6 +63,8 @@ require './lib/area_header.rb'
 require './lib/area_data.rb'
 require './lib/helps.rb'
 require './lib/mobiles.rb'
+require './lib/objects.rb'
+require './lib/rooms.rb'
 
 class Area
 	attr_reader :name, :errors, :mobiles, :objects, :rooms, :resets, :specials
