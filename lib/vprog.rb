@@ -575,7 +575,7 @@ class MobProg
 				section_end = true
 				trigger[:end] = true
 				err(current_line, nil, "Section #ENDs inside an incomplete mobprog!") unless last_line == :nothing
-				err(current_line, line, "Invalid text on same line as \#End delimeter") unless line.upcase =~ /^#END$/
+				err(current_line, line, "Invalid text on same line as \#End delimiter") unless line.upcase =~ /^#END$/
 			else
 				err(current_line, line, "Invalid line, expected #{expected[last_line]}")
 			end

@@ -1,7 +1,7 @@
 # Avatar area file verifier by Scevine.
 #
 # This verifier depends on the input file having a minimum of proper
-# formatting, i.e. #SECTIONs, #VNUMs, and delimeters starting on their
+# formatting, i.e. #SECTIONs, #VNUMs, and delimiters starting on their
 # own lines, text fields sticking to their own lines, etc. (You get
 # this from the area builder anyway, so it shouldn't be an issue.)
 #

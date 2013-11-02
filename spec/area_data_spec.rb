@@ -10,13 +10,13 @@ describe AreaData do
   it "detects invalid text after its terminating S" do
     area_data.contents << "\nHi there"
 
-    expect_one_error(area_data, AreaData.err_msg(:continues_after_delimeter))
+    expect_one_error(area_data, AreaData.err_msg(:continues_after_delimiter))
   end
 
   it "detects a missing terminating S" do
     area_data.contents.chop!
 
-    expect_one_error(area_data, AreaData.err_msg(:no_delimeter))
+    expect_one_error(area_data, AreaData.err_msg(:no_delimiter))
   end
 
   it "detects invalid line types" do

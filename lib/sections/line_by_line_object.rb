@@ -38,7 +38,7 @@ class LineByLineObject
 
   def invalid_text_after_end? line
     if @section_end && !line.empty?
-      err(@current_line, line, "Section continues after ending delimeter")
+      err(@current_line, line, "Section continues after ending delimiter")
       return true
     end
     false

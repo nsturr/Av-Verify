@@ -12,7 +12,7 @@ class VnumSection < Section
 
   def split_entries
 
-    @delimeter = slice_delimeter
+    @delimiter = slice_delimiter
 
     @current_line += 1
     section_end = false
@@ -37,11 +37,11 @@ class VnumSection < Section
       @errors += entry.errors
     end
 
-    if @delimeter.nil?
+    if @delimiter.nil?
       err(@current_line, nil, "##{self.class.name} section lacks terminating #0")
     else
-      unless @delimeter.rstrip =~ /#{self.class.delimeter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter)
+      unless @delimiter.rstrip =~ /#{self.class.delimiter(:start)}\z/
+        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
         err(line_num, bad_line, "##{self.class.name} section continues after terminating #0")
       end
     end

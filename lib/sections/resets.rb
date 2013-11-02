@@ -5,7 +5,7 @@ class Resets < Section
 
   attr_reader :resets, :reset_counts, :errors
 
-  @section_delimeter = "^S"
+  @section_delimiter = "^S"
 
   def initialize(contents, line_number)
     super(contents, line_number)
@@ -23,7 +23,7 @@ class Resets < Section
   end
 
   def split_resets
-    @delimeter = slice_delimeter
+    @delimiter = slice_delimiter
 
     # Conveniently has a line-by-line structure to it. Easy street.
     @contents.each_line do |line|
@@ -76,11 +76,11 @@ class Resets < Section
     end
 
     @current_line += 1
-    if @delimeter.nil?
+    if @delimiter.nil?
       err(@current_line, nil, "#RESETS section lacks terminating S")
     else
-      unless @delimeter.rstrip =~ /#{Resets.delimeter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter)
+      unless @delimiter.rstrip =~ /#{Resets.delimiter(:start)}\z/
+        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
         err(line_num, bad_line, "#RESETS section continues after terminating S")
       end
     end

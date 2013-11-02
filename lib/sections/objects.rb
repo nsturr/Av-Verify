@@ -7,7 +7,7 @@
 
 class Objects < VnumSection
 
-  @section_delimeter = "^#0\\b" # N.B. some valid vnums regrettably begin with a 0
+  @section_delimiter = "^#0\\b" # N.B. some valid vnums regrettably begin with a 0
 
   def self.child_class
     Objekt

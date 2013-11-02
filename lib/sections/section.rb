@@ -11,9 +11,9 @@ class Section
     @ERROR_MESSAGES[message]
   end
 
-  def self.delimeter(*options)
-    if @section_delimeter
-      delim = @section_delimeter
+  def self.delimiter(*options)
+    if @section_delimiter
+      delim = @section_delimiter
       delim.prepend("\\A") if options.include? :start
       options.include?(:string) ? delim : /#{delim}/
     end
@@ -30,18 +30,18 @@ class Section
     @contents.slice!(/\A.*(?:\n|\Z)/)
   end
 
-  def slice_delimeter
-    @contents.slice!(/^#{self.class.delimeter}.*\z/m)
+  def slice_delimiter
+    @contents.slice!(/^#{self.class.delimiter}.*\z/m)
   end
 
   # returns an array of offending line and line number
-  def invalid_text_after_delimeter(line_number, text)
-    unless text =~ /#{self.class.delimeter(:string)}\s*?$/
+  def invalid_text_after_delimiter(line_number, text)
+    unless text =~ /#{self.class.delimiter(:string)}\s*?$/
       offending_text = text[/\A.*$/]
     else
       offending_text = text.rstrip
-      # This slices off the delimeter line, leaving the \n at the end, which is good
-      offending_text.slice!(/#{self.class.delimeter(:string)}.*$/)
+      # This slices off the delimiter line, leaving the \n at the end, which is good
+      offending_text.slice!(/#{self.class.delimiter(:string)}.*$/)
       # This finds up to the first line with non-whitespace on it
       offending_text = offending_text[/\A.*?\S[^\n]*$/m]
       line_number += offending_text.count("\n")

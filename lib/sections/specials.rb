@@ -2,7 +2,7 @@ require_relative 'section'
 
 class Specials < Section
 
-  @section_delimeter = "^S"
+  @section_delimiter = "^S"
 
   attr_reader :specials, :line_number, :errors
 
@@ -17,7 +17,7 @@ class Specials < Section
   end
 
   def split_specials
-    @delimeter = slice_delimeter
+    @delimiter = slice_delimiter
 
     @contents.each_line do |line|
       @current_line += 1
@@ -39,11 +39,11 @@ class Specials < Section
     # TODO: should be able to dry up the code below. Into Section maybe?
 
     @current_line += 1
-    if @delimeter.nil?
+    if @delimiter.nil?
       err(@current_line, nil, "#SPECIALS section lacks terminating 0$~")
     else
-      unless @delimeter.rstrip =~ /#{Specials.delimeter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter)
+      unless @delimiter.rstrip =~ /#{Specials.delimiter(:start)}\z/
+        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
         err(line_num, bad_line, "#SPECIALS section continues after terminating S")
       end
     end

@@ -12,7 +12,7 @@ require_relative '../helpers/has_quoted_keywords'
 # ~
 # 0$~
 #
-# The delimeter 0$~ sometimes has a space between the 0 and the $
+# The delimiter 0$~ sometimes has a space between the 0 and the $
 # The tilde closing off a help file text can be on the same line as the
 # text, but will throw a warning (it's ugly). There can be many blocks
 # of help files between #HELPS and 0$~ as long as they have both a
@@ -20,23 +20,27 @@ require_relative '../helpers/has_quoted_keywords'
 
 class Helps < Section
 
+  @ERROR_MESSAGES = {
+    no_delimiter: "#HELPS section lacks terminating 0$~",
+    continues_after_delimiter: "#HELPS section continues after terminating 0$~"
+  }
+
   attr_reader :help_files
 
-  @section_delimeter = "0 ?\\$~"
+  @section_delimiter = "0 ?\\$~"
 
-  def initialize(contents, line_number)
+  def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "HELPS"
 
     @help_files = []
     slice_first_line # Takes off section name header
-    split_help_files
   end
 
   def split_help_files
 
-    # grabs the delimeter and whatever (erroneous) content is after it
-    @delimeter = slice_delimeter
+    # grabs the delimiter and whatever (erroneous) content is after it
+    @delimiter = slice_delimiter
 
     expect_header = true
     help_body = ""
@@ -44,7 +48,7 @@ class Helps < Section
 
     @contents.each_line do |line|
       @current_line += 1
-      help_body << line
+      help_body << line.dup
 
       if expect_header
         line_number = @current_line
@@ -61,19 +65,20 @@ class Helps < Section
   end
 
   def parse
+    split_help_files
 
     @help_files.each do |help_file|
-      help_file.parse
+      # help_file.parse
       @errors += help_file.errors
     end
 
     @current_line += 1
-    if @delimeter.nil?
-      err(@current_line, nil, "#HELPS section lacks terminating 0$~")
+    if @delimiter.nil?
+      err(@current_line, nil, Helps.err_msg(:no_delimiter))
     else
-      unless @delimeter.rstrip =~ /#{Helps.delimeter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter)
-        err(line_num, bad_line, "#HELPS section continues after terminating 0$~")
+      unless @delimiter.rstrip =~ /#{Helps.delimiter(:start)}\z/
+        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
+        err(line_num, bad_line, Helps.err_msg(:continues_after_delimiter))
       end
     end
 

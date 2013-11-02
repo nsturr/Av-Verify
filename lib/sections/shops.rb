@@ -6,7 +6,7 @@ require_relative "line_by_line_object"
 
 class Shops < Section
 
-  @section_delimeter = "^0\\b[^\\d\\n]*$"
+  @section_delimiter = "^0\\b[^\\d\\n]*$"
 
   attr_reader :shops
 
@@ -21,7 +21,7 @@ class Shops < Section
   end
 
   def split_shops
-    @delimeter = slice_delimeter
+    @delimiter = slice_delimiter
     # split on exactly one number in a line, maybe some invalid non-numbers after,
     # whatever. Shops sucks so much.
     @entries = @contents.split(/^(?=\d+\b[^\d]*$)/)
@@ -37,9 +37,9 @@ class Shops < Section
       @errors += shop.errors
     end
 
-    if @delimeter
-      unless @delimeter.rstrip =~ /#{Shops.delimeter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter)
+    if @delimiter
+      unless @delimiter.rstrip =~ /#{Shops.delimiter(:start)}\z/
+        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
         err(line_num, bad_line, "#SHOPS section continues after terminating 0$~")
       end
     else
