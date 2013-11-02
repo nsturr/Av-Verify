@@ -1,5 +1,5 @@
-require_relative "section.rb"
-require_relative "line_by_line_object.rb"
+require "./sections/section"
+require "./sections/line_by_line_object"
 
 # This section will be the death of me.
 # seriously, die in a fire, #shops

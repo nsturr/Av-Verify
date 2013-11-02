@@ -1,4 +1,4 @@
-require_relative 'section.rb'
+require './sections/section'
 
 class AreaData < Section
 

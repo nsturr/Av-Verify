@@ -1,9 +1,9 @@
-require_relative "vnum_section.rb"
-require_relative "modules/tilde.rb"
-require_relative "modules/has_apply_flag.rb"
-require_relative "modules/has_quoted_keywords.rb"
-require_relative "line_by_line_object.rb"
-require_relative "bits.rb"
+  require "./sections/vnum_section"
+  require "./sections/line_by_line_object"
+  require "./helpers/tilde"
+  require "./helpers/has_apply_flag"
+  require "./helpers/has_quoted_keywords"
+  require "./helpers/bits"
 
 class Objects < VnumSection
 

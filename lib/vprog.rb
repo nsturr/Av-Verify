@@ -17,8 +17,8 @@
 #   Handle $f0 variables in function CALLS when parsing the parameter
 #     Lower priority: determine if I care that much to do the above
 
-require_relative 'progconstants'
-require_relative 'avcolors'
+require './helpers/progconstants'
+require './helpers/avcolors'
 
 class MobProg
 	attr_reader :name, :t_mob, :t_room, :t_fun, :errors

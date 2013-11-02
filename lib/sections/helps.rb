@@ -1,6 +1,6 @@
-require_relative 'section.rb'
-require_relative 'modules/tilde.rb'
-require_relative 'modules/has_quoted_keywords.rb'
+require './sections/section'
+require './helpers/tilde'
+require './helpers/has_quoted_keywords'
 
 # Helps section and HelpEntry classes contained within this file
 

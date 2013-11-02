@@ -1,5 +1,5 @@
-require_relative "section.rb"
-require_relative "modules/parsable.rb"
+require "./sections/section"
+require "./helpers/parsable"
 
 class Resets < Section
 

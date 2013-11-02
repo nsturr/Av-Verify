@@ -1,4 +1,4 @@
-require_relative 'modules/parsable.rb'
+require './helpers/parsable'
 
 class Section
   include Parsable
