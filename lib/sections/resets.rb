@@ -118,7 +118,7 @@ class Reset
     wear_loc_out_of_bounds: "Wear location out of bounds 0 to #{WEAR_MAX}",
     door_out_of_bounds: "Door number out of bounds 0 to 5",
     bad_door_direction: "Invalid door direction",
-    door_state_out_of_bounds: "Door state out of bounds 0 to 8"
+    door_state_out_of_bounds: "Door state out of bounds 0 to 8",
     bad_door_state: "Invalid door state",
     number_of_exits: "Number of exits out of bounds 0 to 6",
     bad_number_of_exits: "Invalid number of exits"
