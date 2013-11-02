@@ -7,6 +7,14 @@ class Resets < Section
 
   @section_delimiter = "^S"
 
+  @ERROR_MESSAGES = {
+    reset_limit: "Mob reset limit is %i, but %i mobs load before it.",
+    wear_loc_filled: "Wear location already filled on this mob reset.",
+    reset_doesnt_follow_mob: "%s reset doesn't immediately follow a mob",
+    no_delimiter: "#RESETS section lacks terminating S",
+    continues_after_delimiter: "#RESETS section continues after terminating S"
+  }
+
   def initialize(contents, line_number)
     super(contents, line_number)
     @id = "RESETS"
@@ -33,6 +41,8 @@ class Resets < Section
       @resets << Reset.new(line.rstrip, @current_line)
     end
 
+    # TODO: we never checked for invalid text after delimiter
+
   end
 
   def parse
@@ -49,25 +59,25 @@ class Resets < Section
         @recent_mob_reset = reset
         @previous_reset_type = :mobile
         if @reset_counts[reset.vnum] >= reset.limit
-          warn(reset.line_number, reset.line, "Mob reset limit is #{reset.limit}, but #{@reset_counts[reset.vnum]} mobs load before it.")
+          warn(reset.line_number, reset.line, Resets.err_msg(:reset_limit) % [reset.limit, @reset_counts[reset.vnum]])
         end
         @reset_counts[reset.vnum] += 1
 
       when :equipment
         if @recent_mob_reset
           if @recent_mob_reset.attachments.any? { |el| el.target == reset.target && el.slot == reset.slot}
-            err(reset.line_number, reset.line, "Wear location already filled on this mob reset.")
+            err(reset.line_number, reset.line, Resets.err_msg(:wear_loc_filled))
           end
           @recent_mob_reset.attachments << reset
         end
         unless @previous_reset_type == :mobile
-          warn(reset.line_number, reset.line, "Equipment reset doesn't immediately follow a mob")
+          warn(reset.line_number, reset.line, Resets.err_msg(:reset_doesnt_follow_mob) % "Equipment")
         end
 
       when :inventory
         @recent_mob_reset.attachments << reset if @recent_mob_reset
         unless @previous_reset_type == :mobile
-          warn(reset.line_number, reset.line, "Inventory reset doesn't immediately follow a mob")
+          warn(reset.line_number, reset.line, Resets.err_msg(:reset_doesnt_follow_mob) % "Inventory")
         end
 
       else
@@ -77,11 +87,11 @@ class Resets < Section
 
     @current_line += 1
     if @delimiter.nil?
-      err(@current_line, nil, "#RESETS section lacks terminating S")
+      err(@current_line, nil, Resets.err_msg(:no_delimiter))
     else
       unless @delimiter.rstrip =~ /#{Resets.delimiter(:start)}\z/
         line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, "#RESETS section continues after terminating S")
+        err(line_num, bad_line, Resets.err_msg(:continues_after_delimiter))
       end
     end
 
@@ -91,6 +101,28 @@ end
 
 class Reset
   include Parsable
+
+  @ERROR_MESSAGES = {
+    invalid_reset: "Invalid reset (expecting M, G, E, O, P, D, R)",
+    reset_m_matches: "Line should match: M 0 <vnum> <limit> <room>",
+    reset_g_matches: "Line should match: G <0 or -#> <vnum> 0",
+    reset_e_matches: "Line should match: E <0 or -#> <vnum> 0 <wear>",
+    reset_o_matches: "Line should match: O 0 <vnum> 0 <room>",
+    reset_p_matches: "Line should match: O 0 <vnum> 0 <room>",
+    reset_r_matches: "Line should match: R 0 <vnum> <number_of_exits>",
+    negative: "%s can't be negative",
+    zero_or_negative: "%s can't be 0 or negative",
+    invalid_vnum: "Invalid %s VNUM",
+    invalid_limit: "Invalid %s spawn limit",
+    not_enough_tokens: "Not enough tokens on in %s reset line",
+    wear_loc_out_of_bounds: "Wear location out of bounds 0 to #{WEAR_MAX}",
+    door_out_of_bounds: "Door number out of bounds 0 to 5",
+    bad_door_direction: "Invalid door direction",
+    door_state_out_of_bounds: "Door state out of bounds 0 to 8"
+    bad_door_state: "Invalid door state",
+    number_of_exits: "Number of exits out of bounds 0 to 6",
+    bad_number_of_exits: "Invalid number of exits"
+  }
 
   attr_reader :line_number, :line, :vnum, :type, :target, :limit, :slot, :errors,
     :attachments
@@ -114,10 +146,11 @@ class Reset
 
   def parse
     if self.type == :invalid
-      err(@line_number, @line, "Invalid reset (expecting M, G, E, O, P, D, R)")
+      err(@line_number, @line, Reset.err_msg(:invalid_reset))
     else
       self.send("parse_#{self.type}")
     end
+    self
   end
 
   def parse_mobile
@@ -126,33 +159,33 @@ class Reset
     unless [vnum, limit, room].any? { |el| el.nil? }
 
       unless zero =~ /^-?\d+$/
-        err(@line_number, @line, "Line should match: M 0 <vnum> <limit> <room>")
+        err(@line_number, @line, Reset.err_msg(:reset_m_matches))
       end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, "Mob VNUM can't be 0 or negative") if @vnum < 1
+        err(@line_number, @line, Reset.err_msg(:zero_or_negative) % "Mob VNUM") if @vnum < 1
       else
-        err(@line_number, @line, "Invalid mob VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "mob")
       end
 
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
-        err(@line_number, @line, "Mob limit can't be negative") if @limit < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Mob limit") if @limit < 0
       else
-        err(@line_number, @line, "Invalid mob limit")
+        err(@line_number, @line, Reset.err_msg(:invalid_limit) % "mob")
       end
 
       # Sometimes comments starting with * are smooshed up against the room vnum
       if room =~ /^-?\d+\*?$/
         @target = room[/^[^\*]*/].to_i
-        err(@line_number, @line, "Target spawn room can't be negative") if @target < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Target spawn room") if @target < 0
       else
-        err(@line_number, @line, "Invalid room VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
       end
 
     else
-      err(@line_number, @line, "Not enough tokens on in mob reset line")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "mob")
     end
 
   end
@@ -165,22 +198,22 @@ class Reset
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
       else
-        err(@line_number, @line, "Invalid inventory spawn limit")
+        err(@line_number, @line, Reset.err_msg(:invalid) % "inventory spawn limit")
       end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, "Object VNUM can't be negative") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
       else
-        err(@line_number, @line, "Invalid object VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
       end
 
       # The zero doesn't actually need to be a zero, just needs to be there
       unless zero =~ /^-?\d+\*?$/
-        err(@line_number, @line, "Line should match: G <0 or -#> <vnum> 0")
+        err(@line_number, @line, Reset.err_msg(:reset_g_matches))
       end
     else
-      err(@line_number, @line, "Not enough tokens in inventory reset line")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "inventory")
     end
   end
 
@@ -192,29 +225,29 @@ class Reset
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
       else
-        err(@line_number, @line, "Invalid first token")
+        err(@line_number, @line, Reset.err_msg(:reset_e_matches))
       end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, "Object VNUM can't be negative") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
       else
-        err(@line_number, @line, "Invalid object VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
       end
 
       # The zero doesn't need to be a zero, it just needs to be there
       unless zero =~ /^-?\d+$/
-        err(@line_number, @line, "Line should match: E <0 or -#> <vnum> 0 <wear>")
+        err(@line_number, @line, Reset.err_msg(:reset_e_matches))
       end
 
       if wear =~ /^-?\d+\*?$/
         @slot = wear[/[^\*]*/].to_i
-        err(@line_number, @line, "Wear location out of bounds 0 to #{WEAR_MAX}") unless @slot.between?(0,WEAR_MAX)
+        err(@line_number, @line, Reset.err_msg(:wear_loc_out_of_bounds)) unless @slot.between?(0,WEAR_MAX)
       else
-        err(@line_number, @line, "Invalid wear location")
+        err(@line_number, @line, Reset.err_msg(:invalid) % "wear location")
       end
     else
-      err(@line_number, @line, "Not enough tokens in equipment reset line")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "equipment")
     end
   end
 
@@ -225,24 +258,24 @@ class Reset
 
       # MOOOOOOON ZEEEERO TWOOOOOO!
       unless zero =~ /^-?\d+$/ && zero_two =~ /^-?\d+$/
-        err(@line_number, @line, "Line should match: O 0 <vnum> 0 <room>")
+        err(@line_number, @line, Reset.err_msg(:reset_o_matches))
       end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, "Object VNUM can't be negative") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
       else
-        err(@line_number, @line, "Invalid object VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
       end
 
       if room =~ /^-?\d+\*?$/
         @target = room[/[^\*]*/].to_i
-        err(@line_number, @line, "Target room VNUM can't be negative") if @target < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Target room VNUM") if @target < 0
       else
-        err(@line_number, @line, "Invalid target room VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "target room")
       end
     else
-      err(@line_number, @line, "Not enough tokens in object reset line")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "object")
     end
   end
 
@@ -253,24 +286,24 @@ class Reset
 
       # MOOOOOOON ZEEEERO TWOOOOOO!
       unless zero =~ /^-?\d+$/ && zero_two =~ /^-?\d+$/
-        err(@line_number, @line, "Line should match: O 0 <vnum> 0 <room>")
+        err(@line_number, @line, Reset.err_msg(:reset_p_matches))
       end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, "Object VNUM can't be negative") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
       else
-        err(@line_number, @line, "Invalid object VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
       end
 
       if container =~ /^-?\d+\*?$/
         @target = container[/^[^*]*/].to_i
-        err(@line_number, @line, "Target container VNUM can't be negative") if @target < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Target container VNUM") if @target < 0
       else
-        err(@line_number, @line, "Invalid target container VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "Target container")
       end
     else
-      err(@line_number, @line, "Not enough tokens in container reset line")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "container")
     end
   end
 
@@ -282,26 +315,26 @@ class Reset
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, "Room VNUM can't be negative") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Room VNUM") if @vnum < 0
       else
-        err(@line_number, @line, "Invalid room VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
       end
 
       if direction =~ /^-?\d+$/
         @target = direction.to_i
-        err(@line_number, @line, "Door number out of bounds 0 to 5") unless @target.between?(0,5)
+        err(@line_number, @line, Reset.err_msg(:door_out_of_bounds)) unless @target.between?(0,5)
       else
-        err(@line_number, @line, "Invalid door direction")
+        err(@line_number, @line, Reset.err_msg(:bad_door_direction))
       end
 
       if state =~ /^-?\d+\*?$/
         @slot = state[/~[^\*]*/].to_i
-        err(@line_number, @line, "Door state out of bounds 0 to 8") unless @slot.between?(0,8)
+        err(@line_number, @line, Reset.err_msg(:door_state_out_of_bounds)) unless @slot.between?(0,8)
       else
-        err(@line_number, @line, "Invalid door state")
+        err(@line_number, @line, Reset.err_msg(:bad_door_state))
       end
     else
-      err(@line_number, @line, "Not enough tokens in door reset line")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "door")
     end
   end
 
@@ -312,24 +345,24 @@ class Reset
     unless [zero, target, number_of_exits].any? { |el| el.nil? }
 
       unless zero =~ /^-?\d+$/
-        err(@line_number, @line, "Line should match: R 0 <vnum> <number_of_exits>")
+        err(@line_number, @line, Reset.err_msg(:reset_r_matches))
       end
 
       if target =~ /^-?\d+$/
         @target = target.to_i
-        err(@line_number, @line, "Room VNUM can't be negative") if @target < 0
+        err(@line_number, @line, Reset.err_msg(:negative) % "Room VNUM") if @target < 0
       else
-        err(@line_number, @line, "Invalid target room VNUM")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "target room")
       end
 
       if number_of_exits =~ /^-?\d+\*?$/
         @slot = number_of_exits.to_i
-        err(@line_number, @line, "Number of exits out of bounds 0 to 6") unless @slot.between?(0,6)
+        err(@line_number, @line, Reset.err_msg(:door_number_out_of_bounds)) unless @slot.between?(0,6)
       else
-        err(@line_number, @line, "Invalid number of exits")
+        err(@line_number, @line, Reset.err_msg(:bad_number_of_exits))
       end
     else
-      err(@line_number, @line, "Not enough tokens in random reset line")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "random")
     end
   end
 
