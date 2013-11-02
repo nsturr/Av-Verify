@@ -11,13 +11,14 @@ class LineByLineObject
     @line_number = line_number
     @current_line = line_number
     @errors = []
-    @expectation = :vnum
   end
 
   def parse
+    @expectation = :vnum
     @contents.each_line do |line|
       result = self.send("parse_#{@expectation}", line.rstrip)
       redo if result == :redo # If we discovered it's probably a different line type
+      break if result == :break # Typically if section ended early
       @current_line += 1
     end
   end

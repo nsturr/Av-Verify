@@ -9,8 +9,6 @@ class Objects < VnumSection
 
   @section_delimeter = "^#0\\b" # N.B. some valid vnums regrettably begin with a 0
 
-  attr_reader :objects
-
   def self.child_class
     Objekt
   end
@@ -18,7 +16,6 @@ class Objects < VnumSection
   def initialize(contents, line_number)
     super(contents, line_number)
     @name = "OBJECTS"
-    @objects = {}
   end
 
   def objects
@@ -38,7 +35,6 @@ class Objekt < LineByLineObject
 
   def initialize(contents, line_number)
     super(contents, line_number)
-    @long_line = 0 # For determining how many lines the long_desc spans
 
     # Need the following instantiated as we'll be adding to them later
     @long_desc = ""
@@ -46,6 +42,11 @@ class Objekt < LineByLineObject
     @values = []
     @apply = Hash.new(0)
     @edesc = {}
+
+    # Temporary variables
+    # @recent_keywords
+    @long_line = 0 # For determining how many lines the long_desc spans
+    # @last_multiline
   end
 
   def parse
@@ -113,7 +114,7 @@ class Objekt < LineByLineObject
   def parse_adesc line
     ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
 
-    if m = line.match(/^(\d+) +#{Bits.insert} +#{Bits.insert}$/)
+    if line =~ /^(\d+) +#{Bits.insert} +#{Bits.insert}$/
       err(@current_line, line, "Doesn't look like part of an adesc. Forget a ~ somewhere?")
       @expectation = :type_extra_wear
       return :redo

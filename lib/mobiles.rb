@@ -16,7 +16,6 @@ class Mobiles < VnumSection
   def initialize(contents, line_number)
     super(contents, line_number)
     @name = "MOBILES"
-    @mobiles = {}
   end
 
   def mobiles
