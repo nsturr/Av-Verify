@@ -3,7 +3,7 @@ require_relative '../helpers/parsable'
 class Section
   include Parsable
 
-  attr_reader :line_number, :id
+  attr_reader :line_number, :id, :contents
 
   def self.err_msg(message=nil)
     return @ERROR_MESSAGES.keys unless message

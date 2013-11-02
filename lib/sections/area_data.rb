@@ -1,5 +1,6 @@
 require_relative 'section'
-require_relative '../helpers/avconstants.rb'
+require_relative '../helpers/avconstants'
+require_relative '../helpers/bits'
 
 class AreaData < Section
 
@@ -49,9 +50,6 @@ class AreaData < Section
           # However nothing but whitespace can follow that tilde!
           err(@current_line, line, AreaData.err_msg(:kspawn_text_after_tilde)) if line =~ /~.*?\S/
         end
-        # If we haven't found any tildes in this line, then the text must be continuing.
-        # Onward to the next line!
-        # @current_line += 1
         next
       end
 
@@ -85,10 +83,8 @@ class AreaData < Section
         err(@current_line, line, AreaData.err_msg(:invalid_line))
       end
 
-      # @current_line += 1
-
-      err(@current_line, nil, AreaData.err_msg(:kspawn_no_tilde)) if @kspawn_multiline
     end
+    err(@current_line, nil, AreaData.err_msg(:kspawn_no_tilde)) if @kspawn_multiline
     err(@current_line, nil, AreaData.err_msg(:no_delimeter)) unless section_end
   end # parse
 
@@ -123,7 +119,7 @@ class AreaData < Section
     @used_lines << "F"
     items = line.split(" ", 3)
     if items[1] =~ Bits.pattern
-      err(@current_line, line, AreaData.err_msg(:bad_bit) % "Areaflags") if Bits.new(items[1]).error?
+      err(@current_line, line, AreaData.err_msg(:bad_bit) % "Area flags") if Bits.new(items[1]).error?
     else
       err(@current_line, line, AreaData.err_msg(:bad_line) % "area flags")
     end
