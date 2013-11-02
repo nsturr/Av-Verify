@@ -5,12 +5,6 @@ class Section
 
   attr_reader :line_number, :id, :contents
 
-  def self.err_msg(message=nil)
-    return @ERROR_MESSAGES.keys unless message
-    raise ArgumentError.new "Error message #{message} not found" unless @ERROR_MESSAGES.key?(message)
-    @ERROR_MESSAGES[message]
-  end
-
   def self.delimiter(*options)
     if @section_delimiter
       delim = @section_delimiter

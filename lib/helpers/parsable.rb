@@ -1,5 +1,17 @@
 module Parsable
 
+  def self.included(base)
+    base.extend(ParsableErrors)
+  end
+
+  module ParsableErrors
+    def err_msg(message=nil)
+      return @ERROR_MESSAGES.keys unless message
+      raise ArgumentError.new "Error message #{message} not found" unless @ERROR_MESSAGES.key?(message)
+      @ERROR_MESSAGES[message]
+    end
+  end
+
   attr_reader :errors
 
   Error = Struct.new(:line, :type, :context, :description)
