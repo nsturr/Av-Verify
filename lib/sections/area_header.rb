@@ -2,7 +2,20 @@ require_relative 'section'
 
 class AreaHeader < Section
 
-  def initialize(contents, line_number)
+  @@ERROR_MESSAGES = {
+    bad_range: "Level range should be 8 chars long, including braces",
+    no_braces: "Level range not enclosed in braces { }",
+    multi_line: "#AREA section spans more than one line",
+    extra_tilde: "#AREA section contains more than one ~",
+    missing_tilde: "#AREA section contains no ~"
+  }
+
+  def self.err_msg(message)
+    raise ArgumentError.new "Error message #{message} not found" unless @@ERROR_MESSAGES.key?(message)
+    @@ERROR_MESSAGES[message]
+  end
+
+  def initialize(contents, line_number=1)
     super(contents, line_number)
     @name = "AREA"
   end
@@ -14,18 +27,18 @@ class AreaHeader < Section
 
     # Check the proper dimensions of the {LvlRng} section
     if bracket_open && bracket_close
-      warn(@line_num, @contents, "Level range should be 8 chars long, including braces") if bracket_close - bracket_open != 7
+      warn(@line_number, @contents, AreaHeader.err_msg(:bad_range)) if bracket_close - bracket_open != 7
     else
-      warn(@line_num, @contents, "Level range not enclosed in braces { }")
+      warn(@line_number, @contents, AreaHeader.err_msg(:no_braces))
     end
 
     if @contents.include? "\n"
-      err(@line_num, @contents, "#AREA section spans more than one line")
+      err(@line_number, @contents, AreaHeader.err_msg(:multi_line))
     end
     if @contents.count("~") > 1
-      err(@line_num, @contents, "#AREA section contains more than one ~")
+      err(@line_number, @contents, AreaHeader.err_msg(:extra_tilde))
     elsif @contents.count("~") == 0
-      err(@line_num, @contents, "#AREA section contains no ~")
+      err(@line_number, @contents, AreaHeader.err_msg(:missing_tilde))
     end
 
     self
