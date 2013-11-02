@@ -307,7 +307,8 @@ class Reset
 
   def parse_random
     # Line syntax: R 0 vnum number_of_exits
-    zero, target, number_of_exits, comment = line.split(" ", 5)
+    # drop the leading R and the comment
+    zero, target, number_of_exits, comment = line.split(" ", 5)[1..-2]
     unless [zero, target, number_of_exits].any? { |el| el.nil? }
 
       unless zero =~ /^-?\d+$/
