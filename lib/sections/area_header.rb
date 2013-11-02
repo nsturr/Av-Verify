@@ -1,4 +1,4 @@
-require './sections/section'
+require_relative 'section'
 
 class AreaHeader < Section
 

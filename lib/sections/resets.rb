@@ -1,5 +1,5 @@
-require "./sections/section"
-require "./helpers/parsable"
+require_relative "section"
+require_relative "../helpers/parsable"
 
 class Resets < Section
 

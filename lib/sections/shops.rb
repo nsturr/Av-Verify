@@ -1,5 +1,5 @@
-require "./sections/section"
-require "./sections/line_by_line_object"
+require_relative "section"
+require_relative "line_by_line_object"
 
 # This section will be the death of me.
 # seriously, die in a fire, #shops

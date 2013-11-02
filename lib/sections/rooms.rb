@@ -1,8 +1,8 @@
-require "./sections/vnum_section"
-require "./sections/line_by_line_object"
-require "./helpers/tilde"
-require "./helpers/has_quoted_keywords"
-require "./helpers/bits"
+require_relative "vnum_section"
+require_relative "line_by_line_object"
+require_relative "../helpers/tilde"
+require_relative "../helpers/has_quoted_keywords"
+require_relative "../helpers/bits"
 
 class Rooms < VnumSection
 

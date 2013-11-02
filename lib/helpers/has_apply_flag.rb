@@ -1,4 +1,4 @@
-require "./helpers/bits"
+require_relative "bits"
 
 module HasApplyFlag
 

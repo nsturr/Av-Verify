@@ -1,4 +1,8 @@
-require './sections/section'
+require_relative 'section'
+
+# TODO: Assign instnace vars and readers to AreaData so we can fetch
+# the data later on.
+# TODO: dry up the duplication checking
 
 class AreaData < Section
 

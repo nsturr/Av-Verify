@@ -1,6 +1,6 @@
-require './sections/section'
-require './helpers/tilde'
-require './helpers/has_quoted_keywords'
+require_relative 'section'
+require_relative '../helpers/tilde'
+require_relative '../helpers/has_quoted_keywords'
 
 # Helps section and HelpEntry classes contained within this file
 

@@ -1,4 +1,4 @@
-require './helpers/parsable'
+require_relative '../helpers/parsable'
 
 class Section
   include Parsable

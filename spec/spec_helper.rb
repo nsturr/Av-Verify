@@ -1,7 +1,7 @@
 require "rspec"
 
-require_relative "area_data_spec"
 require_relative "area_header_spec"
+require_relative "area_data_spec"
 require_relative "helps_spec"
 require_relative "mobiles_spec"
 require_relative "objects_spec"
