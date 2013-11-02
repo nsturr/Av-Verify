@@ -29,6 +29,43 @@ class Mobile < LineByLineObject
   include HasApplyFlag
   include HasQuotedKeywords
 
+  @ERROR_MESSAGES = {
+    visible_tab: "Visible text contains a tab character",
+    invalid_text_after: "Invalid text after %s",
+    invalid_vnum: "Invalid VNUM",
+    invalid_before_vnum: "Invalid text before VNUM",
+    invalid_after_vnum: "Invalid text after VNUM",
+    tilde_absent: "%s has no terminating ~",
+    tilde_absent_or_spans: "%s has no terminating ~ or spans multiple lines",
+    tilde_invalid_text: "Invalid text after terminating ~",
+    tilde_not_alone: "%s's terminating ~ should be on its own line",
+    short_desc_spans: "Mob short desc spans multiple lines",
+    long_desc_spans: "Long desc has more than one line of text",
+    description_no_tilde: "This doesn't look like part of a description. Forget a terminating ~ above?",
+    no_terminating: "Line lacks terminating %s",
+    act_not_npc: "ACT_NPC is not set",
+    bad_bit: "%s flag is not a power of 2",
+    bad_field: "Bad %s field",
+    bad_align_range: "Alignment out of bounds -1000 to 1000",
+    act_aff_align_matches: "Line should read: <act> <aff> <align> S",
+    level_matches: "Line should follow syntax: <level:#> 0 0",
+    constant_matches: "Line should read: 0d0+0 0d0+0 0 0",
+    bad_sex_range: "Sex out of bounds 0 to 2",
+    sex_matches: "Line should read: 0 0 <sex:#>",
+    race_duplicated: "Mob's race already defined",
+    race_out_of_bounds: "Mob race out of bounds 0 to #{RACE_MAX}",
+    class_duplicated: "Mob's class already defined",
+    non_numeric: "Invalid (non-numeric) %s field",
+    class_out_of_bounds: "Mob class out of bounds 0 to #{CLASS_MAX}",
+    team_duplicated: "Mob's team already defined",
+    team_out_of_bounds: "Mob team out of bounds 0 to #{TEAM_MAX}",
+    kspawn_duplicated: "Mob's kspawn already defined",
+    kspawn_no_tilde: "Killspawn lacks terminating ~ between lines %s and %s",
+    non_numeric_or_neg: "Invalid (negative or non-numeric) %s",
+    invalid_extra_field: "Invalid extra field (expecting R, C, L, A, or K)",
+    not_enough_tokens: "Not enough tokens in kspawn line"
+  }
+
   ATTRIBUTES = [:vnum, :name, :short_desc, :long_desc, :description, :act, :aff,
     :align, :level, :sex, :race, :klass, :apply, :team, :kspawn]
 
@@ -47,7 +84,7 @@ class Mobile < LineByLineObject
   def parse
     super
     if @expectation == :multiline_kspawn
-      err(@current_line, nil, "Killspawn lacks terminating ~ between lines #{@last_multiline} and #{@current_line}")
+      err(@current_line, nil, Mobile.err_msg(:kspawn_no_tilde) % [@last_multiline, @current_line])
     end
   end
 
@@ -55,10 +92,10 @@ class Mobile < LineByLineObject
     m = line.match(/#(?<vnum>\d+)/)
     if m
       @vnum = m[:vnum].to_i
-      err(@current_line, line, "Invalid text before VNUM") if m.pre_match =~ /\S/
-      err(@current_line, line, "Invalid text after VNUM") if m.post_match =~ /\S/
+      err(@current_line, line, Mobile.err_msg(:invalid_before_vnum)) if m.pre_match =~ /\S/
+      err(@current_line, line, Mobile.err_msg(:invalid_after_vnum)) if m.post_match =~ /\S/
     else
-      err(@current_line, line, "Invalid VNUM line")
+      err(@current_line, line, Mobile.err_msg(:invalid_vnum))
     end
     expect :name
   end
@@ -66,9 +103,9 @@ class Mobile < LineByLineObject
   def parse_name line
     return if invalid_blank_line? line
     if has_tilde? line
-      err(@current_line, line, tilde(:extra_text, "Mob name")) unless trailing_tilde? line
+      err(@current_line, line, Mobile.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
     else
-      err(@current_line, line, tilde(:absent_or_spans, "Mob name"))
+      err(@current_line, line, Mobile.err_msg(:tilde_absent_or_spans) % "Mob name")
     end
 
     @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "mob")
@@ -77,13 +114,13 @@ class Mobile < LineByLineObject
 
   def parse_short_desc line
     if line.empty?
-      err(@current_line, nil, "Mobile short desc spans multiple lines")
+      err(@current_line, nil, Mobile.err_msg(:short_desc_spans))
     else
-      ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
+      ugly(@current_line, line, Mobile.err_msg(:visible_tab)) if line.include?("\t")
       if has_tilde? line
-        err(@current_line, line, tilde(:extra_text, "Short desc")) unless trailing_tilde? line
+        err(@current_line, line, Mobile.err_msg(:invalid_text)) unless trailing_tilde? line
       else
-        err(@current_line, line, tilde(:absent_or_spans, "Short desc"))
+        err(@current_line, line, Mobile.err_msg(:absent_or_spans) % "Short desc")
       end
       @short_desc = line[/\A[^~]*/]
       expect :long_desc
@@ -91,7 +128,7 @@ class Mobile < LineByLineObject
   end
 
   def parse_long_desc line
-    ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
+    ugly(@current_line, line, Mobile.err_msg(:visible_tab)) if line.include?("\t")
     @long_line += 1
 
     @long_desc << line
@@ -99,22 +136,22 @@ class Mobile < LineByLineObject
     if has_tilde? line
       expect :description
       if line =~ /~./
-        err(@current_line, line, "Invalid text after terminating ~")
+        err(@current_line, line, Mobile.err_msg(:tilde_invalid_text))
       elsif line.length > 1
-        ugly(@current_line, line, "Terminating ~ should be on its own line")
+        ugly(@current_line, line, Mobile.err_msg(:tilde_not_alone) % "Long desc")
       end
     elsif @long_line == 2
-      ugly(@current_line, line, "Long desc has more than one line of text")
+      ugly(@current_line, line, Mobile.err_msg(:long_desc_spans))
     end
   end
 
   def parse_description line
-    ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
+    ugly(@current_line, line, Mobile.err_msg(:visible_tab)) if line.include?("\t")
     # Firstly, try to match the <act> <aff> <align> S line
     # If it matches exactly, it's a safe bet that the description section lacks a
     # ~ and we just bled into it.
     if line =~ /^#{Bits.insert} +#{Bits.insert} +-?\d+ +S/
-      err(@current_line, line, "This doesn't look like part of a description. Forget a terminating ~ above?")
+      err(@current_line, line, Mobile.err_msg(:description_no_tilde))
       # Set code block to expect the next line (which is the line we just found)
       # and redo the block on the current line
       expect :act_aff_align
@@ -125,9 +162,9 @@ class Mobile < LineByLineObject
     if has_tilde? line
       expect :act_aff_align
       if trailing_tilde? line
-        ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
+        ugly(@current_line, line, Mobile.err_msg(:tilde_not_alone) % "Description") unless isolated_tilde? line
       else
-        err(@current_line, line, tilde(:extra_text, "Description"))
+        err(@current_line, line, Mobile.err_msg(:tilde_invalid_text))
       end
     end
   end
@@ -135,30 +172,30 @@ class Mobile < LineByLineObject
   def parse_act_aff_align line
     return if invalid_blank_line? line
 
-    err(@current_line, line, "Line lacks terminating S") unless line.end_with?("S")
+    err(@current_line, line, Mobile.err_msg(:no_terminating) % "S") unless line.end_with?("S")
     items = line.split
     if items.length == 4
       if items[0] =~ Bits.pattern
         @act = Bits.new(items[0])
-        warn(@current_line, line, "ACT_NPC is not set") unless @act.bit? 1
-        err(@current_line, line, "Act flag is not a power of 2") if @act.error?
+        warn(@current_line, line, Mobile.err_msg(:act_not_npc)) unless @act.bit? 1
+        err(@current_line, line, Mobile.err_msg(:bad_bit) % "Act") if @act.error?
       else
-        err(@current_line, line, "Bad act flags")
+        err(@current_line, line, Mobile.err_msg(:bad_field) % "act flags")
       end
       if items[1] =~ Bits.pattern
         @aff = Bits.new(items[1])
-        err(@current_line, line, "Affect flag is not a power of 2") if @aff.error?
+        err(@current_line, line, Mobile.err_msg(:bad_bit) % "Affect") if @aff.error?
       else
-        err(@current_line, line, "Bad affect flags")
+        err(@current_line, line, Mobile.err_msg(:bad_field) % "affect flags")
       end
       if m = items[2].match(/(-?\d+\b)/)
         @align = m[1].to_i
-        err(@current_line, line, "Alignment out of bounds -1000 to 1000") unless @align.between?(-1000, 1000)
+        err(@current_line, line, Mobile.err_msg(:bad_align_range)) unless @align.between?(-1000, 1000)
       else
-        err(@current_line, line, "Bad alignment")
+        err(@current_line, line, Mobile.err_msg(:bad_field) % "align")
       end
     else
-      err(@current_line, line, "Line should read: <act> <aff> <align> S")
+      err(@current_line, line, Mobile.err_msg(:act_aff_align_matches))
     end
 
     expect :level
@@ -170,9 +207,9 @@ class Mobile < LineByLineObject
       @level = m[1].to_i
     else
       unless line =~ /^\d+\b/
-        err(@current_line, line, "Bad \"level\" field")
+        err(@current_line, line, Mobile.err_msg(:bad_field) % "level")
       else
-        err(@current_line, line, "Line should follow syntax: <level:#> 0 0")
+        err(@current_line, line, Mobile.err_msg(:level_matches))
       end
     end
     expect :constant
@@ -183,7 +220,7 @@ class Mobile < LineByLineObject
     # Technically the line doesn't have to read 0d0+0 0d0+0 0 0, any numbers
     # will do, though they have no effect.
     unless line =~ /^\d+d\d+\+\d+ +\d+d\d+\+\d+ +\d+ +\d+$/i
-      err(@current_line, line, "Line should read: 0d0+0 0d0+0 0 0")
+      err(@current_line, line, Mobile.err_msg(:constant_matches))
     end
     expect :sex
   end
@@ -192,9 +229,9 @@ class Mobile < LineByLineObject
     return if invalid_blank_line? line
     if m = line.match(/^\d+ +\d+ +(\d+)$/)
       @sex = m[1].to_i
-      err(@current_line, line, "Sex out of bounds 0 to 2") unless @sex.between?(0,SEX_MAX)
+      err(@current_line, line, Mobile.err_msg(:bad_sex_range)) unless @sex.between?(0,SEX_MAX)
     else
-      err(@current_line, line, "Line should follow syntax: 0 0 <sex:#>")
+      err(@current_line, line, Mobile.err_msg(:sex_matches))
     end
     expect :misc
   end
@@ -206,33 +243,33 @@ class Mobile < LineByLineObject
 
     case line.lstrip[0]
     when "R"
-      err(@current_line, line, "Mob's race already defined") && return if self.race
+      err(@current_line, line, Mobile.err_msg(:race_duplicated)) && return if self.race
       if m = line.match(/^R +(-?\d+)/)
         @race = m[1].to_i
-        err(@current_line, line, "Mob race out of bounds 0 to #{RACE_MAX}") unless @race.between?(0, RACE_MAX)
+        err(@current_line, line, Mobile.err_msg(:race_out_of_bounds)) unless @race.between?(0, RACE_MAX)
       else
-        err(@current_line, line, "Invalid (non-numeric) \"race\" field")
+        err(@current_line, line, Mobile.err_msg(:non_numeric) % "race")
       end
-      err(@current_line, line, "Invalid text after \"race\" field") unless line =~ /^R +-?\d+$/
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "race") unless line =~ /^R +-?\d+$/
 
     when"C"
-      err(@current_line, line, "Mob's class already defined") && return if self.klass
+      err(@current_line, line, Mobile.err_msg(:class_duplicated)) && return if self.klass
       if m = line.match(/^C +(-?\d+)/)
         @klass = m[1].to_i
-        err(@current_line, line, "Mob class out of bounds 0 to #{CLASS_MAX}") unless @klass.between?(0, CLASS_MAX)
+        err(@current_line, line, Mobile.err_msg(:class_out_of_bounds)) unless @klass.between?(0, CLASS_MAX)
       else
-        err(@current_line, line, "Invalid (non-numeric) \"class\" field")
+        err(@current_line, line, Mobile.err_msg(:non_numeric) % "class")
       end
-      err(@current_line, line, "Invalid text after \"class\" field") unless line =~ /^C +-?\d+$/
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "class") unless line =~ /^C +-?\d+$/
 
     when "L"
-      err(@current_line, line, "Mob's team already defined") && return if self.team
+      err(@current_line, line, Mobile.err_msg(:team_duplicated)) && return if self.team
       if m = line.match(/^L +(-?\d+)/)
         @team = m[1].to_i
-        err(@current_line, line, "Mob team out of bounds 0 to #{TEAM_MAX}") unless @team.between?(0, TEAM_MAX)
-        err(@current_line, line, "Invalid text after \"team\" field") unless line =~ /^L +-?\d+$/
+        err(@current_line, line, Mobile.err_msg(:team_out_of_bounds)) unless @team.between?(0, TEAM_MAX)
+        err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "team") unless line =~ /^L +-?\d+$/
       else
-        err(@current_line, line, "Invalid (non-numeric) \"team\" field")
+        err(@current_line, line, Mobile.err_msg(:non_numeric) % "team")
       end
 
     when "A"
@@ -243,7 +280,7 @@ class Mobile < LineByLineObject
       end
 
     when "K"
-      err(@current_line, line, "Mob's kspawn already defined") && return if self.kspawn
+      err(@current_line, line, Mobile.err_msg(:kspawn_duplicated)) && return if self.kspawn
       @last_multiline = @current_line
       # Split line into: K condition type spawn mob text...
       # Also toss out the leading 'K'
@@ -257,22 +294,22 @@ class Mobile < LineByLineObject
       }
 
       if [condition, type, spawn, room].any? { |el| el.nil? }
-        err(@current_line, line, "Not enough tokens in kspawn line")
+        err(@current_line, line, Mobile.err_msg(:not_enough_tokens))
       else
         unless self.kspawn[:condition] =~ /^\d+$/
-          err(@current_line, line, "Invalid (negative or non-numeric) kspawn condition")
+          err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg) % "kspawn condition")
         end
 
         if self.kspawn[:type].error?
-          err(@current_line, line, "Invalid (incomplete or not power of 2) kspawn type bitfield")
+          err(@current_line, line, Mobile.err_msg(:bad_bit) % "Kspawn type")
         end
 
         unless self.kspawn[:spawn] =~ /^-1$|^\d+$/
-          err(@current_line, line, "Invalid (non-numeric) kspawn vnum")
+          err(@current_line, line, Mobile.err_msg(:non_numeric) % "kspawn vnum")
         end
 
         unless self.kspawn[:room] =~ /^-1$|^\d+$/
-          err(@current_line, line, "Invalid (non-numeric or less than -1) kspawn location")
+          err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg) % "kspawn location")
         end
       end
 
@@ -281,14 +318,14 @@ class Mobile < LineByLineObject
       # is found.
       expect :multiline_kspawn unless line.end_with?("~")
     else
-      err(@current_line, line, "Invalid extra field (expecting R, C, L, A, or K)")
+      err(@current_line, line, Mobile.err_msg(:invalid_extra_field))
     end
 
   end
 
   def parse_multiline_kspawn line
     self.kspawn[:text] << "\n" + line
-    ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
+    ugly(@current_line, line, Mobile.err_msg(:visible_tab)) if line.include?("\t")
     # This type is only ever expected if a killspawn text field spans multiple lines
     expect :misc if line.end_with?("~")
   end
