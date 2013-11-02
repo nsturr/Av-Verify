@@ -9,7 +9,7 @@ class Resets < Section
 
   def initialize(contents, line_number)
     super(contents, line_number)
-    @name = "RESETS"
+    @id = "RESETS"
 
     @resets = []
     @reset_counts = Hash.new(0)

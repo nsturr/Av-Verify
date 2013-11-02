@@ -8,7 +8,7 @@ class Specials < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @name = "SPECIALS"
+    @id = "SPECIALS"
 
     @specials = []
 

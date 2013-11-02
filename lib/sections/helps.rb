@@ -26,7 +26,7 @@ class Helps < Section
 
   def initialize(contents, line_number)
     super(contents, line_number)
-    @name = "HELPS"
+    @id = "HELPS"
 
     @help_files = []
     slice_first_line # Takes off section name header

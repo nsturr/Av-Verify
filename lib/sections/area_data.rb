@@ -1,4 +1,5 @@
 require_relative 'section'
+require_relative '../helpers/avconstants.rb'
 
 # TODO: Assign instnace vars and readers to AreaData so we can fetch
 # the data later on.
@@ -6,11 +7,21 @@ require_relative 'section'
 
 class AreaData < Section
 
+  @ERROR_MESSAGES = {
+    invalid_line: "Invalid AREADATA line, expected P, F, O, K, M, G, S",
+    continues_after_delimeter: "Section continues after 'S' delimeter",
+    no_delimeter: "#AREADATA lacks terminating S",
+    duplicate: "Duplicate '%s' line in #AREADATA",
+    invalid_extra_text: "Invalid text after #AREADATA %s line",
+    kspawn_no_tilde: "Kspawn lacks terminating ~",
+    kspawn_text_after_tilde: "Invalid text on kspawn line after terminating ~"
+  }
+
   @section_delimeter = "^S"
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @name = "AREADATA"
+    @id = "AREADATA"
 
     @used_lines = []
     @kspawn_multiline = false
@@ -33,7 +44,7 @@ class AreaData < Section
         if line.include?("~")
           @kspawn_multiline = false
           # However nothing but whitespace can follow that tilde!
-          err(@current_line, line, "Invalid text on kspawn line after terminating ~") if line =~ /~.*?\S/
+          err(@current_line, line, AreaData.err_msg(:kspawn_text_after_tilde)) if line =~ /~.*?\S/
         end
         # If we haven't found any tildes in this line, then the text must be continuing.
         # Onward to the next line!
@@ -44,7 +55,7 @@ class AreaData < Section
       # If the "S" section has been parsed, then this line comes after the section
       # formally ends.
       if section_end
-        err(@current_line, line, "Section continues after 'S' delimeter")
+        err(@current_line, line, AreaData.err_msg(:continues_after_delimeter))
         break #Only need to throw this error once
       end
 
@@ -64,14 +75,14 @@ class AreaData < Section
       when "S"
         section_end = true
       else
-        err(@current_line, line, "Invalid AREADATA line")
+        err(@current_line, line, AreaData.err_msg(:invalid_line))
       end
 
       # @current_line += 1
 
-      err(@current_line, nil, "Kspawn line lacks terminating ~") if @kspawn_multiline
+      err(@current_line, nil, AreaData.err_msg(:kspawn_no_tilde)) if @kspawn_multiline
     end
-    err(@current_line, nil, "#AREADATA lacks terminating S") unless section_end
+    err(@current_line, nil, AreaData.err_msg(:no_delimeter)) unless section_end
   end # parse
 
   private
@@ -79,12 +90,12 @@ class AreaData < Section
   def parse_plane_line line
     # Plane should match: P # #
     if @used_lines.include? "P"
-      err(@current_line, line, "Duplicate \"Plane\" line in #AREADATA")
+      err(@current_line, line, AreaData.err_msg(:duplicate) % "P")
     else
       @used_lines << "P"
       items = line.split(" ", 4)
       if items.length > 3
-        err(@current_line, line, "Invalid text after #AREADATA plane line")
+        err(@current_line, line, AreaData.err_msg(:invalid_extra_text) % "plane")
       end
 
       if items.length > 1 && items[1] =~ /^-?\d+$/

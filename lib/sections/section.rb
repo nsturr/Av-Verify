@@ -3,7 +3,13 @@ require_relative '../helpers/parsable'
 class Section
   include Parsable
 
-  attr_reader :line_number, :name
+  attr_reader :line_number, :id
+
+  def self.err_msg(message=nil)
+    return @ERROR_MESSAGES.keys unless message
+    raise ArgumentError.new "Error message #{message} not found" unless @ERROR_MESSAGES.key?(message)
+    @ERROR_MESSAGES[message]
+  end
 
   def self.delimeter(*options)
     if @section_delimeter
