@@ -1,4 +1,5 @@
 require_relative "section.rb"
+require_relative "modules/parsable.rb"
 
 class Resets < Section
 
@@ -76,11 +77,11 @@ class Resets < Section
 
     @current_line += 1
     if @delimeter.nil?
-      err(@current_line, nil, "#RESETS section lacks terminating 0$~")
+      err(@current_line, nil, "#RESETS section lacks terminating S")
     else
       unless @delimeter.rstrip =~ /#{Resets.delimeter(:start)}\z/
         line_num, bad_line = invalid_text_after_delimeter(@current_line, @delimeter)
-        err(line_num, bad_line, "#RESETS section continues after terminating 0$~")
+        err(line_num, bad_line, "#RESETS section continues after terminating S")
       end
     end
 
@@ -89,6 +90,7 @@ class Resets < Section
 end
 
 class Reset
+  include Parsable
 
   attr_reader :line_number, :line, :vnum, :type, :target, :limit, :slot, :errors,
     :attachments
