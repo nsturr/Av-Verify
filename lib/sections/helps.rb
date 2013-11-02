@@ -48,7 +48,7 @@ class Helps < Section
 
     @contents.each_line do |line|
       @current_line += 1
-      help_body << line.dup
+      help_body << line
 
       if expect_header
         line_number = @current_line
@@ -81,7 +81,7 @@ class Helps < Section
         err(line_num, bad_line, Helps.err_msg(:continues_after_delimiter))
       end
     end
-
+    self
   end
 
 end
@@ -91,18 +91,25 @@ class HelpFile
   include TheTroubleWithTildes
   include HasQuotedKeywords
 
-  attr_reader :level, :keywords, :body, :line_number
+  @ERROR_MESSAGES = {
+    no_level: "Help file doesn't start with a level",
+    tilde_absent: "Line has no terminating ~",
+    tilde_invalid_text: "Invalid text after terminating ~",
+    tilde_not_alone: "Help file's terminating ~ should be on its own line"
+  }
+
+  attr_reader :level, :keywords, :body, :line_number, :contents
 
   def initialize(contents, line_number=1)
     @line_number = line_number
     @current_line = line_number
-    @contents = contents.rstrip
+    @contents = contents.dup.rstrip
     @errors = []
   end
 
   def parse
-
-    first_line = @contents.slice!(/\A.*(?:\n|\Z)/).strip
+    @body = @contents.dup
+    first_line = @body.slice!(/\A.*(?:\n|\Z)/).strip
 
     # N.B. Help file level can be negative
     first_line.match(/\A(-?\d+)\s+/) do |m|
@@ -110,9 +117,9 @@ class HelpFile
 
       keywords = m.post_match
       unless has_tilde?(keywords)
-        err(@current_line, first_line, tilde(:absent))
+        err(@current_line, first_line, HelpFile.err_msg(:tilde_absent))
       else
-        err(@current_line, first_line, tilde(:extra_text)) unless trailing_tilde?(keywords)
+        err(@current_line, first_line, HelpFile.err_msg(:tilde_invalid_text)) unless trailing_tilde?(keywords)
       end
       nab_tilde(keywords)
 
@@ -121,20 +128,20 @@ class HelpFile
 
     end # if first line starts with a number
     if self.level.nil?
-      err(@current_line, first_line, "Help file doesn't start with a level")
+      err(@current_line, first_line, HelpFile.err_msg(:no_level))
     end
 
     # First line done with. Onto the body.
-    @current_line += @contents.count("\n") + 1
-    end_line = @contents[/^.*~.*$/]
-    if !has_tilde?(@contents)
-      err(@current_line, nil, tilde(:absent, "Help file body"))
+    @current_line += @body.count("\n") + 1
+    end_line = @body[/^.*~.*$/]
+    if !has_tilde?(@body)
+      err(@current_line, nil, HelpFile.err_msg(:tilde_absent))
     elsif !trailing_tilde?(end_line)
-      err(@current_line, end_line, tilde(:extra_text, "Help file body"))
+      err(@current_line, end_line, HelpFile.err_msg(:tilde_invalid_text))
     elsif !isolated_tilde?(end_line)
-      ugly(@current_line, end_line, tilde(:not_alone))
+      ugly(@current_line, end_line, HelpFile.err_msg(:tilde_not_alone))
     end
-
+    self
   end
 
 end
