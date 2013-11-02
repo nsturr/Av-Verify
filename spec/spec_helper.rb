@@ -14,12 +14,9 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
-require_relative "area_header_spec"
-require_relative "area_data_spec"
-require_relative "helps_spec"
-require_relative "mobiles_spec"
-require_relative "objects_spec"
-require_relative "rooms_spec"
-require_relative "resets_spec"
-require_relative "shops_spec"
-require_relative "specials_spec"
+def expect_one_error(item, message, printout=false)
+  item.parse
+  p item.errors if printout
+  expect(item.errors.length).to eq(1)
+  expect(item.errors.first.description).to eq(message)
+end

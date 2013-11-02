@@ -1,3 +1,4 @@
+require "./spec/spec_helper"
 require "./lib/sections/area_header"
 
 describe AreaHeader do
@@ -30,33 +31,23 @@ describe AreaHeader do
   end
 
   it "detects a missing tilde" do
-    missing_tilde.parse
-    expect(missing_tilde.errors.length).to eq(1)
-    expect(missing_tilde.errors.first.description).to eq(AreaHeader.err_msg(:missing_tilde))
+    expect_one_error(missing_tilde, AreaHeader.err_msg(:missing_tilde))
   end
 
   it "detects an extra invalid tilde" do
-    extra_tilde.parse
-    expect(extra_tilde.errors.length).to eq(1)
-    expect(extra_tilde.errors.first.description).to eq(AreaHeader.err_msg(:extra_tilde))
+    expect_one_error(extra_tilde, AreaHeader.err_msg(:extra_tilde))
   end
 
   it "detects a header spanning multiple lines" do
-    multi_line.parse
-    expect(multi_line.errors.length).to eq(1)
-    expect(multi_line.errors.first.description).to eq(AreaHeader.err_msg(:multi_line))
+    expect_one_error(multi_line, AreaHeader.err_msg(:multi_line))
   end
 
   it "detects the wrong number of characters in the level range" do
-    bad_range.parse
-    expect(bad_range.errors.length).to eq(1)
-    expect(bad_range.errors.first.description).to eq(AreaHeader.err_msg(:bad_range))
+    expect_one_error(bad_range, AreaHeader.err_msg(:bad_range))
   end
 
   it "detects missing braces around the level range" do
-    no_braces.parse
-    expect(no_braces.errors.length).to eq(1)
-    expect(no_braces.errors.first.description).to eq(AreaHeader.err_msg(:no_braces))
+    expect_one_error(no_braces, AreaHeader.err_msg(:no_braces))
   end
 
 end
