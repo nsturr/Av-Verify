@@ -7,7 +7,7 @@ class Section
 
   def self.delimiter(*options)
     if @section_delimiter
-      delim = @section_delimiter
+      delim = @section_delimiter.dup
       delim.prepend("\\A") if options.include? :start
       options.include?(:string) ? delim : /#{delim}/
     end
