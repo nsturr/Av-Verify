@@ -86,6 +86,8 @@ class AreaData < Section
     end
     err(@current_line, nil, AreaData.err_msg(:kspawn_no_tilde)) if @kspawn_multiline
     err(@current_line, nil, AreaData.err_msg(:no_delimiter)) unless section_end
+
+    self
   end # parse
 
   private
