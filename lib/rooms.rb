@@ -77,7 +77,7 @@ class Room < LineByLineObject
     else
       err(@current_line, line, "Invalid VNUM line")
     end
-    @expectation = :name
+    expect :name
   end
 
   def parse_name line
@@ -88,7 +88,7 @@ class Room < LineByLineObject
       err(@current_line, line, tilde(:absent_or_spans, "Room name"))
     end
     @name = line[/\A[^~]*/]
-    @expectation = :description
+    expect :description
   end
 
   def parse_description line
@@ -98,13 +98,13 @@ class Room < LineByLineObject
       err(@current_line, line, "This doesn't look like part of a description. Forget a terminating ~ above?")
       # Set code block to expect the next line (which is the line we just found)
       # and redo the block on the current line
-      @expectation = :roomflags_sector
+      expect :roomflags_sector
       return :redo
     else
       @description << line
     end
     if has_tilde? line
-      @expectation = :roomflags_sector
+      expect :roomflags_sector
       if trailing_tilde? line
         ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
       else
@@ -133,7 +133,7 @@ class Room < LineByLineObject
       err(@current_line, line, "Invalid sector field")
     end
 
-    @expectation = :misc
+    expect :misc
   end
 
   def parse_misc line
@@ -154,10 +154,10 @@ class Room < LineByLineObject
       else
         err(@current_line, line, Room.invalid_room_field)
       end
-      @expectation = :door_desc
+      expect :door_desc
 
     when "E"
-      @expectation = :edesc_keywords
+      expect :edesc_keywords
 
     when "A"
       if m = line.match(/^A +(#{Bits.insert})/)
@@ -167,7 +167,7 @@ class Room < LineByLineObject
       else
         err(@current_line, line, "Invalid alignment restriction line")
       end
-      @expectation = :misc
+      expect :misc
 
     when "C"
       if m = line.match(/^C +(#{Bits.insert})/)
@@ -177,11 +177,11 @@ class Room < LineByLineObject
       else
         err(@current_line, line, "Invalid class restriction line")
       end
-      @expectation = :misc
+      expect :misc
 
     when "S"
       # Ends the room definition
-      @expectation = :end
+      expect :end
 
     else
       err(@current_line, line, Room.invalid_room_field)
@@ -193,7 +193,7 @@ class Room < LineByLineObject
     ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
 
     if has_tilde? line
-      @expectation = :door_keyword
+      expect :door_keyword
       err(@current_line, line, tilde(:extra_text, "Door desc")) unless trailing_tilde? line
       ugly(@current_line, line, tilde(:not_alone, "Door desc")) unless isolated_tilde? line
     end
@@ -212,7 +212,7 @@ class Room < LineByLineObject
       err(@current_line, line, "Door keywords lack terminating ~ or spans multiple lines")
     end
 
-    @expectation = :door_locks
+    expect :door_locks
   end
 
   def parse_door_locks line
@@ -245,7 +245,7 @@ class Room < LineByLineObject
       err(@current_line, line, "Line should match: <locks> <key> <to_vnum>")
     end
 
-    @expectation = :misc
+    expect :misc
   end
 
   def parse_edesc_keywords line
@@ -259,7 +259,7 @@ class Room < LineByLineObject
     @edesc[keywords] = ""
 
     @last_multiline = @current_line
-    @expectation = :multiline_edesc
+    expect :multiline_edesc
   end
 
   def parse_multiline_edesc line
@@ -267,7 +267,7 @@ class Room < LineByLineObject
     @edesc[@recent_keywords] << line[/[^~]*/]
 
     if has_tilde? line
-      @expectation = :misc
+      expect :misc
       @recent_keywords = nil
       err(@current_line, line, tilde(:extra_text, "Edesc body")) unless trailing_tilde? line
       ugly(@current_line, line, tilde(:not_alone, "Edesc body")) unless isolated_tilde? line

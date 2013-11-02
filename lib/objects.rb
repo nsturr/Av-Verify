@@ -65,7 +65,7 @@ class Objekt < LineByLineObject
     else
       err(@current_line, line, "Invalid VNUM line")
     end
-    @expectation = :name
+    expect :name
   end
 
   def parse_name line
@@ -76,7 +76,7 @@ class Objekt < LineByLineObject
       err(@current_line, line, tilde(:absent_or_spans, "Object name"))
     end
     @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "object")
-    @expectation = :short_desc
+    expect :short_desc
   end
 
   def parse_short_desc line
@@ -90,7 +90,7 @@ class Objekt < LineByLineObject
         err(@current_line, line, tilde(:absent_or_spans, "Short desc"))
       end
       @short_desc = line[/\A[^~]*/]
-      @expectation = :long_desc
+      expect :long_desc
     end
   end
 
@@ -101,14 +101,14 @@ class Objekt < LineByLineObject
     @long_desc << line
 
     if has_tilde? line
-      @expectation = :description
+      expect :description
       if line =~ /~./
         err(@current_line, line, "Invalid text after terminating ~")
       end
     elsif @long_line == 2
       ugly(@current_line, line, "Long desc has more than one line of text")
     end
-    @expectation = :adesc
+    expect :adesc
   end
 
   def parse_adesc line
@@ -116,14 +116,14 @@ class Objekt < LineByLineObject
 
     if line =~ /^(\d+) +#{Bits.insert} +#{Bits.insert}$/
       err(@current_line, line, "Doesn't look like part of an adesc. Forget a ~ somewhere?")
-      @expectation = :type_extra_wear
+      expect :type_extra_wear
       return :redo
     else
       @adesc << line
     end
 
     if has_tilde? line
-      @expectation = :type_extra_wear
+      expect :type_extra_wear
       unless trailing_tilde? line
         err(@current_line, line, tilde(:extra_text, "Adesc"))
       end
@@ -142,7 +142,7 @@ class Objekt < LineByLineObject
     else
       err(current_line, line, "Line should follow syntax: <type:#> <extraflag:#> <wearflag:#>")
     end
-    @expectation = :values
+    expect :values
   end
 
   def parse_values line
@@ -161,7 +161,7 @@ class Objekt < LineByLineObject
       err(@current_line, line, "Wrong number of values in value0-3 line")
     end
 
-    @expectation = :weight_worth
+    expect :weight_worth
   end
 
   def parse_weight_worth line
@@ -180,7 +180,7 @@ class Objekt < LineByLineObject
     # above won't catch them.
     @weight, @worth = @weight.to_i, @worth.to_i
 
-    @expectation = :misc
+    expect :misc
   end
 
   def parse_misc line
@@ -203,7 +203,7 @@ class Objekt < LineByLineObject
       end
     when "E"
       err(@current_line, line, "Invalid text after E flag") if line.length > 1
-      @expectation = :edesc_keyword
+      expect :edesc_keyword
     else
       err(@current_line, line, "Invalid extra field (expecting A, Q, or E)")
     end
@@ -234,12 +234,12 @@ class Objekt < LineByLineObject
     @recent_keywords = keywords
 
     @last_multiline = @current_line + 1 # The next line begins a multiline field
-    @expectation = :multiline_edesc
+    expect :multiline_edesc
   end
 
   def parse_multiline_edesc line
     if has_tilde? line
-      @expectation = :misc
+      expect :misc
       unless trailing_tilde? line
         err(@current_line, line, tilde(:extra_text, "Edesc body"))
         unless isolated_tilde? line

@@ -14,7 +14,7 @@ class LineByLineObject
   end
 
   def parse
-    @expectation = :vnum
+    expect :vnum
     @contents.each_line do |line|
       result = self.send("parse_#{@expectation}", line.rstrip)
       redo if result == :redo # If we discovered it's probably a different line type
@@ -23,9 +23,22 @@ class LineByLineObject
     end
   end
 
+  def expect type
+    raise ArgumentError.new "Argument must be a symbol" unless type.is_a? Symbol
+    @expectation = type
+  end
+
   def invalid_blank_line? line
     if line.empty?
       err(@current_line, nil, "Invalid blank line in #{self.class.name} definition")
+      return true
+    end
+    false
+  end
+
+  def invalid_text_after_end? line
+    if @section_end && !line.empty?
+      err(@current_line, line, "Section continues after ending delimeter")
       return true
     end
     false

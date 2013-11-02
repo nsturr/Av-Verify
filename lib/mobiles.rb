@@ -59,7 +59,7 @@ class Mobile < LineByLineObject
     else
       err(@current_line, line, "Invalid VNUM line")
     end
-    @expectation = :name
+    expect :name
   end
 
   def parse_name line
@@ -71,7 +71,7 @@ class Mobile < LineByLineObject
     end
 
     @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "mob")
-    @expectation = :short_desc
+    expect :short_desc
   end
 
   def parse_short_desc line
@@ -85,7 +85,7 @@ class Mobile < LineByLineObject
         err(@current_line, line, tilde(:absent_or_spans, "Short desc"))
       end
       @short_desc = line[/\A[^~]*/]
-      @expectation = :long_desc
+      expect :long_desc
     end
   end
 
@@ -96,7 +96,7 @@ class Mobile < LineByLineObject
     @long_desc << line
 
     if has_tilde? line
-      @expectation = :description
+      expect :description
       if line =~ /~./
         err(@current_line, line, "Invalid text after terminating ~")
       elsif line.length > 1
@@ -116,13 +116,13 @@ class Mobile < LineByLineObject
       err(@current_line, line, "This doesn't look like part of a description. Forget a terminating ~ above?")
       # Set code block to expect the next line (which is the line we just found)
       # and redo the block on the current line
-      @expectation = :act_aff_align
+      expect :act_aff_align
       return :redo
     else
       @description << line
     end
     if has_tilde? line
-      @expectation = :act_aff_align
+      expect :act_aff_align
       if trailing_tilde? line
         ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
       else
@@ -160,7 +160,7 @@ class Mobile < LineByLineObject
       err(@current_line, line, "Line should read: <act> <aff> <align> S")
     end
 
-    @expectation = :level
+    expect :level
   end
 
   def parse_level line
@@ -174,7 +174,7 @@ class Mobile < LineByLineObject
         err(@current_line, line, "Line should follow syntax: <level:#> 0 0")
       end
     end
-    @expectation = :constant
+    expect :constant
   end
 
   def parse_constant line
@@ -184,7 +184,7 @@ class Mobile < LineByLineObject
     unless line =~ /^\d+d\d+\+\d+ +\d+d\d+\+\d+ +\d+ +\d+$/i
       err(@current_line, line, "Line should read: 0d0+0 0d0+0 0 0")
     end
-    @expectation = :sex
+    expect :sex
   end
 
   def parse_sex line
@@ -195,7 +195,7 @@ class Mobile < LineByLineObject
     else
       err(@current_line, line, "Line should follow syntax: 0 0 <sex:#>")
     end
-    @expectation = :misc
+    expect :misc
   end
 
   # This method parses Race, Class, Team, Apply, and Kspawn lines, as
@@ -278,7 +278,7 @@ class Mobile < LineByLineObject
       # The line's last field is text with can span multiple lines. If there's no tilde,
       # expect the next line to just be more text that can be ignored until a tilde
       # is found.
-      @expectation = :multiline_kspawn unless line.end_with?("~")
+      expect :multiline_kspawn unless line.end_with?("~")
     else
       err(@current_line, line, "Invalid extra field (expecting R, C, L, A, or K)")
     end
@@ -289,7 +289,7 @@ class Mobile < LineByLineObject
     self.kspawn[:text] << "\n" + line
     ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
     # This type is only ever expected if a killspawn text field spans multiple lines
-    @expectation = :misc if line.end_with?("~")
+    expect :misc if line.end_with?("~")
   end
 
 end
