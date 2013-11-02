@@ -14,6 +14,21 @@ describe AreaHeader do
     expect(valid_header.errors).to be_empty
   end
 
+  it "parses the level range" do
+    valid_header.parse
+    expect(valid_header.level).to eq("*HERO*")
+  end
+
+  it "parses the area builder" do
+    valid_header.parse
+    expect(valid_header.author).to eq("Scevine")
+  end
+
+  it "parses the area name" do
+    valid_header.parse
+    expect(valid_header.name).to eq("The Forge")
+  end
+
   it "detects a missing tilde" do
     missing_tilde.parse
     expect(missing_tilde.errors.length).to eq(1)
