@@ -128,7 +128,7 @@ module AreaAttributes
     #   @resets = s ? s.resets : nil
     # end
     @resets ||= @main_sections["resets"]
-    @resets ? @resets.resets || nil
+    @resets ? @resets.resets : nil
   end
 
   def shops
@@ -137,7 +137,7 @@ module AreaAttributes
     #   @shops = s ? s.shops : nil
     # end
     @shops ||= @main_sections["shops"]
-    @resets ? @resets.resets || nil
+    @resets ? @resets.resets : nil
   end
 
   def specials
@@ -146,7 +146,7 @@ module AreaAttributes
     #   @specials = s ? s.specials : nil
     # end
     @specials ||= @main_sections["specials"]
-    @specials ? @specials.specials || nil
+    @specials ? @specials.specials : nil
   end
 
 end
