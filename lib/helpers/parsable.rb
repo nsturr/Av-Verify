@@ -51,7 +51,7 @@ module Parsable
     self.errors.none? { |error| error.type == :error }
   end
 
-  def error_report(nocolor=true)
+  def error_report(nocolor=false)
     unless @errors.empty?
       nocolor = @flags ? @flags.include?(:nocolor) : nocolor
 

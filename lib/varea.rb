@@ -35,10 +35,10 @@ require './helpers/avcolors'
 require './helpers/parsable'
 require './helpers/area_attributes'
 
-%w{ area_header area_data helps mobiles
-	  objects rooms resets shops specials }.each do |section|
-		require "./sections/#{section}"
-end
+%w{
+	area_header area_data helps mobiles
+	objects rooms resets shops specials
+}.each { |section| require "./sections/#{section}" }
 
 class Area
 	include Parsable
@@ -160,15 +160,21 @@ class Area
 
 end
 
-if ARGV[0]
-	if File.exist?(ARGV[0])
-		puts "Parsing #{ARGV[0]}..."
-		new_area = Area.new(ARGV[0], ARGV[1..-1])
-		new_area.verify_all
-		new_area.error_report
+if __FILE__ == $PROGRAM_NAME
+
+	if ARGV[0]
+		if File.exist?(ARGV[0])
+			puts "Parsing #{ARGV[0]}..."
+			new_area = Area.new(ARGV[0], ARGV[1..-1])
+			new_area.verify_all
+			new_area.error_report
+		else
+			puts "#{ARGV[0]} not found, skipping."
+		end
 	else
-		puts "#{ARGV[0]} not found, skipping."
+		puts "Usage: varea filename.are [nocolor|cosmetic|nowarning]"
 	end
+
 end
 
 =begin Commenting out the needlessly complex batch verifying function.
