@@ -70,10 +70,25 @@ class Area
     @main_sections = extract_main_sections(data)
   end
 
+  def has_section? section
+    if section.is_a? Symbol
+      section = section.to_s
+    end
+
+    if section == "areaheader"
+      @main_sections.key? "area"
+    elsif section.is_a? String
+      section = section.downcase.gsub("_", "")
+      @main_sections.key? section
+    elsif section.is_a? Class
+      @main_sections.values.any? { |s| s.class == section }
+    end
+  end
+
   def verify_all
     @main_sections.each_value do |section|
       next if section.parsed?
-      puts "Found ##{section.name} on line #{section.line_number}" if @flags.include?(:debug)
+      puts "Found ##{section.id} on line #{section.line_number}" if @flags.include?(:debug)
       section.parse
       @errors += section.errors
     end
@@ -120,23 +135,23 @@ class Area
     first_line = content.match(/^#.*?$/).to_s.rstrip
     # AREA section has its contents on the same line as the section name
     if first_line.downcase.start_with?("#area ", "#area\t")
-      name = "AREA"
+      name = "area"
     else
       # Other sections technically can have contents on same line as section,
       # name, but I'm enforcing good syntax anyway.
       first_line = content.slice(/\A.*(?:\n|\Z)/).rstrip
-      name = first_line.match(/[a-zA-Z\$]+/).to_s
+      name = first_line.match(/[a-zA-Z\$]+/).to_s.downcase
 
       if first_line.include?(" ")
         err(line_start_section, first_line, "Invalid text on same line as section name")
       end
     end
 
-    unless SECTIONS.include? name.downcase
+    unless SECTIONS.include? name
       err(line_num, nil, "Invalid section name ##{name}") and return
     end
 
-    case name.downcase
+    case name
     when "area"
       AreaHeader.new(content, line_num)
     when "areadata"
