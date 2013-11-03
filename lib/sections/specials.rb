@@ -1,8 +1,14 @@
 require_relative 'section'
+require_relative '../helpers/avconstants'
 
 class Specials < Section
 
   @section_delimiter = "^S"
+
+  @ERROR_MESSAGES = {
+    no_delimiter: "#SPECIALS section lacks terminating S",
+    continues_after_delimiter: "#SPECIALS section continues after terminating S"
+  }
 
   attr_reader :specials, :errors
 
@@ -13,7 +19,6 @@ class Specials < Section
     @specials = []
 
     slice_first_line
-    split_specials
   end
 
   def to_s
@@ -32,6 +37,7 @@ class Specials < Section
   end
 
   def parse
+    split_specials
 
     @specials.each do |special|
       special.parse
@@ -44,11 +50,11 @@ class Specials < Section
 
     @current_line += 1
     if @delimiter.nil?
-      err(@current_line, nil, "#SPECIALS section lacks terminating 0$~")
+      err(@current_line, nil, Specials.err_msg(:no_delimiter))
     else
       unless @delimiter.rstrip =~ /#{Specials.delimiter(:start)}\z/
         line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, "#SPECIALS section continues after terminating S")
+        err(line_num, bad_line, Specials.err_msg(:continues_after_delimiter))
       end
     end
     self.specials
@@ -58,6 +64,15 @@ end
 
 class Special
   include Parsable
+
+  @ERROR_MESSAGES = {
+    invalid_vnum: "Invalid mob vnum",
+    negative_vnum: "Mob VNUM can't be negative",
+    invalid_spec: "Invalid SPEC_FUN",
+    unknown_spec: "Unknown SPEC_FUN",
+    not_enough_tokens: "Not enough tokens in special line",
+    invalid_line: "Invalid special line"
+  }
 
   attr_reader :line, :line_number, :vnum, :spec, :errors
 
@@ -79,23 +94,23 @@ class Special
       unless [vnum, spec].any? { |el| el.nil? }
         if vnum =~ /^\d+$/
           @vnum = vnum.to_i
-          err(self.line_number, self.line, "Mob VNUM can't be negative") if @vnum < 0
+          err(self.line_number, self.line, Special.err_msg(:negative_vnum)) if @vnum < 0
         else
-          err(self.line_number, self.line, "Invalid mob vnum")
+          err(self.line_number, self.line, Special.err_msg(:invalid_vnum))
         end
 
         # include potential comments starting with * smooshed up against the spec
         if spec =~ /^\w+(?:\*.*|$)/
           @spec = spec[/^[^\*]*/].downcase
-          err(self.line_number, self.line, "Unknown SPEC_FUN") unless SPECIALS.include? @spec
+          err(self.line_number, self.line, Section.err_msg(:unknown_spec)) unless SPECIALS.include? @spec
         else
-          err(self.line_number, self.line, "Invalid SPEC_FUN")
+          err(self.line_number, self.line, Section.err_msg(:invalid_spec))
         end
       else
-        err(self.line_number, self.line, "Not enough tokens in special line")
+        err(self.line_number, self.line, Section.err_msg(:not_enough_tokens))
       end
     else
-      err(self.line_number, self.line, "Invalid special line")
+      err(self.line_number, self.line, Section.err_msg(:invalid_line))
     end
     self
   end
