@@ -31,7 +31,7 @@ describe AreaData do
     line, i = m[0], m.begin(0)
     area_data.contents.insert(i, line)
 
-    expect_one_error(area_data, AreaData.err_msg(:duplicate) % line[0] )
+    expect_one_error(area_data, AreaData.err_msg(:duplicate) % line[0])
   end
 
   it "calls the correct parse method for each line type" do
@@ -67,21 +67,26 @@ describe AreaData do
       expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area plane")
     end
 
-    it "detects out-of-range sectors" do
+    it "detects out-of-range zone" do
       i = area_data.contents.index(/(?<=P \d )\d/)
       area_data.contents.insert(i, "99")
 
       expect_one_error(area_data, AreaData.err_msg(:zone_out_of_range))
     end
 
-    it "detects non-numeric sectors" do
+    it "detects non-numeric zone" do
       i = area_data.contents.index(/(?<=P \d )\d/)
       area_data.contents[i] = "a"
 
       expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area zone")
     end
 
-    it "parses the plane and sector data"
+    it "parses the plane and zone data" do
+      area_data.parse
+
+      expect(area_data.plane).to eq(2)
+      expect(area_data.zone).to eq(1)
+    end
 
   end
 
@@ -108,7 +113,13 @@ describe AreaData do
       expect_one_error(area_data, AreaData.err_msg(:bad_bit) % "Area flags")
     end
 
-    it "parses the area flag data"
+    it "parses the area flag data" do
+      area_data.parse
+
+      expect(area_data.flags).to be_an_instance_of(Bits)
+      expect(area_data.flags.bit? 2).to be_true
+      expect(area_data.flags.bit? 16).to be_true
+    end
 
   end
 
@@ -125,16 +136,29 @@ describe AreaData do
       i, j = area_data.contents.match(/(?<=O )\d+/).offset(0)
       area_data.contents[i,2] = "hi"
 
-      expect_one_error(area_data, AreaData.err_msg(:bad_line) % "outlaw")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "outlaw")
     end
 
-    it "parses the outlaw data"
+    it "parses the outlaw data" do
+      area_data.parse
+
+      expect(area_data.outlaw[:dump_vnum]).to eq(11423)
+      expect(area_data.outlaw[:jail_vnum]).to eq(11406)
+      expect(area_data.outlaw[:death_row_vnum]).to eq(11498)
+      expect(area_data.outlaw[:executioner_vnum]).to eq(11400)
+      expect(area_data.outlaw[:justice_factor]).to eq(150)
+    end
 
   end
 
   context "when parsing a kspawn" do
 
-    it "detects invalid non-numeric elements"
+    it "detects invalid non-numeric elements" do
+      i = area_data.contents.index("-1")
+      area_data.contents.insert(i, "hi")
+
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "seeker")
+    end
 
     it "can parse a kspawn spanning multiple lines" do
       i = area_data.contents.index("~")
@@ -151,11 +175,12 @@ describe AreaData do
       area_data.parse
 
       # This syntax rubs me the wrong way, but then so do porcupines, and
-      # you don't see THEM whip-stopping the barnyard corral, now do ya.
-      # Nope, you sure don't.
+      # you don't see THEM varnishing the shingles at the barnyard corral,
+      # now do ya. Nope, you sure don't.
       expect(area_data.errors.one? do |error|
         error.description == AreaData.err_msg(:kspawn_no_tilde)
       end)
+      # This emporary insanity brought to you by Lumoloth, the deceiver.
     end
 
     it "detects an extra tilde" do
@@ -165,7 +190,16 @@ describe AreaData do
       expect_one_error(area_data, AreaData.err_msg(:kspawn_extra_tilde))
     end
 
-    it "parses the area kspawn"
+    it "parses the area kspawn" do
+      area_data.parse
+
+      expect(area_data.kspawn).to_not be_nil
+      expect(area_data.kspawn[:condition]).to eq(1)
+      expect(area_data.kspawn[:command]).to eq(3)
+      expect(area_data.kspawn[:mob_vnum]).to eq(8623)
+      expect(area_data.kspawn[:room_vnum]).to eq(-1)
+      expect(area_data.kspawn[:text]).to eq("Oh dear, what have you done?")
+    end
 
   end
 
@@ -180,12 +214,22 @@ describe AreaData do
 
     it "detects invalid non-numeric elements" do
       i, j = area_data.contents.match(/(?<=M )\d+/).offset(0)
-      area_data.contents[i,2] = "hi"
+      area_data.contents[i] = "h"
 
-      expect_one_error(area_data, AreaData.err_msg(:bad_line) % "area modifier")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area modifier")
     end
 
-    it "parses the area modification data"
+    it "parses the area modifier data" do
+      area_data.parse
+
+      expect(area_data.modifier).to_not be_nil
+      expect(area_data.modifier[:xpgain_mod]).to eq(0)
+      expect(area_data.modifier[:hp_regen_mod]).to eq(13)
+      expect(area_data.modifier[:mana_regen_mod]).to eq(14)
+      expect(area_data.modifier[:move_regen_mod]).to eq(15)
+      expect(area_data.modifier[:statloss_mod]).to eq(50)
+      expect(area_data.modifier[:respawn_room]).to eq(11499)
+    end
 
   end
 
@@ -202,10 +246,21 @@ describe AreaData do
       i, j = area_data.contents.match(/(?<=G )\d+/).offset(0)
       area_data.contents[i,2] = "hi"
 
-      expect_one_error(area_data, AreaData.err_msg(:bad_line) % "group exp")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "group exp")
     end
 
-    it "parses the group exp data"
+    it "parses the group exp data" do
+      area_data.parse
+
+      expect(area_data.group_exp).to_not be_nil
+      expect(area_data.group_exp[:pct0]).to eq(100)
+      expect(area_data.group_exp[:num1]).to eq(7)
+      expect(area_data.group_exp[:pct1]).to eq(45)
+      expect(area_data.group_exp[:num2]).to eq(11)
+      expect(area_data.group_exp[:pct2]).to eq(10)
+      expect(area_data.group_exp[:pct3]).to eq(1)
+      expect(area_data.group_exp[:diversity]).to eq(25)
+    end
 
   end
 
