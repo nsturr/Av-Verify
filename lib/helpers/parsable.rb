@@ -1,3 +1,5 @@
+require_relative "avcolors"
+
 module Parsable
 
   def self.included(base)
@@ -13,8 +15,6 @@ module Parsable
   end
 
   attr_reader :errors
-
-  Error = Struct.new(:line, :type, :context, :description)
 
   def err(line, context, description)
     error = Error.new(line, :error, context, description)
@@ -44,7 +44,42 @@ module Parsable
   end
 
   def valid?
-    self.errors.any? { |error| error[:type] == :error }
+    self.errors.any? { |error| error.type == :error }
+  end
+
+  class Error
+    attr_accessor :line, :type, :context, :description
+
+    COLOR = {
+      warning: :R,
+      error: :BR,
+      nb: :Y,
+      ugly: :CC
+    }
+
+    def initialize(line, type, context, description)
+      @line, @type, @context, @description = line, type, context, description
+    end
+
+    def to_pretty
+      to_s(true)
+    end
+
+    def to_s(color=false)
+      # Error reports will look like this by default:
+      # Line NNNN: Description of error
+      # --> The offending line [only displayed if error[:context] is not nil]
+
+      text_line = "Line #{self.line}:"
+      text_indent = "-->"
+      if color
+        text_line.CC!(COLOR[self.type])
+        text_indent.CC!(COLOR[self.type])
+      end
+      formatted = "#{text_line} #{self.description}\n"
+      formatted += "#{text_indent} #{self.context}\n" unless self.context.nil?
+      formatted + "\n"
+    end
   end
 
 end
