@@ -47,4 +47,8 @@ class AreaHeader < Section
     self
   end
 
+  def to_hash
+    {name: self.name, author: self.author, level: self.level}
+  end
+
 end

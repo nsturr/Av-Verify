@@ -52,7 +52,7 @@ class Helps < Section
 
     @contents.each_line do |line|
       @current_line += 1
-      help_body << line << "\n"
+      help_body << line
 
       if expect_header
         line_number = @current_line
