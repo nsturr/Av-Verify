@@ -70,18 +70,18 @@ class Area
     @main_sections = extract_main_sections(data)
   end
 
-  def has_section? section
+  def get_section section
     if section.is_a? Symbol
       section = section.to_s
     end
 
     if section == "areaheader"
-      @main_sections.key? "area"
+      @main_sections["area"]
     elsif section.is_a? String
       section = section.downcase.gsub("_", "")
-      @main_sections.key? section
+      @main_sections[section]
     elsif section.is_a? Class
-      @main_sections.values.any? { |s| s.class == section }
+      @main_sections.find { |_, s| s.class == section }
     end
   end
 
