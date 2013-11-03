@@ -26,17 +26,38 @@ Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
   * <code>Shops</code>
   * <code>Specials</code>
 
-* <code>LineByLineItem</code> includes <code>Parsable</code> and <code>TheTroubleWithTildes</code>
+* <code>LineByLineItem</code> includes <code>Parsable</code> and <code>TheTroubleWithTildes</code>. Its subclasses are all parsed the same way (line by line, if you couldn't guess)
   * <code>Mobile</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
   * <code>Object</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
   * <code>Room</code> includes <code>HasQuotedKeywords</code>
-  * <code>Shop</code>
+  * <code>Shop</code> (is the bane of my existance)
 
 * <code>HelpFile</code> includes <code>Parsable</code>, <code>HasQuoteKeywords</code>, and <code>TheTroubleWithTildes</code>
 * <code>Reset</code> includes <code>Parsable</code>
 * <code>Special</code> includes <code>Parsable</code>
-* <code>Bits</code>
-* <code>Error</code>
+* <code>Bits</code> inherits from <code>Array</code>, and has the following methods for dealing with bit fields:
+  * <code>Bits#bit?(i)</code> true if <code>i</code> is part of the bit field
+  * <code>Bits::pattern</code> & <code>Bits::insert</code> patterns
+* <code>Error</code> is an error. It can be of type <code>:error</code>, <code>:warning</code>, <code>:nb</code>, or <code>:ugly</code>
+
+### Modules
+
+#### AreaAttributes
+Gives <code>Area</code> its getter methods.
+
+#### Parsable
+Supplies the <code>Error</code> class and bestows the <code>err</code> method (and its ilk), and the <code>error_report</code> method that prints all of the object's errors.
+
+#### HasApplyFlag
+Bestows the <code>parse_apply_flag</code> method.
+
+#### HasQuotedKeywords
+Bestows the <code>parse_quoted_keywords</code> method which turns a string of keywords into an array of keywords, taking single quotes into account.
+
+Also generates errors for mismatched quotes, and if supplied a boolean will generate a warning if there are any quotes in the keywords. (Since you probably don't want to be quoting an object keyword.)
+
+#### TheTroubleWithTildes
+It is what it sounds like.
 
 
 ## vProg
