@@ -2,30 +2,45 @@ module AreaAttributes
 
   #AREA
   def name
-    s = get_section("area")
-    s ? s.name : nil
+    unless @name
+      s = @main_sections["area"]
+      @name = s ? s.name : nil
+    end
+    @name
   end
 
   def author
-    s = get_section("area")
-    s ? s.author : nil
+    unless @author
+      s = @main_sections["area"]
+      @author = s ? s.author : nil
+    end
+    @author
   end
 
   def level
-    s = get_section("area")
-    s ? s.level : nil
+    unless @level
+      s = @main_sections["area"]
+      @level = s ? s.level : nil
+    end
+    @level
   end
 
   #AREADATA
 
   def plane
-    s = get_section("areadata")
-
+    unless @plane
+      s = @main_sections["areadata"]
+      @plane = s ? s.plane : nil
+    end
+    @plane
   end
 
   def zone
-    s = get_section("areadata")
-
+    unless @zone
+      s = @main_sections["areadata"]
+      @zone = s ? s.zone : nil
+    end
+    @zone
   end
 
   def sector
@@ -33,62 +48,101 @@ module AreaAttributes
   end
 
   def flags
-    s = get_section("areadata")
-
+    unless @flags
+      s = @main_sections["areadata"]
+      @flags = s ? s.flags : nil
+    end
+    @flags
   end
 
-  #outlawy stuff here
-
-  def kspawn
-    s = get_section("areadata")
-
+  def outlaw
+    unless @outlaw
+      s = @main_sections["areadata"]
+      @outlaw = s ? s.outlaw : nil
+    end
+    @outlaw
   end
 
-  def modifications
-    s = get_section("areadata")
+  def seeker
+    unless @seeker
+      s = @main_sections["areadata"]
+      @seeker = s ? s.kspawn : nil
+    end
+    @seeker
+  end
 
+  def modifiers
+    unless @modifiers
+      s = @main_sections["areadata"]
+      @modifiers = s ? k.modifiers : nil
+    end
+    @modifiers
   end
 
   def group_exp
-    s = get_section("areadata")
-
+    unless @group_exp
+      s = @main_sections["areadata"]
+      @group_exp = s ? k.group_exp : nil
+    end
+    @group_exp
   end
 
   # the regular sections
 
   def helps
-    s = get_section("helps")
-    s.help_files
+    unless @helps
+      s = @main_sections["helps"]
+      @helps = s ? s.help_files : nil
+    end
+    @helps
   end
 
   def mobiles
-    s = get_section("mobiles")
-    s.mobiles
+    unless @mobiles
+      s = @main_sections["mobiles"]
+      @mobiles = s ? s.mobiles : nil
+    end
+    @mobiles
   end
 
   def objects
-    s = get_section("objects")
-    s.objects
+    unless @objects
+      s = @main_sections["objects"]
+      @objects = s ? s.objects : nil
+    end
+    @objects
   end
 
   def rooms
-    s = get_section("rooms")
-    s.rooms
+    unless @rooms
+      s = @main_sections["rooms"]
+      @rooms = s ? s.rooms : nil
+    end
+    @rooms
   end
 
   def resets
-    s = get_section("resets")
-    s.resets
+    unless @resets
+      s = @main_sections["resets"]
+      @resets = s ? s.resets : nil
+    end
+    @resets
   end
 
   def shops
-    s = get_section("shops")
-    s.shops
+    unless @shops
+      s = @main_sections["shops"]
+      @shops = s ? s.shops : nil
+    end
+    @shops
   end
 
   def specials
-    s = get_section("specials")
-    s.specials
+    unless @specials
+      s = @main_sections["specials"]
+      @specials = s ? s.specials : nil
+    end
+    @specials
   end
 
 end

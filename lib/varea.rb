@@ -79,11 +79,11 @@ class Area
     end
   end
 
-  private
+  def parse(id)
 
-  def get_section(id)
-    @main_sections.find { |section| section.id == id.downcase }
   end
+
+  private
 
   def extract_main_sections(data)
     lines_so_far = 1
