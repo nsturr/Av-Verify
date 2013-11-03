@@ -7,6 +7,10 @@ describe Helps do
 
   let(:helps) { Helps.new(help.dup) }
 
+  it_should_behave_like Section do
+    let(:section) { helps }
+  end
+
   it_should_behave_like Parsable do
     let(:item) { helps }
   end

@@ -158,7 +158,7 @@ class Reset
 
   def parse
     super # set parsed to true
-    
+
     if self.type == :invalid
       err(@line_number, @line, Reset.err_msg(:invalid_reset))
     else

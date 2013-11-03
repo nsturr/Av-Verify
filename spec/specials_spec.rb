@@ -7,6 +7,10 @@ describe Specials do
 
   let(:specials) { Specials.new(data) }
 
+  it_should_behave_like Section do
+    let(:section) { specials }
+  end
+
   it_should_behave_like Parsable do
     let(:item) { specials }
   end

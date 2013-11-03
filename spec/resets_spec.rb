@@ -7,6 +7,10 @@ describe Resets do
 
   let(:resets) { Resets.new(data) }
 
+  it_should_behave_like Section do
+    let(:section) { resets }
+  end
+
   it_should_behave_like Parsable do
     let(:item) { resets }
   end
