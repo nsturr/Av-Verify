@@ -40,7 +40,7 @@ class VnumSection < Section
         err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
         next
       end
-      err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum)) unless first_line =~ /^#\d+\s*$/
+      err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum)) unless entry =~ /\A#\d+\s*$/
       @raw_entries << self.class.child_class.new(entry, entry_line_number)
     end
   end
