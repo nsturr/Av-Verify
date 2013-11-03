@@ -92,7 +92,7 @@ class Special
 
       vnum, spec = self.line.split(" ", 4)[1..2] # Drop the comment at the end
       unless [vnum, spec].any? { |el| el.nil? }
-        if vnum =~ /^\d+$/
+        if vnum =~ /^-?\d+$/
           @vnum = vnum.to_i
           err(self.line_number, self.line, Special.err_msg(:negative_vnum)) if @vnum < 0
         else
@@ -102,15 +102,15 @@ class Special
         # include potential comments starting with * smooshed up against the spec
         if spec =~ /^\w+(?:\*.*|$)/
           @spec = spec[/^[^\*]*/].downcase
-          err(self.line_number, self.line, Section.err_msg(:unknown_spec)) unless SPECIALS.include? @spec
+          err(self.line_number, self.line, Special.err_msg(:unknown_spec)) unless SPECIALS.include? @spec
         else
-          err(self.line_number, self.line, Section.err_msg(:invalid_spec))
+          err(self.line_number, self.line, Special.err_msg(:invalid_spec))
         end
       else
-        err(self.line_number, self.line, Section.err_msg(:not_enough_tokens))
+        err(self.line_number, self.line, Special.err_msg(:not_enough_tokens))
       end
     else
-      err(self.line_number, self.line, Section.err_msg(:invalid_line))
+      err(self.line_number, self.line, Special.err_msg(:invalid_line))
     end
     self
   end
