@@ -20,6 +20,10 @@ class Shops < Section
     split_shops
   end
 
+  def to_s
+    "#SHOPS: #{self.shops.size} entries, line #{self.line_number}"
+  end
+
   def split_shops
     @delimiter = slice_delimiter
     # split on exactly one number in a line, maybe some invalid non-numbers after,
@@ -45,6 +49,7 @@ class Shops < Section
     else
       err(@current_line, nil, "Shops section ends without terminating 0")
     end
+    self.shops
   end
 
 end
@@ -60,6 +65,10 @@ class Shop < LineByLineObject
     @section_end = false
   end
 
+  def to_s
+    "<Shop: vnum #{self.vnum}, line #{line_number}>"
+  end
+
   def parse
     super
     unless @expectation == :vnum
@@ -70,6 +79,7 @@ class Shop < LineByLineObject
         end
       err(@current_line, nil, "Shop terminates without #{expectation} line")
     end
+    self
   end
 
   def parse_vnum line

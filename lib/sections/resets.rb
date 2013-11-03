@@ -30,6 +30,10 @@ class Resets < Section
     split_resets
   end
 
+  def to_s
+    "#RESETS: #{self.resets.size} entries, line #{self.line_number}"
+  end
+
   def split_resets
     @delimiter = slice_delimiter
 
@@ -95,6 +99,7 @@ class Resets < Section
       end
     end
 
+    self.resets
   end
 
 end
@@ -142,6 +147,10 @@ class Reset
       end
     @attachments = []
     @errors = []
+  end
+
+  def to_s
+    "<Reset: #{self.type}, #{self.vnum}, line #{self.line_number}>"
   end
 
   def parse

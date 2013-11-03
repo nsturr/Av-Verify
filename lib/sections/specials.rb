@@ -4,16 +4,20 @@ class Specials < Section
 
   @section_delimiter = "^S"
 
-  attr_reader :specials, :line_number, :errors
+  attr_reader :specials, :errors
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @id = "SPECIALS"
+    @id = "specials"
 
     @specials = []
 
     slice_first_line
     split_specials
+  end
+
+  def to_s
+    "#SPECIALS: #{self.specials.size} entries, line #{self.line_number}"
   end
 
   def split_specials
@@ -47,7 +51,7 @@ class Specials < Section
         err(line_num, bad_line, "#SPECIALS section continues after terminating S")
       end
     end
-
+    self.specials
   end
 
 end
@@ -61,6 +65,10 @@ class Special
     @line = line
     @line_number = line_number
     @errors = []
+  end
+
+  def to_s
+    "<Special: vnum #{self.vnum}, #{self.spec}>"
   end
 
   def parse
@@ -89,7 +97,7 @@ class Special
     else
       err(self.line_number, self.line, "Invalid special line")
     end
-
+    self
   end
 
 end

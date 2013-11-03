@@ -17,6 +17,10 @@ class Rooms < VnumSection
     @id = "ROOMS"
   end
 
+  def to_s
+    "#ROOMS: #{self.rooms.size} entries, line #{self.line_number}"
+  end
+
   def rooms
     @entries
   end
@@ -46,6 +50,10 @@ class Room < LineByLineObject
     # @recent_door
   end
 
+  def to_s
+    "<Room: vnum #{self.vnum}, #{self.name}, line #{self.line_number}>"
+  end
+
   def parse
     super
     if @expectation != :end
@@ -66,6 +74,7 @@ class Room < LineByLineObject
 
       err(@current_line, nil, whine)
     end
+    self
   end
 
   def parse_vnum line
@@ -101,7 +110,7 @@ class Room < LineByLineObject
       expect :roomflags_sector
       return :redo
     else
-      @description << line
+      @description << line << "\n"
     end
     if has_tilde? line
       expect :roomflags_sector
@@ -189,7 +198,7 @@ class Room < LineByLineObject
   end
 
   def parse_door_desc line
-    @recent_door[:description] << line[/[^~]*/]
+    @recent_door[:description] << line[/[^~]*/] << "\n"
     ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
 
     if has_tilde? line
@@ -264,7 +273,7 @@ class Room < LineByLineObject
 
   def parse_multiline_edesc line
     ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
-    @edesc[@recent_keywords] << line[/[^~]*/]
+    @edesc[@recent_keywords] << line[/[^~]*/] << "\n"
 
     if has_tilde? line
       expect :misc

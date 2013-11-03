@@ -18,6 +18,10 @@ class Objects < VnumSection
     @id = "OBJECTS"
   end
 
+  def to_s
+    "#OBJECTS: #{self.objects.size} entries, line #{self.line_number}"
+  end
+
   def objects
     @entries
   end
@@ -75,6 +79,10 @@ class Objekt < LineByLineObject
     # @last_multiline
   end
 
+  def to_s
+    "<Object: vnum #{self.vnum}, #{self.short_desc}, line #{self.line_number}>"
+  end
+
   def parse
     super
     if @expectation == :multiline_edesc
@@ -125,7 +133,7 @@ class Objekt < LineByLineObject
     ugly(@current_line, line, Objekt.err_msg(:visible_tab)) if line.include?("\t")
     @long_line += 1
 
-    @long_desc << line
+    @long_desc << line << "\n"
 
     if has_tilde? line
       expect :description
@@ -146,7 +154,7 @@ class Objekt < LineByLineObject
       expect :type_extra_wear
       return :redo
     else
-      @adesc << line
+      @adesc << line << "\n"
     end
 
     if has_tilde? line
@@ -271,12 +279,11 @@ class Objekt < LineByLineObject
         err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
         unless isolated_tilde? line
           ugly(@current_line, line, Objekt.err_msg(:tilde_not_alone) % "Edesc body")
-          @edesc[@recent_keywords] << line[/[^~]*/]
         end
       end
     end
 
-    @edesc[@recent_keywords] << line[/[^~]*/]
+    @edesc[@recent_keywords] << line[/[^~]*/] << "\n"
 
   end
 

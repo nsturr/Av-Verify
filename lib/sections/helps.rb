@@ -37,6 +37,10 @@ class Helps < Section
     slice_first_line # Takes off section name header
   end
 
+  def to_s
+    "#HELPS: #{self.help_files.size} entries, line #{self.line_number}"
+  end
+
   def split_help_files
 
     # grabs the delimiter and whatever (erroneous) content is after it
@@ -48,7 +52,7 @@ class Helps < Section
 
     @contents.each_line do |line|
       @current_line += 1
-      help_body << line
+      help_body << line << "\n"
 
       if expect_header
         line_number = @current_line
@@ -81,7 +85,7 @@ class Helps < Section
         err(line_num, bad_line, Helps.err_msg(:continues_after_delimiter))
       end
     end
-    self
+    self.help_files
   end
 
 end
@@ -105,6 +109,10 @@ class HelpFile
     @current_line = line_number
     @contents = contents.dup.rstrip
     @errors = []
+  end
+
+  def to_s
+    "<Help: level #{self.level}, #{self.keywords.join(" ")}, line #{self.line_number}>"
   end
 
   def parse

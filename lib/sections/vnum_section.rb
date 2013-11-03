@@ -45,7 +45,7 @@ class VnumSection < Section
         err(line_num, bad_line, "##{self.class.name} section continues after terminating #0")
       end
     end
-
+    @entries
   end
 
 end

@@ -19,6 +19,10 @@ class Mobiles < VnumSection
     @id = "MOBILES"
   end
 
+  def to_s
+    "#MOBILES: #{self.mobiles.size} entries, line #{self.line_number}"
+  end
+
   def mobiles
     @entries
   end
@@ -81,11 +85,16 @@ class Mobile < LineByLineObject
     @apply = Hash.new(0)
   end
 
+  def to_s
+    "<Mobile: vnum #{self.vnum}, #{self.short_desc}, line #{self.line_number}>"
+  end
+
   def parse
     super
     if @expectation == :multiline_kspawn
       err(@current_line, nil, Mobile.err_msg(:kspawn_no_tilde) % [@last_multiline, @current_line])
     end
+    self
   end
 
   def parse_vnum line
@@ -131,7 +140,7 @@ class Mobile < LineByLineObject
     ugly(@current_line, line, Mobile.err_msg(:visible_tab)) if line.include?("\t")
     @long_line += 1
 
-    @long_desc << line
+    @long_desc << line << "\n"
 
     if has_tilde? line
       expect :description
@@ -157,7 +166,7 @@ class Mobile < LineByLineObject
       expect :act_aff_align
       return :redo
     else
-      @description << line
+      @description << line << "\n"
     end
     if has_tilde? line
       expect :act_aff_align
