@@ -44,7 +44,7 @@ module Parsable
   end
 
   def valid?
-    self.errors.any? { |error| error.type == :error }
+    self.errors.none? { |error| error.type == :error }
   end
 
   class Error
