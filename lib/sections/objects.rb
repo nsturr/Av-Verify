@@ -80,6 +80,7 @@ class Objekt < LineByLineObject
     if @expectation == :multiline_edesc
       err(@current_line, nil, Objekt.err_msg(:edesc_no_tilde) % [last_multiline, @current_line])
     end
+    self
   end
 
   def parse_vnum line
