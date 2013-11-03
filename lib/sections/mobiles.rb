@@ -253,33 +253,36 @@ class Mobile < LineByLineObject
     case line.lstrip[0]
     when "R"
       err(@current_line, line, Mobile.err_msg(:race_duplicated)) && return if self.race
-      if m = line.match(/^R +(-?\d+)/)
-        @race = m[1].to_i
+      race, error = line.split[1..-1]
+      if race =~ /\A\d+\z/
+        @race = race.to_i
         err(@current_line, line, Mobile.err_msg(:race_out_of_bounds)) unless @race.between?(0, RACE_MAX)
       else
         err(@current_line, line, Mobile.err_msg(:non_numeric) % "race")
       end
-      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "race") unless line =~ /^R +-?\d+$/
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "race") unless error.nil?
 
     when"C"
       err(@current_line, line, Mobile.err_msg(:class_duplicated)) && return if self.klass
-      if m = line.match(/^C +(-?\d+)/)
-        @klass = m[1].to_i
+      klass, error = line.split[1..-1]
+      if klass =~ /\A\d+\z/
+        @klass = klass.to_i
         err(@current_line, line, Mobile.err_msg(:class_out_of_bounds)) unless @klass.between?(0, CLASS_MAX)
       else
         err(@current_line, line, Mobile.err_msg(:non_numeric) % "class")
       end
-      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "class") unless line =~ /^C +-?\d+$/
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "class") unless error.nil?
 
     when "L"
       err(@current_line, line, Mobile.err_msg(:team_duplicated)) && return if self.team
-      if m = line.match(/^L +(-?\d+)/)
-        @team = m[1].to_i
+      team, error = line.split[1..-1]
+      if team =~ /\A\d+\z/
+        @team = team.to_i
         err(@current_line, line, Mobile.err_msg(:team_out_of_bounds)) unless @team.between?(0, TEAM_MAX)
-        err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "team") unless line =~ /^L +-?\d+$/
       else
         err(@current_line, line, Mobile.err_msg(:non_numeric) % "team")
       end
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "team") unless error.nil?
 
     when "A"
       # see HasApplyFlag module for this
