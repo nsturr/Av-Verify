@@ -36,9 +36,6 @@ class Mobile < LineByLineObject
   @ERROR_MESSAGES = {
     visible_tab: "Visible text contains a tab character",
     invalid_text_after: "Invalid text after %s",
-    invalid_vnum: "Invalid VNUM",
-    invalid_before_vnum: "Invalid text before VNUM",
-    invalid_after_vnum: "Invalid text after VNUM",
     tilde_absent: "%s has no terminating ~",
     tilde_absent_or_spans: "%s has no terminating ~ or spans multiple lines",
     tilde_invalid_text: "Invalid text after terminating ~",
@@ -99,13 +96,8 @@ class Mobile < LineByLineObject
 
   def parse_vnum line
     m = line.match(/#(?<vnum>\d+)/)
-    if m
-      @vnum = m[:vnum].to_i
-      err(@current_line, line, Mobile.err_msg(:invalid_before_vnum)) if m.pre_match =~ /\S/
-      err(@current_line, line, Mobile.err_msg(:invalid_after_vnum)) if m.post_match =~ /\S/
-    else
-      err(@current_line, line, Mobile.err_msg(:invalid_vnum))
-    end
+    # To even be created, a Mobile needs to have a valid vnum
+    @vnum = m[:vnum].to_i
     expect :name
   end
 

@@ -79,13 +79,8 @@ class Room < LineByLineObject
 
   def parse_vnum line
     m = line.match(/#(?<vnum>\d+)/)
-    if m
-      @vnum = m[:vnum].to_i
-      err(@current_line, line, "Invalid text before VNUM") if m.pre_match =~ /\S/
-      err(@current_line, line, "Invalid text after VNUM") if m.post_match =~ /\S/
-    else
-      err(@current_line, line, "Invalid VNUM line")
-    end
+    # To even be created, a Room needs to have a valid vnum
+    @vnum = m[:vnum].to_i
     expect :name
   end
 

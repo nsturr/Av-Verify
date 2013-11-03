@@ -4,6 +4,7 @@ class VnumSection < Section
 
   @ERROR_MESSAGES = {
     invalid_vnum: "Invalid %s VNUM",
+    invalid_after_vnum: "Invalid text on same line as VNUM",
     duplicate: "Duplicate %s #%i, first appears on line %i",
     no_delimiter: "#%s section lacks terminating #0",
     continues_after_delimiter: "#%s section continues after terminating #0",
@@ -39,6 +40,7 @@ class VnumSection < Section
         err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
         next
       end
+      err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum)) unless first_line =~ /^#\d+\s*$/
       @raw_entries << self.class.child_class.new(entry, entry_line_number)
     end
   end
