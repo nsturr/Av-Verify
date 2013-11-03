@@ -34,6 +34,7 @@ require './helpers/bits'
 require './helpers/avcolors'
 require './helpers/parsable'
 require './helpers/area_attributes'
+require './helpers/correlate_sections'
 
 %w{
   area_header area_data helps mobiles
@@ -43,6 +44,7 @@ require './helpers/area_attributes'
 class Area
   include Parsable
   include AreaAttributes
+  include CorrelateSections
 
   def initialize(filename, flags=[])
     # How 'bout a little FILE, Scarecrow! >:D

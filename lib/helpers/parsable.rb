@@ -71,17 +71,23 @@ module Parsable
       text_error = errors == 1 ? "1 error" : "#{errors} errors"
       text_warning = warnings == 1 ? "1 warning" : "#{warnings} warnings"
       text_cosmetic = cosmetic == 1 ? "1 cosmetic issue" : "#{cosmetic} cosmetic issues"
+      text_notice = notices == 1 ? "1 notice" : "#{notices} notices"
 
       unless nocolor
         text_error.BR!
         text_warning.R!
         text_cosmetic.C!
+        text_notice.Y!
       end
 
       summary = "#{text_intro} #{text_error}, #{text_warning}."
       if cosmetic > 0
         summary.chop!
-        summary += ", #{text_cosmetic}."
+        summary << ", #{text_cosmetic}."
+      end
+      if notices > 0
+        summar.chop!
+        summary << ", #{text_notice}."
       end
       puts summary
 
