@@ -10,7 +10,7 @@ describe Resets do
   it "ignores whitespace and comments" do
     resets.parse
 
-    expect(resets.errors.size).to eq(0)
+    expect(resets.errors).to be_empty
   end
 
   it "detects resets whose limit won't let them load" do
@@ -54,6 +54,13 @@ describe Reset do
     invalid = Reset.new("This probably should have been a comment, right?")
 
     expect_one_error(invalid, Reset.err_msg(:invalid_reset))
+  end
+
+  it "ignores comments starting with *" do
+    valid = Reset.new("M 0 11400 1 11406* Questmaster -> Northern Forge")
+    valid.parse
+
+    expect(valid.errors).to be_empty
   end
 
   context "when parsing a mob reset" do
