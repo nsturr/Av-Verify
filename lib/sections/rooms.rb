@@ -282,10 +282,7 @@ class Room < LineByLineObject
   private
 
   def new_door direction
-    h = Hash.new
-    h[:direction] = direction
-    h[:description] = ""
-    h
+    {direction: direction, description: ""}
   end
 
 end
