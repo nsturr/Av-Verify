@@ -3,7 +3,7 @@
 SECTIONS = %w{area areadata helps mobiles objects rooms resets shops specials $}
 
 SPECIALS = %w{
-	spec_animate_dead spec_archer spec_archerall spec_assassin 
+	spec_adaptive spec_animate_dead spec_archer spec_archerall spec_assassin 
 	spec_battle_cleric spec_battle_mage spec_battle_sor spec_bci_lite 
 	spec_berserker spec_bodyguard spec_breath_acid spec_breath_any 
 	spec_breath_fire spec_breath_frost spec_breath_gas spec_breath_lightning 
