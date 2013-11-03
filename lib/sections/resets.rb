@@ -1,5 +1,6 @@
 require_relative "section"
 require_relative "../helpers/parsable"
+require_relative "../helpers/avconstants"
 
 class Resets < Section
 
@@ -15,7 +16,7 @@ class Resets < Section
     continues_after_delimiter: "#RESETS section continues after terminating S"
   }
 
-  def initialize(contents, line_number)
+  def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "resets"
 
@@ -27,7 +28,6 @@ class Resets < Section
     @previous_reset_type = :null
 
     slice_first_line
-    split_resets
   end
 
   def to_s
@@ -45,11 +45,10 @@ class Resets < Section
       @resets << Reset.new(line.rstrip, @current_line)
     end
 
-    # TODO: we never checked for invalid text after delimiter
-
   end
 
   def parse
+    split_resets
 
     @resets.each do |reset|
 
@@ -114,11 +113,13 @@ class Reset
     reset_e_matches: "Line should match: E <0 or -#> <vnum> 0 <wear>",
     reset_o_matches: "Line should match: O 0 <vnum> 0 <room>",
     reset_p_matches: "Line should match: O 0 <vnum> 0 <room>",
+    reset_d_matches: "Line should match: D 0 <room> <direction> <state>",
     reset_r_matches: "Line should match: R 0 <vnum> <number_of_exits>",
     negative: "%s can't be negative",
     zero_or_negative: "%s can't be 0 or negative",
     invalid_vnum: "Invalid %s VNUM",
     invalid_limit: "Invalid %s spawn limit",
+    invalid_field: "Invalid %s",
     not_enough_tokens: "Not enough tokens on in %s reset line",
     wear_loc_out_of_bounds: "Wear location out of bounds 0 to #{WEAR_MAX}",
     door_out_of_bounds: "Door number out of bounds 0 to 5",
@@ -132,7 +133,7 @@ class Reset
   attr_reader :line_number, :line, :vnum, :type, :target, :limit, :slot, :errors,
     :attachments
 
-  def initialize(line, line_number)
+  def initialize(line, line_number=1)
     @line = line
     @line_number = line_number
     @type = case line.lstrip[0]
@@ -207,7 +208,7 @@ class Reset
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
       else
-        err(@line_number, @line, Reset.err_msg(:invalid) % "inventory spawn limit")
+        err(@line_number, @line, Reset.err_msg(:invalid_limit) % "inventory")
       end
 
       if vnum =~ /^-?\d+$/
@@ -234,7 +235,7 @@ class Reset
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
       else
-        err(@line_number, @line, Reset.err_msg(:reset_e_matches))
+        err(@line_number, @line, Reset.err_msg(:invalid_limit) % "equipment")
       end
 
       if vnum =~ /^-?\d+$/
@@ -253,7 +254,7 @@ class Reset
         @slot = wear[/[^\*]*/].to_i
         err(@line_number, @line, Reset.err_msg(:wear_loc_out_of_bounds)) unless @slot.between?(0,WEAR_MAX)
       else
-        err(@line_number, @line, Reset.err_msg(:invalid) % "wear location")
+        err(@line_number, @line, Reset.err_msg(:invalid_field) % "wear location")
       end
     else
       err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "equipment")
@@ -281,7 +282,7 @@ class Reset
         @target = room[/[^\*]*/].to_i
         err(@line_number, @line, Reset.err_msg(:negative) % "Target room VNUM") if @target < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "target room")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
       end
     else
       err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "object")
@@ -309,7 +310,7 @@ class Reset
         @target = container[/^[^*]*/].to_i
         err(@line_number, @line, Reset.err_msg(:negative) % "Target container VNUM") if @target < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "Target container")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "container")
       end
     else
       err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "container")
@@ -321,6 +322,10 @@ class Reset
     zero, vnum, direction, state, comment = line.split(" ", 6)[1..-1]
 
     unless [zero, vnum, direction, state].any? { |el| el.nil? }
+
+      unless zero =~ /\A\d+\z/
+        err(@line_number, @line, Reset.err_msg(:reset_d_matches))
+      end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
@@ -337,7 +342,7 @@ class Reset
       end
 
       if state =~ /^-?\d+\*?$/
-        @slot = state[/~[^\*]*/].to_i
+        @slot = state[/^[^\*]*/].to_i
         err(@line_number, @line, Reset.err_msg(:door_state_out_of_bounds)) unless @slot.between?(0,8)
       else
         err(@line_number, @line, Reset.err_msg(:bad_door_state))
@@ -361,12 +366,12 @@ class Reset
         @target = target.to_i
         err(@line_number, @line, Reset.err_msg(:negative) % "Room VNUM") if @target < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "target room")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
       end
 
       if number_of_exits =~ /^-?\d+\*?$/
         @slot = number_of_exits.to_i
-        err(@line_number, @line, Reset.err_msg(:door_number_out_of_bounds)) unless @slot.between?(0,6)
+        err(@line_number, @line, Reset.err_msg(:number_of_exits)) unless @slot.between?(0,6)
       else
         err(@line_number, @line, Reset.err_msg(:bad_number_of_exits))
       end
