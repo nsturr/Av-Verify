@@ -2,7 +2,6 @@
 
 Area and Prog verifiers for AVATAR Mud, implemented in Ruby.
 
-
 ## vArea
 
 Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
@@ -10,6 +9,35 @@ Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
 * <code>nowarning</code>: Suppresses warnings that won't prevent the area from functioning (typically these consist of loading vnums from outside the area file)
 * <code>cosmetic</code>: Shows cosmetic warnings that are normally suppressed (mostly just tildes on the wrong line)
 * <code>nocolor</code>: Disables ANSI color codes, so output can be cleanly piped into another program
+
+### Classes
+
+* <code>Area</code> includes <code>Parsable</code> and <code>AreaAttributes</code>
+
+* <code>Section</code> includes <code>Parsable</code>
+  * <code>AreaHeader</code>
+  * <code>AreaData</code>
+  * <code>Helps</code>
+  * <code>VnumSection</code>
+    * <code>Mobiles</code>
+    * <code>Objects</code>
+    * <code>Rooms</code>
+  * <code>Resets</code>
+  * <code>Shops</code>
+  * <code>Specials</code>
+
+* <code>LineByLineItem</code> includes <code>Parsable</code> and <code>TheTroubleWithTildes</code>
+  * <code>Mobile</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
+  * <code>Object</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
+  * <code>Room</code> includes <code>HasQuotedKeywords</code>
+  * <code>Shop</code>
+
+* <code>HelpFile</code> includes <code>Parsable</code>, <code>HasQuoteKeywords</code>, and <code>TheTroubleWithTildes</code>
+* <code>Reset</code> includes <code>Parsable</code>
+* <code>Special</code> includes <code>Parsable</code>
+* <code>Bits</code>
+* <code>Error</code>
+
 
 ## vProg
 
