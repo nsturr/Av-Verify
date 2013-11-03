@@ -79,56 +79,6 @@ class Area
 		end
 	end
 
-	def error_report(nocolor=true)
-		unless @errors.empty?
-			nocolor = @flags.include?(:nocolor)
-
-			errors, warnings, notices, cosmetic = 0, 0, 0, 0
-			@errors.each do |item|
-				errors += 1 if item.type == :error
-				warnings += 1 if item.type == :warning
-				notices += 1 if item.type == :nb
-				cosmetic += 1 if item.type == :ugly
-			end
-
-			text_intro = errors > 0 ? "Someone's been a NAUGHTY builder!" : "Error report:"
-			text_error = errors == 1 ? "1 error" : "#{errors} errors"
-			text_warning = warnings == 1 ? "1 warning" : "#{warnings} warnings"
-			text_cosmetic = cosmetic == 1 ? "1 cosmetic issue" : "#{cosmetic} cosmetic issues"
-
-			unless nocolor
-				text_error.BR!
-				text_warning.R!
-				text_cosmetic.C!
-			end
-
-			summary = "#{text_intro} #{text_error}, #{text_warning}."
-			if cosmetic > 0
-				summary.chop!
-				summary += ", #{text_cosmetic}."
-			end
-			puts summary
-
-			suppressed = 0
-			@errors.each do |error|
-				if error.type == :error
-					puts error.to_s(nocolor)
-				elsif error.type == :warning && !@flags.include?(:nowarning)
-					puts error.to_s(nocolor)
-				elsif error.type == :nb && @flags.include?(:notices)
-					puts error.to_s(nocolor)
-				elsif error.type == :ugly && @flags.include?(:cosmetic)
-					puts error.to_s(nocolor)
-				else
-					suppressed += 1
-				end
-			end
-			puts "Suppressed #{suppressed} items." if suppressed > 0
-		else
-			puts "No errors found."
-		end
-	end
-
 	private
 
 	def get_section(id)
