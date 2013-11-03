@@ -16,6 +16,10 @@ module Parsable
 
   attr_reader :errors
 
+  def parsed?
+    @parsed || false
+  end
+
   def err(line, context, description)
     error = Error.new(line, :error, context, description)
     @errors << error

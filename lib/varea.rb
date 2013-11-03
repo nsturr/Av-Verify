@@ -27,11 +27,13 @@
 #  Change some of the regexps to match tabs in addition to spaces
 #    (Mostly in #AREADATA but also in class/race/etc lines)
 #  When expecting door locks, properly interpret a single ~
+#  Fix the tildes that get appended to the shifted-on text fields
 
 require './helpers/avconstants'
 require './helpers/bits'
 require './helpers/avcolors'
 require './helpers/parsable'
+require './helpers/area_attributes'
 
 %w{ area_header area_data helps mobiles
 	  objects rooms resets shops specials }.each do |section|
@@ -40,13 +42,7 @@ end
 
 class Area
 	include Parsable
-
-	%w{ area areadata helps mobiles objects
-		 rooms resets shops specials }.each do |section|
-			define_method(section) do
-				get_section(section).first
-			end
-		end
+	include AreaAttributes
 
 	def initialize(filename, flags=[])
 		# How 'bout a little FILE, Scarecrow! >:D
@@ -79,6 +75,7 @@ class Area
 
 	def verify_all
 		@main_sections.each do |section|
+			next if section.parsed?
 			puts "Found ##{section.name} on line #{section.line_number}" if @flags.include?(:debug)
 			section.parse
 			@errors += section.errors
@@ -138,7 +135,7 @@ class Area
 	private
 
 	def get_section(id)
-		@main_sections.select { |section| section.id == id.upcase }
+		@main_sections.find { |section| section.id == id.upcase }
 	end
 
 	def extract_main_sections(data)
@@ -162,7 +159,8 @@ class Area
 			new_section = make_section(content, line_start_section)
 
 			if sections.any? { |s| s.class == new_section.class }
-				warn(new_section.line_number, nil, "Another #{new_section.class} section? This bodes ill.")
+				warn(new_section.line_number, nil, "Another #{new_section.class} section? This bodes ill. Skipping")
+				next
 			end
 			sections << new_section
 		end
