@@ -16,7 +16,7 @@ class Mobiles < VnumSection
 
   def initialize(contents, line_number)
     super(contents, line_number)
-    @id = "MOBILES"
+    @id = "mobiles"
   end
 
   def to_s

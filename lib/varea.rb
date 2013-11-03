@@ -74,7 +74,7 @@ class Area
 	end
 
 	def verify_all
-		@main_sections.each do |section|
+		@main_sections.each_value do |section|
 			next if section.parsed?
 			puts "Found ##{section.name} on line #{section.line_number}" if @flags.include?(:debug)
 			section.parse
@@ -135,14 +135,14 @@ class Area
 	private
 
 	def get_section(id)
-		@main_sections.find { |section| section.id == id.upcase }
+		@main_sections.find { |section| section.id == id.downcase }
 	end
 
 	def extract_main_sections(data)
 		lines_so_far = 1
 
 		separated = data.split(/^(?=#[a-zA-Z\$]+)/)
-		sections = []
+		sections = {}
 
 		separated.each do |content|
 			# Keep track of how many lines per section, so that the next section
@@ -162,10 +162,10 @@ class Area
 				warn(new_section.line_number, nil, "Another #{new_section.class} section? This bodes ill. Skipping")
 				next
 			end
-			sections << new_section
+			sections[new_section.id] = new_section
 		end
 
-		sections.compact
+		sections
 	end
 
 	def make_section(content, line_num)

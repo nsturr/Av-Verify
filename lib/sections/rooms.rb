@@ -14,7 +14,7 @@ class Rooms < VnumSection
 
   def initialize(contents, line_number)
     super(contents, line_number)
-    @id = "ROOMS"
+    @id = "rooms"
   end
 
   def to_s
