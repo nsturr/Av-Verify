@@ -55,10 +55,7 @@ class Area
 		total_lines = data.count("\n") + 1
 		data.rstrip!
 
-		@flags = []
-		unless flags.empty?
-			@flags = flags.map {|item| item.downcase.to_sym}
-		end
+		@flags = flags.map {|item| item.downcase.to_sym}
 
 		@errors = []
 

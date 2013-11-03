@@ -65,18 +65,14 @@ module Parsable
       @line, @type, @context, @description = line, type, context, description
     end
 
-    def to_pretty
-      to_s(true)
-    end
-
-    def to_s(color=false)
+    def to_s(nocolor=false)
       # Error reports will look like this by default:
       # Line NNNN: Description of error
       # --> The offending line [only displayed if error[:context] is not nil]
 
       text_line = "Line #{self.line}:"
       text_indent = "-->"
-      if color
+      unless nocolor
         text_line.CC!(COLOR[self.type])
         text_indent.CC!(COLOR[self.type])
       end
