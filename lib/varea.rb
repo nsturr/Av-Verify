@@ -31,27 +31,25 @@
 require './helpers/avconstants'
 require './helpers/bits'
 require './helpers/avcolors'
-require './helpers/parsable' # Bestows the err methods
+require './helpers/parsable'
 
-require './sections/area_header'
-require './sections/area_data'
-require './sections/helps'
-require './sections/mobiles'
-require './sections/objects'
-require './sections/rooms'
-require './sections/resets'
-require './sections/shops'
-require './sections/specials'
+%w{ area_header area_data helps mobiles
+	  objects rooms resets shops specials }.each do |section|
+		require "./sections/#{section}"
+end
 
 class Area
 	include Parsable
 
-	attr_reader :name, :mobiles, :objects, :rooms, :resets, :specials
+	%w{ area areadata helps mobiles objects
+		 rooms resets shops specials }.each do |section|
+			define_method(section) do
+				get_section(section).first
+			end
+		end
 
 	def initialize(filename, flags=[])
 		# How 'bout a little FILE, Scarecrow! >:D
-		@name = File.basename(filename)
-
 		unless File.exist?(filename)
 			puts "#{filename} not found, skipping."
 			return nil
@@ -79,10 +77,6 @@ class Area
 		@main_sections = extract_main_sections(data)
 	end
 
-	def get_section(id)
-		@main_sections.select { |section| section.id == id }
-	end
-
 	def verify_all
 		@main_sections.each do |section|
 			puts "Found ##{section.name} on line #{section.line_number}" if @flags.include?(:debug)
@@ -91,14 +85,11 @@ class Area
 		end
 	end
 
-	def error_report
+	def error_report(nocolor=true)
 		unless @errors.empty?
-			color = !@flags.include?(:nocolor)
+			nocolor = @flags.include?(:nocolor)
 
-			errors = 0
-			warnings = 0
-			notices = 0
-			cosmetic = 0
+			errors, warnings, notices, cosmetic = 0, 0, 0, 0
 			@errors.each do |item|
 				errors += 1 if item.type == :error
 				warnings += 1 if item.type == :warning
@@ -111,7 +102,7 @@ class Area
 			text_warning = warnings == 1 ? "1 warning" : "#{warnings} warnings"
 			text_cosmetic = cosmetic == 1 ? "1 cosmetic issue" : "#{cosmetic} cosmetic issues"
 
-			unless @flags.include?(:nocolor)
+			unless nocolor
 				text_error.BR!
 				text_warning.R!
 				text_cosmetic.C!
@@ -127,13 +118,13 @@ class Area
 			suppressed = 0
 			@errors.each do |error|
 				if error.type == :error
-					puts error.to_s(color)
+					puts error.to_s(nocolor)
 				elsif error.type == :warning && !@flags.include?(:nowarning)
-					puts error.to_s(color)
+					puts error.to_s(nocolor)
 				elsif error.type == :nb && @flags.include?(:notices)
-					puts error.to_s(color)
+					puts error.to_s(nocolor)
 				elsif error.type == :ugly && @flags.include?(:cosmetic)
-					puts error.to_s(color)
+					puts error.to_s(nocolor)
 				else
 					suppressed += 1
 				end
@@ -145,6 +136,10 @@ class Area
 	end
 
 	private
+
+	def get_section(id)
+		@main_sections.select { |section| section.id == id.upcase }
+	end
 
 	def extract_main_sections(data)
 		lines_so_far = 1
