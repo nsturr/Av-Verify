@@ -5,20 +5,22 @@ help = File.read("./spec/test-helps.are")
 
 describe Helps do
 
-  before(:each) do
-    @helps = Helps.new(help.dup)
+  let(:helps) { Helps.new(help.dup) }
+
+  it_should_behave_like Parsable do
+    let(:item) { helps }
   end
 
   it "detects invalid text after the delimiter" do
-    @helps.contents << "\n\nHey, good times man."
+    helps.contents << "\n\nHey, good times man."
 
-    expect_one_error(@helps, Helps.err_msg(:continues_after_delimiter))
+    expect_one_error(helps, Helps.err_msg(:continues_after_delimiter))
   end
 
   it "detects a missing delimiter" do
-    @helps.contents.slice!(/0\$~.*\z/m)
+    helps.contents.slice!(/0\$~.*\z/m)
 
-    expect_one_error(@helps, Helps.err_msg(:no_delimiter))
+    expect_one_error(helps, Helps.err_msg(:no_delimiter))
   end
 
 end
@@ -29,6 +31,10 @@ describe HelpFile do
     help_section = Helps.new(help.dup)
     help_section.parse
     help_section.help_files.first
+  end
+
+  it_should_behave_like Parsable do
+    let(:item) { help_file }
   end
 
   it "detects missing tildes on the keyword line" do

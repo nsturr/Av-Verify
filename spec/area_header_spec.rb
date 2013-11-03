@@ -10,6 +10,10 @@ describe AreaHeader do
   let(:bad_range) { AreaHeader.new("#AREA {51 51} Quietus Shadow Keep~") }
   let(:no_braces) { AreaHeader.new("#AREA {*HERO* Scevine The Forge~") }
 
+  it_should_behave_like Parsable do
+    let(:item) { valid_header }
+  end
+
   it "lets valid headers pass" do
     valid_header.parse
     expect(valid_header.errors).to be_empty

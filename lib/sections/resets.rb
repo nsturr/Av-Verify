@@ -48,6 +48,8 @@ class Resets < Section
   end
 
   def parse
+    super # set parsed to true
+
     split_resets
 
     @resets.each do |reset|
@@ -155,6 +157,8 @@ class Reset
   end
 
   def parse
+    super # set parsed to true
+    
     if self.type == :invalid
       err(@line_number, @line, Reset.err_msg(:invalid_reset))
     else

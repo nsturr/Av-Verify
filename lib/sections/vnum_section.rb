@@ -10,6 +10,10 @@ class VnumSection < Section
     split_entries
   end
 
+  def [](vnum)
+    @entries[vnum]
+  end
+
   def split_entries
 
     @delimiter = slice_delimiter
@@ -30,6 +34,7 @@ class VnumSection < Section
   end
 
   def parse
+    super # set @parsed to true
 
     @raw_entries.each do |entry|
       entry.parse

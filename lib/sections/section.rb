@@ -20,6 +20,10 @@ class Section
     @errors = []
   end
 
+  def parse
+    super
+  end
+
   def slice_first_line
     @contents.slice!(/\A.*(?:\n|\Z)/)
   end

@@ -43,6 +43,8 @@ class AreaData < Section
   end
 
   def parse
+    super # set parsed to true
+    
     section_end = false
 
     @contents.rstrip.each_line do |line|

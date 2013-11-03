@@ -16,6 +16,10 @@ module Parsable
 
   attr_reader :errors
 
+  def parse
+    @parsed = true
+  end
+
   def parsed?
     @parsed || false
   end

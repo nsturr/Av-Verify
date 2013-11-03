@@ -36,6 +36,8 @@ class Shops < Section
   end
 
   def parse
+    super # set parsed to true
+
     @shops.each do |shop|
       shop.parse
       @errors += shop.errors

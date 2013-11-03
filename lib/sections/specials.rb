@@ -37,6 +37,7 @@ class Specials < Section
   end
 
   def parse
+    super # set parsed to true
     split_specials
 
     @specials.each do |special|
@@ -87,6 +88,7 @@ class Special
   end
 
   def parse
+    super # set parsed to true
 
     if self.line.start_with? "M\s"
 

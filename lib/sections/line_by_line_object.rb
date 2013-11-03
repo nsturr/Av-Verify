@@ -14,6 +14,8 @@ class LineByLineObject
   end
 
   def parse
+    super # set parsed to true
+    
     expect :vnum
     @contents.each_line do |line|
       result = self.send("parse_#{@expectation}", line.rstrip)
