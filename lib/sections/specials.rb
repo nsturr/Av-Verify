@@ -7,7 +7,8 @@ class Specials < Section
 
   @ERROR_MESSAGES = {
     no_delimiter: "#SPECIALS section lacks terminating S",
-    continues_after_delimiter: "#SPECIALS section continues after terminating S"
+    continues_after_delimiter: "#SPECIALS section continues after terminating S",
+    duplicate_spec: "This will override mob's existing special: %s"
   }
 
   attr_reader :specials, :errors
@@ -16,7 +17,8 @@ class Specials < Section
     super(contents, line_number)
     @id = "specials"
 
-    @specials = []
+    @raw_lines = []
+    @specials = {}
 
     slice_first_line
   end
@@ -32,7 +34,7 @@ class Specials < Section
       @current_line += 1
       next if line.strip.empty?
       next if line.strip.start_with? "*"
-      @specials << Special.new(line, @current_line)
+      @raw_lines << Special.new(line, @current_line)
     end
   end
 
@@ -40,8 +42,13 @@ class Specials < Section
     super # set parsed to true
     split_specials
 
-    @specials.each do |special|
+    @raw_lines.each do |special|
       special.parse
+      vnum = special.vnum
+      if @specials.key? vnum
+        warn(special.line_number, special.line, Specials.err_msg(:duplicate_spec) % @specials[vnum].spec)
+      end
+      @specials[special.vnum] = special
       @errors += special.errors
     end
 

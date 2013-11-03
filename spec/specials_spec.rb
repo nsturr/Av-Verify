@@ -29,6 +29,15 @@ describe Specials do
     expect_one_error(specials, Specials.err_msg(:continues_after_delimiter))
   end
 
+  it "detects multiple specs for a single mob" do
+    # We're grabbing a complete spec_fun line, then inserting a copy
+    # as the first line
+    i, j = specials.contents.match(/^M.*\n/).offset(0)
+    specials.contents.insert(i, specials.contents[i...j])
+
+    expect_one_error(specials, Specials.err_msg(:duplicate_spec) % "spec_cast_wizard")
+  end
+
 end
 
 describe Special do
