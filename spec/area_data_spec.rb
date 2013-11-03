@@ -39,7 +39,7 @@ describe AreaData do
     expect(area_data).to receive(:parse_flags_line)
     expect(area_data).to receive(:parse_outlaw_line)
     expect(area_data).to receive(:parse_kspawn_line)
-    expect(area_data).to receive(:parse_modifier_line)
+    expect(area_data).to receive(:parse_modifiers_line)
     expect(area_data).to receive(:parse_group_exp_line)
     area_data.parse
   end
@@ -203,32 +203,32 @@ describe AreaData do
 
   end
 
-  context "when parsing an area modifier line" do
+  context "when parsing an area modifiers line" do
 
     it "detects invalid trailing text" do
       i, j = area_data.contents.match(/^M.*$/).offset(0)
       area_data.contents.insert(j, " writing rspec isn't my idea of a goot saturday")
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text) % "area modifier")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text) % "area modifiers")
     end
 
     it "detects invalid non-numeric elements" do
       i, j = area_data.contents.match(/(?<=M )\d+/).offset(0)
       area_data.contents[i] = "h"
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area modifier")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area modifiers")
     end
 
-    it "parses the area modifier data" do
+    it "parses the area modifiers data" do
       area_data.parse
 
-      expect(area_data.modifier).to_not be_nil
-      expect(area_data.modifier[:xpgain_mod]).to eq(0)
-      expect(area_data.modifier[:hp_regen_mod]).to eq(13)
-      expect(area_data.modifier[:mana_regen_mod]).to eq(14)
-      expect(area_data.modifier[:move_regen_mod]).to eq(15)
-      expect(area_data.modifier[:statloss_mod]).to eq(50)
-      expect(area_data.modifier[:respawn_room]).to eq(11499)
+      expect(area_data.modifiers).to_not be_nil
+      expect(area_data.modifiers[:xpgain_mod]).to eq(0)
+      expect(area_data.modifiers[:hp_regen_mod]).to eq(13)
+      expect(area_data.modifiers[:mana_regen_mod]).to eq(14)
+      expect(area_data.modifiers[:move_regen_mod]).to eq(15)
+      expect(area_data.modifiers[:statloss_mod]).to eq(50)
+      expect(area_data.modifiers[:respawn_room]).to eq(11499)
     end
 
   end

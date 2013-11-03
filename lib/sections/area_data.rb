@@ -24,7 +24,7 @@ class AreaData < Section
 
   @section_delimiter = "^S"
 
-  attr_reader :plane, :zone, :flags, :outlaw, :kspawn, :modifier, :group_exp
+  attr_reader :plane, :zone, :flags, :outlaw, :kspawn, :modifiers, :group_exp
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
@@ -38,7 +38,7 @@ class AreaData < Section
   def to_hash
     {
       plane: @plane, zone: @zone, flags: @flags, outlaw: @outlaw,
-      kspawn: @kspawn, modifier: @modifier, group_exp: @group_exp
+      kspawn: @kspawn, modifiers: @modifiers, group_exp: @group_exp
     }
   end
 
@@ -87,7 +87,7 @@ class AreaData < Section
       when "K"
         parse_kspawn_line line
       when "M"
-        parse_modifier_line line
+        parse_modifiers_line line
       when "G"
         parse_group_exp_line line
       when "S"
@@ -214,10 +214,10 @@ class AreaData < Section
     }
   end
 
-  def parse_modifier_line line
+  def parse_modifiers_line line
     # Modifiers should match: M # # # # # # 0 0
     @used_lines << "M"
-    line_name = "area modifier"
+    line_name = "area modifiers"
 
     xpgain_mod, hp_regen_mod, mana_regen_mod, move_regen_mod, statloss_mod,
       respawn_room, zero, zero_two, error = line.split(" ", 10)[1..-1]
@@ -235,7 +235,7 @@ class AreaData < Section
     statloss_mod = ensure_numeric(statloss_mod, line, line_name)
     respawn_room = ensure_numeric(respawn_room, line, line_name)
 
-    @modifier = {
+    @modifiers = {
       xpgain_mod: xpgain_mod, hp_regen_mod: hp_regen_mod,
       mana_regen_mod: mana_regen_mod, move_regen_mod: move_regen_mod,
       statloss_mod: statloss_mod, respawn_room: respawn_room
