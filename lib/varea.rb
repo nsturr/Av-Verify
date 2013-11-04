@@ -191,6 +191,7 @@ if __FILE__ == $PROGRAM_NAME
       puts "Parsing #{ARGV[0]}..."
       new_area = Area.new(ARGV[0], ARGV[1..-1])
       new_area.verify_all
+      new_area.correlate_all
       new_area.error_report
     else
       puts "#{ARGV[0]} not found, skipping."

@@ -1,23 +1,9 @@
 module CorrelateSections
 
   def correlate_all
-
-  end
-
-  def correlate(section)
-
-    s = get_section(section)
-    return if s.nil?
-
-    case s.id
-    when "mobiles"
-    when "objects"
-    when "rooms"
-    when "resets"
-    when "shops"
-    when "specials"
-    end
-
+    correlate_resets(self.resets, self.mobiles, self.objects, self.rooms)
+    # correlate_shops(self.shops, self.mobiles)
+    # correlate_specials(self.specials, self.mobiles)
   end
 
   def correlate_resets(resets, mobiles, objects, rooms)
