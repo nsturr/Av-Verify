@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 # Mob/Room/Lobster/Fun/Balloon Prog verifier by Scevine
 #
 # Usage: ruby vprog.rb filename [nocolor, nowarning, showdeprecated, showunknown]
