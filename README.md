@@ -2,7 +2,7 @@
 
 Area and Prog verifiers for AVATAR Mud, implemented in Ruby.
 
-## vArea
+## vArea : the area verifier
 
 Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
 
@@ -90,7 +90,7 @@ Also generates errors for mismatched quotes, and if supplied a boolean will gene
 It is what it sounds like.
 
 
-## vProg
+## vProg : the prog verifier
 
 Usage: <code>ruby vprog.rb filename.prg [nowarning|showdeprecated|showunknown|nocolor]</code>
 
@@ -98,6 +98,8 @@ Usage: <code>ruby vprog.rb filename.prg [nowarning|showdeprecated|showunknown|no
 * <code>showdeprecated</code>: Will whine about using the old style of insignia tracking
 * <code>showunknown</code>: Will whine about unknown trigger types. (Since most prog files will intentionally have lots of these, it's more of an occasional guard against typos in case you notice something awry)
 * <code>nocolor</code>: Drains color from your face and makes you look like a vampire. N.B. This option does _not_ give you fangs. You must manually use candy corns for that. (Just kidding, it disables ANSI color codes.)
+
+Danger: here (in the code) be dragons. This will likely never receive the same refactoring treatment that vArea did, on account of there being less of a reason to give it a proper API. Also it just isn't worth the sorrow.
 
 # To do
 
