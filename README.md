@@ -108,5 +108,6 @@ Usage: <code>ruby vprog.rb filename.prg [nowarning|showdeprecated|showunknown|no
 
 ### Long term
 
+* Ability to pass a vnum range and have the program ignore external references to those vnums. I.e. "I know vnums i-j aren't in the file, don't throw me warnings about them."
 * Add object/mob analysis. Give breakdown of mob levels and specs, object levels and their apply flags, etc.
 * Mob flow analysis. Could be crazy difficult. Given room connections and terrain types, predict "bottleneck" rooms that could be hard to spot just from reading the area file text. It may be impractical to take random exits and non-Euclidean layouts into account. (Nah it won't, I just wanted an excuse to type "non-Euclidean".)
