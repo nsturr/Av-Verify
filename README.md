@@ -9,6 +9,7 @@ Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
 * <code>nowarning</code>: Suppresses warnings that won't prevent the area from functioning (typically these consist of loading vnums from outside the area file)
 * <code>cosmetic</code>: Shows cosmetic warnings that are normally suppressed (mostly just tildes on the wrong line)
 * <code>nocolor</code>: Disables ANSI color codes, so output can be cleanly piped into another program
+* <code>notices</code>: Shows notices that are suppressed by default (notices consist of room exits leaving the area, and resets referencing a section that isn't in the file)
 
 vArea relies on proper formatting to do its thing, or you will get unexpected errors. That means output from an area builder, etc. Also, while it is technically possible to have more than one of the same section in the same area file (multiple #OBJECTS in houses.are for example), vArea won't parse it.
 
