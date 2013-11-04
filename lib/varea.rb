@@ -7,7 +7,7 @@
 # own lines, text fields sticking to their own lines, etc. (You get
 # this from the area builder anyway, so it shouldn't be an issue.)
 #
-# Usage: ruby varea.rb areafile.are [nowarning, cosmetic, nocolor]
+# Usage: ruby varea.rb areafile.are [nowarning|cosmetic|notices|nocolor]
 #
 # "Nowarning" suppresses non-critical errors, such as Loading a mob
 # or object not in the area, which might be intentional.
@@ -17,9 +17,6 @@
 #
 # "Nocolor" strips ANSI color codes from the output, which is handy
 # if you're piping the output away from the console.
-#
-# If "areafile" ends in the extension ".lst" then the file is interpreted
-# as an arefile list, and every area listed inside will be verified at once.
 #
 # Send bugs and suggestions to the desert colossus, who dwells on the face of
 # the Mesa of Eternity, awaking from its turbulent slumber only during solar
@@ -34,13 +31,13 @@
 #  When expecting door locks, properly interpret a single ~
 #  Fix the tildes that get appended to the shifted-on text fields
 
-require_relative 'helpers/avconstants'
-require_relative 'helpers/bits'
-require_relative 'helpers/avcolors'
-require_relative 'helpers/parsable'
-require_relative 'helpers/area_attributes'
-require_relative 'helpers/correlate_sections'
+# Require all the helper modules and classes
+%w{
+  avconstants avcolors bits parsable
+  area_attributes correlate_sections
+}.each { |helper| require_relative "helpers/#{helper}" }
 
+# Require all the sections
 %w{
   area_header area_data helps mobiles
   objects rooms resets shops specials
@@ -60,13 +57,15 @@ class Area
       return nil
     end
 
-    data = File.read(filename)
+    # TODO: Don't release to the team until you've investigated what's happening
+    # under the hood re: the encoding
+    data = File.read(filename).force_encoding("ISO-8859-1").encode("utf-8", replace: nil)
     total_lines = data.count("\n") + 1
     data.rstrip!
 
     @flags = flags.map {|item| item.downcase.to_sym}
 
-    @errors = []
+    @errors = [] # Required by parsable
 
     if data.end_with?("\#$")
       # If the correct ending char is found, strip it completely so none of the
@@ -193,7 +192,7 @@ if __FILE__ == $PROGRAM_NAME
       puts "#{ARGV[0]} not found, skipping."
     end
   else
-    puts "Usage: varea filename.are [nocolor|cosmetic|nowarning]"
+    puts "Usage: varea filename.are [nocolor|cosmetic|notices|nowarning]"
   end
 
 end
