@@ -101,6 +101,7 @@ Usage: <code>ruby vprog.rb filename.prg [nowarning|showdeprecated|showunknown|no
 ### Immediate
 
 * Clean up the "connections" parsing, as it's too brittle
+* Tilde related methods can be cleaned up a bit
 
 ### Long term
 
