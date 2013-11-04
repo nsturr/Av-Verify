@@ -103,10 +103,6 @@ class Area
     end
   end
 
-  def parse(id)
-
-  end
-
   private
 
   def extract_main_sections(data)
