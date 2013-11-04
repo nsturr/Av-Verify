@@ -16,7 +16,7 @@ module CorrelateSections
         next if door[:dest].between?(-1, 0)
         unless rooms.key? door[:dest]
           rebuilt_line = "#{door[:lock]} #{door[:key]} #{door[:dest]}"
-          warn(door[:lock_line_number], rebuilt_line, "Door destination room is not in the area")
+          nb(door[:lock_line_number], rebuilt_line, "Door destination room is not in the area")
         end
       end
     end
