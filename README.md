@@ -14,7 +14,7 @@ Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
 
 * <code>**Area**</code> includes <code>Parsable</code> and <code>AreaAttributes</code>
 
-* <code>**Section**</code> includes <code>Parsable</code>
+* <code>**Section**</code> includes <code>Parsable</code>. Most sections that are a collection of smaller things (so anything except <code>AreaHeader</code> and <code>AreaData</code>) present a hash-like interface, in which they have <code>[]</code>, <code>each</code>, <code>length</code>, and <code>key?</code> methods. Keyed by VNUM where appropriate. These are not inherited, though they should be (a task for later improvement)
   * <code>**AreaHeader**</code>
   * <code>**AreaData**</code>
   * <code>**Helps**</code>
@@ -32,7 +32,7 @@ Usage: <code>ruby varea.rb filename.are [nowarning|cosmetic|nocolor]</code>
   * <code>**Room**</code> includes <code>HasQuotedKeywords</code>
   * <code>**Shop**</code> (is the bane of my existance)
 
-* <code>**HelpFile**</code> includes <code>Parsable</code>, <code>HasQuoteKeywords</code>, and <code>TheTroubleWithTildes</code>
+* <code>**HelpFile**</code> includes <code>Parsable</code>, <code>HasQuotedKeywords</code>, and <code>TheTroubleWithTildes</code>
 * <code>**Reset**</code> includes <code>Parsable</code>
 * <code>**Special**</code> includes <code>Parsable</code>
 
@@ -66,9 +66,9 @@ Gives Area its getter methods, namely:
 * <code>mobiles</code>, the actual Mobiles object, if any
 * <code>objects</code>, the actual Objects object, if any
 * <code>rooms</code>, the actual Rooms object, if any
-* <code>resets</code>, an array of resets, from Resets
-* <code>shops</code>, an array of shops, from Shops
-* <code>specials</code>, an array of spec_funs, from Specials
+* <code>resets</code>, the actual Resets object, if any
+* <code>shops</code>, the actual Shops object, if any
+* <code>specials</code>, the actual Specials object, if any
 
 Each getter will return nil if the section that contains the data it's looking for isn't in the area. If the section is found, it will also cache its return value so it's only looked up once.
 
