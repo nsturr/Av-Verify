@@ -15,7 +15,7 @@ class Shops < Section
     @id = "shops"
     @shops = []
 
-    slice_first_line
+    slice_first_line!
     @current_line += 1
     split_shops
   end
@@ -41,7 +41,7 @@ class Shops < Section
   end
 
   def split_shops
-    @delimiter = slice_delimiter
+    @delimiter = slice_delimiter!
     # split on exactly one number in a line, maybe some invalid non-numbers after,
     # whatever. Shops sucks so much.
     @entries = @contents.split(/^(?=\d+\b[^\d]*$)/)

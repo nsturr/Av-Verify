@@ -20,7 +20,7 @@ class Specials < Section
     @raw_lines = []
     @specials = {}
 
-    slice_first_line
+    slice_first_line!
   end
 
   def to_s
@@ -48,7 +48,7 @@ class Specials < Section
   end
 
   def split_specials
-    @delimiter = slice_delimiter
+    @delimiter = slice_delimiter!
 
     @contents.each_line do |line|
       @current_line += 1

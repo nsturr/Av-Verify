@@ -32,7 +32,7 @@ class AreaData < Section
 
     @used_lines = []
     @kspawn_multiline = false
-    slice_first_line
+    slice_first_line!
   end
 
   def to_hash

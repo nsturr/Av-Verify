@@ -24,11 +24,11 @@ class Section
     super
   end
 
-  def slice_first_line
+  def slice_first_line!
     @contents.slice!(/\A.*(?:\n|\Z)/)
   end
 
-  def slice_delimiter
+  def slice_delimiter!
     @contents.slice!(/^#{self.class.delimiter}.*\z/m)
   end
 

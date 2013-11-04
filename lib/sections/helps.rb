@@ -34,7 +34,7 @@ class Helps < Section
     @id = "helps"
 
     @help_files = []
-    slice_first_line # Takes off section name header
+    slice_first_line! # Takes off section name header
   end
 
   def to_s
@@ -44,7 +44,7 @@ class Helps < Section
   def split_help_files
 
     # grabs the delimiter and whatever (erroneous) content is after it
-    @delimiter = slice_delimiter
+    @delimiter = slice_delimiter!
 
     expect_header = true
     help_body = ""

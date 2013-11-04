@@ -15,7 +15,7 @@ class VnumSection < Section
     super(contents, line_number)
     @raw_entries = [] # Unparsed, has no VNUM yet, etc.
     @entries = {} # Parsed and validated, keyed by VNUM
-    slice_first_line
+    slice_first_line!
     split_entries
   end
 
@@ -41,7 +41,7 @@ class VnumSection < Section
 
   def split_entries
 
-    @delimiter = slice_delimiter
+    @delimiter = slice_delimiter!
     @current_line += 1
 
     entries = @contents.rstrip.split(/^(?=#\d\S*)/)

@@ -27,7 +27,7 @@ class Resets < Section
     @recent_container_reset
     @previous_reset_type = :null
 
-    slice_first_line
+    slice_first_line!
   end
 
   def [](index)
@@ -47,7 +47,7 @@ class Resets < Section
   end
 
   def split_resets
-    @delimiter = slice_delimiter
+    @delimiter = slice_delimiter!
 
     # Conveniently has a line-by-line structure to it. Easy street.
     @contents.each_line do |line|
