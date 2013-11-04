@@ -224,6 +224,7 @@ class Room < LineByLineObject
     locks, key, to_vnum, error = line.split
     # Make sure the right number of items are on the line
     unless error || [locks, key, to_vnum].any? { |el| el.nil? }
+      @recent_door[:lock_line_number] = @current_line unless @recent_door.nil?
       if locks =~ /^\d+$/
         locks = locks.to_i
         @recent_door[:lock] = locks unless @recent_door.nil?

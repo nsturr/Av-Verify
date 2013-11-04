@@ -27,6 +27,18 @@ class VnumSection < Section
     @entries.key? vnum
   end
 
+  def length
+    @entries.length
+  end
+
+  def size
+    length
+  end
+
+  def each(&prc)
+    @entries.each_value(&prc)
+  end
+
   def split_entries
 
     @delimiter = slice_delimiter

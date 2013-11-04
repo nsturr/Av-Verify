@@ -1,7 +1,7 @@
 module CorrelateSections
 
   def correlate_all
-    # correlate_doors(self.rooms)
+    correlate_doors(self.rooms)
     correlate_resets(self.resets, self.mobiles, self.objects, self.rooms)
     correlate_shops(self.shops, self.mobiles)
     correlate_specials(self.specials, self.mobiles)
@@ -9,6 +9,14 @@ module CorrelateSections
 
   def correlate_doors(rooms)
     return if rooms.nil?
+    rooms.each do |room|
+      room.doors.each_value do |door|
+        unless rooms.key? door[:dest]
+          rebuilt_line = "#{door[:lock]} #{door[:key]} #{door[:dest]}"
+          warn(door[:lock_line_number], rebuilt_line, "Door destination room is not in the area")
+        end
+      end
+    end
   end
 
   def correlate_resets(resets, mobiles, objects, rooms)
