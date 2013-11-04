@@ -25,9 +25,12 @@ SPEC_DEPRECATED = %w{
   spec_frog_devourer spec_plague_frogs
   }
 
-# graaaaah escaping. that blob of slashes is supposed to match
-# a literal \ and "  Also unicode quotes in there
+# graaaaah escaping. that blob of slashes is supposed to match a
+# literal \ and "  Also unicode quotes in there. Generally the only
+# keywords that have these punctuation are help files describing commands
 KEYWORD_PUNCTUATION = %q{\\\\\\"#-=!<>_\[\]|\u0091\u0092}
+# Keywords which probably shouldn't be keywords
+KEYWORD_COMMON = %w( and her hers his if in it of on or the with )
 
 PLANE_MIN = -5 # N.B. 0 Is not a valid plane
 PLANE_MAX = 17 # Legend and titan planes will throw an error, but I'm sure

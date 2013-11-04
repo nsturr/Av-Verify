@@ -35,16 +35,13 @@ module HasQuotedKeywords
   end
 
   def validate_keywords(keywords, line, noquotes=false, name="these")
-    # words that should never be keywords---they're probably part of a quoted block
-    # that was missing its quotes
-    watch_words = %w( and he her hers his if in it of on or she the with )
 
     # Finds keywords containing a single quote that isn't inside the word
     if keywords.any? { |keyword| keyword.count("'") == 1 && !(keyword =~ /\w'\w/) }
       err(@current_line, line, "Keywords missing closing quote")
     end
 
-    if keywords.any? { |keyword| watch_words.include? keyword.downcase }
+    if keywords.any? { |keyword| KEYWORD_COMMON.include? keyword.downcase }
       warn(@current_line, line, "Common word detected as a keyword. Missing quotes?")
     end
 
