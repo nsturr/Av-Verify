@@ -178,8 +178,10 @@ class Objekt < LineByLineObject
     values = line.split
     if values.length == 4
       values.each_with_index do |value, i|
-        if value.match(/^(?:-?\d+|#{Bits.insert})$/)
-          @values[i] = values
+        if value =~ /\A-?\d+\z/
+          @values[i] = value.to_i
+        elsif value =~ Bits.pattern
+          @values[i] = Bits.new(value)
         else
           err(@current_line, line, Objekt.err_msg(:bad_value) % i)
         end

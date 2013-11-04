@@ -23,6 +23,10 @@ class VnumSection < Section
     @entries[vnum]
   end
 
+  def key?(vnum)
+    @entries.key? vnum
+  end
+
   def split_entries
 
     @delimiter = slice_delimiter

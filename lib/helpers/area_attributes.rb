@@ -90,61 +90,32 @@ module AreaAttributes
   # the regular sections
 
   def helps
-    # unless @helps
-    #   s = @main_sections["helps"]
-    #   @helps = s ? s.help_files : nil
-    # end
     @helps ||= @main_sections["helps"]
     @helps ? @helps.help_files : nil
   end
 
   def mobiles
-    # unless @mobiles
-    #   s = @main_sections["mobiles"]
-    #   @mobiles = s #? s.mobiles : nil
-    # end
     @mobiles ||= @main_sections["mobiles"]
   end
 
   def objects
-    # unless @objects
-    #   s = @main_sections["objects"]
-    #   @objects = s ? s.objects : nil
-    # end
     @objects ||= @main_sections["objects"]
   end
 
   def rooms
-    # unless @rooms
-    #   s = @main_sections["rooms"]
-    #   @rooms = s ? s.rooms : nil
-    # end
     @rooms ||= @main_sections["rooms"]
   end
 
   def resets
-    # unless @resets
-    #   s = @main_sections["resets"]
-    #   @resets = s ? s.resets : nil
-    # end
     @resets ||= @main_sections["resets"]
-    @resets ? @resets.resets : nil
   end
 
   def shops
-    # unless @shops
-    #   s = @main_sections["shops"]
-    #   @shops = s ? s.shops : nil
-    # end
     @shops ||= @main_sections["shops"]
     @resets ? @resets.resets : nil
   end
 
   def specials
-    # unless @specials
-    #   s = @main_sections["specials"]
-    #   @specials = s ? s.specials : nil
-    # end
     @specials ||= @main_sections["specials"]
     @specials ? @specials.specials : nil
   end

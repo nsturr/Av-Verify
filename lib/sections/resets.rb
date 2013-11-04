@@ -30,6 +30,18 @@ class Resets < Section
     slice_first_line
   end
 
+  def [](index)
+    @resets[index]
+  end
+
+  def <<(reset)
+    @resets << reset
+  end
+
+  def each(&prc)
+    @resets.each(&prc)
+  end
+
   def to_s
     "#RESETS: #{self.resets.size} entries, line #{self.line_number}"
   end
@@ -359,16 +371,16 @@ class Reset
   def parse_random
     # Line syntax: R 0 vnum number_of_exits
     # drop the leading R and the comment
-    zero, target, number_of_exits, comment = line.split(" ", 5)[1..-2]
-    unless [zero, target, number_of_exits].any? { |el| el.nil? }
+    zero, vnum, number_of_exits, comment = line.split(" ", 5)[1..-2]
+    unless [zero, vnum, number_of_exits].any? { |el| el.nil? }
 
       unless zero =~ /^-?\d+$/
         err(@line_number, @line, Reset.err_msg(:reset_r_matches))
       end
 
-      if target =~ /^-?\d+$/
-        @target = target.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Room VNUM") if @target < 0
+      if vnum =~ /^-?\d+$/
+        @vnum = vnum.to_i
+        err(@line_number, @line, Reset.err_msg(:negative) % "Room VNUM") if @vnum < 0
       else
         err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
       end

@@ -86,7 +86,7 @@ module Parsable
         summary << ", #{text_cosmetic}."
       end
       if notices > 0
-        summar.chop!
+        summary.chop!
         summary << ", #{text_notice}."
       end
       puts summary
@@ -97,7 +97,7 @@ module Parsable
           puts error.to_s(nocolor)
         elsif error.type == :warning && !@flags.include?(:nowarning)
           puts error.to_s(nocolor)
-        elsif error.type == :nb && @flags.include?(:notices)
+        elsif error.type == :nb# && @flags.include?(:notices)
           puts error.to_s(nocolor)
         elsif error.type == :ugly && @flags.include?(:cosmetic)
           puts error.to_s(nocolor)

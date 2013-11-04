@@ -16,6 +16,7 @@ module CorrelateSections
     when "resets"
     when "shops"
     when "specials"
+    end
 
   end
 
@@ -55,9 +56,15 @@ module CorrelateSections
       end
     end
 
-    nb(resets.line_number, nil, "No MOBILES section in area, #{skipped_mobs} mob references in RESETS skipped")
-    nb(resets.line_number, nil, "No OBJECTS section in area, #{skipped_objs} object references in RESETS skipped")
-    nb(resets.line_number, nil, "No ROOMS section in area, #{skipped_rooms} room references in RESETS skipped")
+    if skipped_mobs > 0
+      nb(resets.line_number, nil, "No MOBILES section in area, #{skipped_mobs} mob references in RESETS skipped")
+    end
+    if skipped_objects > 0
+      nb(resets.line_number, nil, "No OBJECTS section in area, #{skipped_objects} object references in RESETS skipped")
+    end
+    if skipped_rooms > 0
+      nb(resets.line_number, nil, "No ROOMS section in area, #{skipped_rooms} room references in RESETS skipped")
+    end
   end
 
   def correlate_shops(shops, mobiles)
@@ -76,6 +83,8 @@ module CorrelateSections
   end
 
   private
+
+  # Checking specific reset references
 
   def correlate_mob_reset_vnum(reset, mobiles)
     return 1 if mobiles.nil?
@@ -121,11 +130,11 @@ module CorrelateSections
     return 1 if rooms.nil?
     if rooms.key?(reset.vnum) == false
       err(reset.line_number, reset.line, "Door reset's room is not in the area")
-    elsif rooms[reset.vnum][:doors].nil?
+    elsif rooms[reset.vnum].doors.nil?
       err(reset.line_number, reset.line, "Door reset's room does not have this exit")
-    elsif rooms[reset.vnum][:doors][reset.target].nil?
+    elsif rooms[reset.vnum].doors[reset.target].nil?
       err(reset.line_number, reset.line, "Door reset's room does not have this exit")
-    elsif rooms[reset.vnum][:doors][reset.target][:lock] == 0
+    elsif rooms[reset.vnum].doors[reset.target][:lock] == 0
       err(reset.line_number, reset.line, "Door reset targets an exit with no door")
     end
     0
