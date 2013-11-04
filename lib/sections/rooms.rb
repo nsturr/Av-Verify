@@ -188,7 +188,7 @@ class Room < LineByLineObject
       expect :end
 
     else
-      if line.start_with? "door"
+      if line =~ /\Adoor\b/
         warn(@current_line, line, "Doesn't look like a valid flag. Mix up your door's keyword and desc lines?")
       else
         err(@current_line, line, Room.invalid_room_field)

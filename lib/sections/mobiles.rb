@@ -173,6 +173,9 @@ class Mobile < LineByLineObject
   def parse_act_aff_align line
     return if invalid_blank_line? line
 
+    # TODO: handle an S smooshed up against align.
+    # this method might let ' act aff 1000S S  ' with an extra S pass
+
     err(@current_line, line, Mobile.err_msg(:no_terminating) % "S") unless line.end_with?("S")
     items = line.split
     if items.length >= 3
@@ -189,7 +192,7 @@ class Mobile < LineByLineObject
       else
         err(@current_line, line, Mobile.err_msg(:bad_field) % "affect flags")
       end
-      if m = items[2].match(/(-?\d+\b)/)
+      if m = items[2].match(/(-?\d+(?:\b|S))/)
         @align = m[1].to_i
         err(@current_line, line, Mobile.err_msg(:bad_align_range)) unless @align.between?(-1000, 1000)
       else
@@ -288,6 +291,9 @@ class Mobile < LineByLineObject
       @last_multiline = @current_line
       # Split line into: K condition type spawn mob text...
       # Also toss out the leading 'K'
+
+      # TODO: Fix tildes being smooshed up against room vnum (it's valid,
+      # but throws an error)
       condition, type, spawn, room, text = line.split(" ", 6)[1..-1]
       @kspawn = {
         condition: condition,

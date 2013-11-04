@@ -37,7 +37,7 @@ module HasQuotedKeywords
   def validate_keywords(keywords, line, noquotes=false, name="these")
 
     # Finds keywords containing a single quote that isn't inside the word
-    if keywords.any? { |keyword| keyword.count("'") == 1 && !(keyword =~ /\w'\w/) }
+    if keywords.any? { |keyword| keyword.start_with?("'") && !keyword.end_with?("'") }
       err(@current_line, line, "Keywords missing closing quote")
     end
 
@@ -45,7 +45,7 @@ module HasQuotedKeywords
       warn(@current_line, line, "Common word detected as a keyword. Missing quotes?")
     end
 
-    if noquotes && keywords.any? { |k| k.start_with?("'") || k.end_with?("'")}
+    if noquotes && keywords.any? { |k| k.start_with?("'") }
       warn(@current_line, line, "Are you sure you want quotes in #{name} keywords?")
     end
   end
