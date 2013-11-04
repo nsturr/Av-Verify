@@ -1,3 +1,9 @@
+# just a little script to print out mob resets, sorted by room
+# handy to make sure you aren't clumping them up
+#
+# should probably incorporate this into varea at some point,
+# but I use it so infrequently I don't think it's necessary
+
 if (ARGV[0])
 
 	data = File.read(ARGV[0])
