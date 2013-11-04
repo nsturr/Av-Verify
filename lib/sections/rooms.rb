@@ -188,7 +188,11 @@ class Room < LineByLineObject
       expect :end
 
     else
-      err(@current_line, line, Room.invalid_room_field)
+      if line.start_with? "door"
+        warn(@current_line, line, "Doesn't look like a valid flag. Mix up your door's keyword and desc lines?")
+      else
+        err(@current_line, line, Room.invalid_room_field)
+      end
     end
   end
 
@@ -206,7 +210,7 @@ class Room < LineByLineObject
   def parse_door_keyword line
     return if invalid_blank_line? line
 
-    @recent_door[:keywords] = parse_quoted_keywords(line[/^[^~]*/], line, true, "door")
+    @recent_door[:keywords] = parse_quoted_keywords(line[/^[^~]*/], line)
 
     if line =~ /^[^~]*~$/
       #
