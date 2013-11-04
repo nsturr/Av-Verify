@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 # Avatar area file verifier by Scevine.
 #
 # This verifier depends on the input file having a minimum of proper
@@ -8,13 +10,16 @@
 # Usage: ruby varea.rb areafile.are [nowarning, cosmetic, nocolor]
 #
 # "Nowarning" suppresses non-critical errors, such as Loading a mob
-# or object not in the area, which might be intentional. "Cosmetic"
-# displays any cosmetic errors such as text fields lacking a newline
-# at the end, lines containing tabs, etc. "Nocolor" strips ANSI color
-# codes from the output, which is handy if you're piping the output
-# away from the console. If "areafile" ends in the extension ".lst"
-# then the file is interpreted as an arefile list, and every area
-# listed inside will be verified at once.
+# or object not in the area, which might be intentional.
+#
+# "Cosmetic"displays any cosmetic errors such as text fields lacking
+# a newline at the end, lines containing tabs, etc.
+#
+# "Nocolor" strips ANSI color codes from the output, which is handy
+# if you're piping the output away from the console.
+#
+# If "areafile" ends in the extension ".lst" then the file is interpreted
+# as an arefile list, and every area listed inside will be verified at once.
 #
 # Send bugs and suggestions to the desert colossus, who dwells on the face of
 # the Mesa of Eternity, awaking from its turbulent slumber only during solar
@@ -29,22 +34,24 @@
 #  When expecting door locks, properly interpret a single ~
 #  Fix the tildes that get appended to the shifted-on text fields
 
-require './helpers/avconstants'
-require './helpers/bits'
-require './helpers/avcolors'
-require './helpers/parsable'
-require './helpers/area_attributes'
-require './helpers/correlate_sections'
+require_relative 'helpers/avconstants'
+require_relative 'helpers/bits'
+require_relative 'helpers/avcolors'
+require_relative 'helpers/parsable'
+require_relative 'helpers/area_attributes'
+require_relative 'helpers/correlate_sections'
 
 %w{
   area_header area_data helps mobiles
   objects rooms resets shops specials
-}.each { |section| require "./sections/#{section}" }
+}.each { |section| require_relative "sections/#{section}" }
 
 class Area
-  include Parsable
-  include AreaAttributes
+  include Parsable # bestows an errors getter
+  include AreaAttributes # bestows getters for all its attributes
   include CorrelateSections
+
+  attr_reader :main_sections, :flags
 
   def initialize(filename, flags=[])
     # How 'bout a little FILE, Scarecrow! >:D
@@ -78,17 +85,17 @@ class Area
     end
 
     if section == "areaheader"
-      @main_sections["area"]
+      self.main_sections["area"]
     elsif section.is_a? String
       section = section.downcase.gsub("_", "")
-      @main_sections[section]
+      self.main_sections[section]
     elsif section.is_a? Class
-      @main_sections.find { |_, s| s.class == section }
+      self.main_sections.find { |_, s| s.class == section }
     end
   end
 
   def verify_all
-    @main_sections.each_value do |section|
+    self.main_sections.each_value do |section|
       next if section.parsed?
       puts "Found ##{section.id} on line #{section.line_number}" if @flags.include?(:debug)
       section.parse
@@ -193,50 +200,3 @@ if __FILE__ == $PROGRAM_NAME
   end
 
 end
-
-=begin Commenting out the needlessly complex batch verifying function.
-        If you're going to uncomment this bit, be sure to comment out the
-        "if" block above
-if ARGV[0]
-  files_enumerated = []
-  path = "."
-  
-  # If file to parse ends with .lst, then treat it as area.lst containing
-  # one areafile name per line, ending with End or $
-  if ARGV[0].match(/^[\w\.\\\/_]+\.lst$/i)
-    list_file = File.open(ARGV[0])
-    # Getting the full path of the list file, then putting just the directory
-    # structure into path (i.e. full path minus file name)
-    path = File.dirname(list_file.path)
-    list_file.each_line do |line|
-      # End filename parsing if the current line contains "end" or starts with "$"
-      break if line.rstrip.match(/^(?:\$|end$)/i)
-      # Add each line to the list of files IF the line is just one word.
-      files_enumerated << path + File::SEPARATOR + line.rstrip.chomp if line.rstrip.match(/^[\w\.]+$/)
-    end
-    list_file.close
-  else
-    # Otherwise, this is just a single area file.
-    files_enumerated << ARGV[0]
-  end
-
-  areas = {}
-  files_enumerated.each do |file|
-    unless File.exist?(file)
-      puts "#{file} not found, skipping."
-      next
-    end
-    #puts file
-    areas[file] = Area.new(file, ARGV[1..-1])
-  end
-
-  areas.each do |file, area|
-    next if area.nil?
-    puts "Results for #{file}:"
-    area.verify_all
-    area.error_report
-  end
-else
-  puts "Bzzzz".Y+"ZZZZZ".BY+"zz".Y+"ZZ".BY+"zzzzzzzz".Y+"ZZZZZ".BY+"zzzzz".Y
-end
-=end
