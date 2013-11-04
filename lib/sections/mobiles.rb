@@ -294,7 +294,7 @@ class Mobile < LineByLineObject
         type: Bits.new(type),
         spawn: spawn,
         room: room,
-        text: text
+        text: text || ""
       }
 
       if [condition, type, spawn, room].any? { |el| el.nil? }
