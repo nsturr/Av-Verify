@@ -194,7 +194,7 @@ class Room < LineByLineObject
 
   def parse_door_desc line
     @recent_door[:description] << line[/[^~]*/] << "\n"
-    ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
+    ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
 
     if has_tilde? line
       expect :door_keyword
@@ -268,7 +268,7 @@ class Room < LineByLineObject
   end
 
   def parse_multiline_edesc line
-    ugly(current_line, line, "Visible text contains a tab character") if line.include?("\t")
+    ugly(@current_line, line, "Visible text contains a tab character") if line.include?("\t")
     @edesc[@recent_keywords] << line[/[^~]*/] << "\n"
 
     if has_tilde? line

@@ -43,7 +43,7 @@ describe HelpFile do
 
   it "detects missing tildes on the keyword line" do
     i = help_file.contents.index("~")
-    help_file.contents[i] = "!"
+    help_file.contents[i] = " "
 
     expect_one_error(help_file, HelpFile.err_msg(:tilde_absent))
   end

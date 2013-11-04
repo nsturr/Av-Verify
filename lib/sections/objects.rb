@@ -128,14 +128,14 @@ class Objekt < LineByLineObject
     @long_desc << line << "\n"
 
     if has_tilde? line
-      expect :description
+      expect :adesc
       if line =~ /~./
         err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
       end
-    elsif @long_line == 2
+    end
+    if @long_line == 2
       ugly(@current_line, line, Objekt.err_msg(:long_desc_spans))
     end
-    expect :adesc
   end
 
   def parse_adesc line

@@ -23,7 +23,7 @@ module HasQuotedKeywords
     until keyword_line.empty?
       # This regex matches either the first whole word, or the first single-quoted
       # block of words, including ones that are missing a closing quote
-      parsed_keywords << keyword_line.slice!(/\A(?:[^\s']+|'.*?(?:'|\z))\s*/).rstrip
+      parsed_keywords << keyword_line.slice!(/\A(?:[^\s]+|'.*?(?:'|\z))\s*/).rstrip
     end
 
     validate_keywords(parsed_keywords, line, noquotes, name)
@@ -36,7 +36,9 @@ module HasQuotedKeywords
     # that was missing its quotes
     watch_words = %w( and he her hers his if in it of on or she the with )
 
-    if keywords.any? { |keyword| keyword.count("'") == 1 }
+    if (keywords.any? do |keyword|
+          keyword[0] != "'" && keyword[-1] != "'" && keyword.count("'") == 1
+        end)
       err(@current_line, line, "Keywords missing closing quote")
     end
 
@@ -44,7 +46,7 @@ module HasQuotedKeywords
       warn(@current_line, line, "Common word detected as a keyword. Missing quotes?")
     end
 
-    if noquotes && keywords.any? { |keyword| keyword.include? "'"}
+    if noquotes && keywords.any? { |k| k.start_with?("'") || k.end_with?("'")}
       warn(@current_line, line, "Are you sure you want quotes in #{name} keywords?")
     end
   end

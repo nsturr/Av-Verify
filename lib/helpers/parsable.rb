@@ -118,7 +118,7 @@ module Parsable
       warning: :R,
       error: :BR,
       nb: :Y,
-      ugly: :CC
+      ugly: :C
     }
 
     def initialize(line, type, context, description)
