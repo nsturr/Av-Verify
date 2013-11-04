@@ -14,10 +14,9 @@
 # of the object ("object", "mobile", "edesc") and a warning will be raised if there
 # are any quotes detected. Name is optional, and is only used for the error readout.
 
-module HasQuotedKeywords
+require_relative "avconstants"
 
-  # graaaaah escaping. that blob of slashes is supposed to match \ and "
-  KEYWORD_PUNCTUATION = %q{\\\\\\"#-=!<>_\[\]|\u0091\u0092}
+module HasQuotedKeywords
 
   # The argument 'source' WILL be destroyed, 'line' will not be
   def parse_quoted_keywords source, line, noquotes=false, name=""
