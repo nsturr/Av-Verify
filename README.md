@@ -15,29 +15,56 @@ vArea relies on proper formatting to do its thing, or you will get unexpected er
 
 ### Main classes
 
-* <code>**Area**</code> includes <code>Parsable</code> and <code>AreaAttributes</code>
+#### Area
 
-* <code>**Section**</code> includes <code>Parsable</code>. Most sections that are a collection of smaller things (so anything except <code>AreaHeader</code> and <code>AreaData</code>) present a hash-like interface, in which they have <code>[]</code>, <code>each</code>, <code>length</code>, and <code>key?</code> methods. Keyed by VNUM where appropriate. These are not inherited, though they should be (a task for later improvement)
-  * <code>**AreaHeader**</code>
-  * <code>**AreaData**</code>
-  * <code>**Helps**</code>
-  * <code>**VnumSection**</code>
-    * <code>**Mobiles**</code>
-    * <code>**Objects**</code>
-    * <code>**Rooms**</code>
-  * <code>**Resets**</code>
-  * <code>**Shops**</code>
-  * <code>**Specials**</code>
+Includes <code>Parsable</code> and <code>AreaAttributes</code> modules. This is what can be thought of as the area file in object form. Its initializer accepts a file path string (relative) which it loads and promptly dissects into sections, detects their type, and instantiates them into the appropriate objects.
 
-* <code>**LineByLineItem**</code> includes <code>Parsable</code> and <code>TheTroubleWithTildes</code>. Its subclasses are all parsed the same way (line by line, if you couldn't guess)
-  * <code>**Mobile**</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
-  * <code>**Object**</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
-  * <code>**Room**</code> includes <code>HasQuotedKeywords</code>
-  * <code>**Shop**</code> (is the bane of my existance)
+Sections are accessible in Area#main_sections.
 
-* <code>**HelpFile**</code> includes <code>Parsable</code>, <code>HasQuotedKeywords</code>, and <code>TheTroubleWithTildes</code>
-* <code>**Reset**</code> includes <code>Parsable</code>
-* <code>**Special**</code> includes <code>Parsable</code>
+<code>verify_all</code> simply runs an each loop on self.main_sections that calls the section's <code>parse</code> method, then add the section's resulting errors (if any) to the area's errors.
+
+<code>correlate_all</code> runs a different set of checks that compares vnum references between sections, the obvious example being #RESETS. It is a shorthand method for separately running <code>correlate_rooms</code>, <code>_resets</code>, <code>_specials</code>, and <code>_shops</code>.
+
+#### Section
+Includes <code>Parsable</code> module. Most sections that are a collection of smaller things (so anything except <code>AreaHeader</code> and <code>AreaData</code>) present a hash-like interface, in which they have <code>[]</code>, <code>each</code>, <code>length</code>, and <code>key?</code> methods. Keyed by VNUM where appropriate. These are not inherited, though they should be (a task for later improvement)
+
+Subclasses of Section:
+* <code>**AreaHeader**</code>
+* <code>**AreaData**</code>
+* <code>**Helps**</code>
+* <code>**VnumSection**</code>
+  * <code>**Mobiles**</code>
+  * <code>**Objects**</code>
+  * <code>**Rooms**</code>
+* <code>**Resets**</code>
+* <code>**Shops**</code>
+* <code>**Specials**</code>
+
+#### VnumSection
+
+Since #Mobiles, #Objects, and #Rooms are all structured similarly, they share the parent class VnumSection. Each of the child sections supply the class name of the items they contain (Mobs, Objects, Rooms respectively) so that VnumSection can break apart the text and instantiate new <code>self.child_class</code> objects.
+
+#### LineByLineItem
+Includes <code>Parsable</code> and <code>TheTroubleWithTildes</code>. Its subclasses are all parsed the same way (line by line, if you couldn't guess)
+
+Its subclasses are:
+* <code>**Mobile**</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
+* <code>**Object**</code> includes <code>HasApplyFlag</code> and <code>HasQuotedKeywords</code>
+* <code>**Room**</code> includes <code>HasQuotedKeywords</code>
+* <code>**Shop**</code> (is the bane of my existance)
+
+#### HelpFile
+Includes <code>Parsable</code>, <code>HasQuotedKeywords</code>, and <code>TheTroubleWithTildes</code> modules.
+
+#### Reset
+
+Includes <code>Parsable</code> module. A reset can be of type mob, inventory, equipment, object, container, door, or random. Its visible attributes are <code>Reset#vnum</code>, <code>Reset#target</code>, <code>Reset#slot</code>, and <code>Reset#limit</code>. Vnum is typically the identifier (references the room, object, or mob that it's placing), and target is typically another vnum (the one it's loading into or onto, etc). Limit and slot are not always used.
+
+Resets have no knowledge of the rest of the area, so they can't tell whether or not the items they're referencing exist. That's what Area#correlate_resets is for.
+
+#### Special
+
+Includes <code>Parsable</code> module.
 
 ### Helper classes
 
