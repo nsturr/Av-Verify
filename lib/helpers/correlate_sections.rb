@@ -13,6 +13,7 @@ module CorrelateSections
     return if rooms.nil?
     rooms.each do |room|
       room.doors.each_value do |door|
+        next if door[:dest].between?(-1, 0)
         unless rooms.key? door[:dest]
           rebuilt_line = "#{door[:lock]} #{door[:key]} #{door[:dest]}"
           warn(door[:lock_line_number], rebuilt_line, "Door destination room is not in the area")
