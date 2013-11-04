@@ -164,10 +164,10 @@ class Objekt < LineByLineObject
       @type = m[1].to_i
       @extra = Bits.new(m[2])
       @wear = Bits.new(m[3])
-      err(current_line, line, Objekt.err_msg(:bad_bit) % "Extra flag") if @extra.error?
-      err(current_line, line, Objekt.err_msg(:bad_bit) % "Wear flag") if @wear.error?
+      err(@current_line, line, Objekt.err_msg(:bad_bit) % "Extra flag") if @extra.error?
+      err(@current_line, line, Objekt.err_msg(:bad_bit) % "Wear flag") if @wear.error?
     else
-      err(current_line, line, Objekt.err_msg(:type_extra_wear_matches))
+      err(@current_line, line, Objekt.err_msg(:type_extra_wear_matches))
     end
     expect :values
   end
@@ -198,7 +198,7 @@ class Objekt < LineByLineObject
 
     @weight, @worth, zero = line.split(" ", 3)
     # err(@current_line, line, "Too many items in weight/worth line") if items.length > 3
-    unless [@weight, @worth, zero].any? { |el| el.nil? } || zero != "0"
+    unless [@weight, @worth, zero].any? { |el| el.nil? } || zero !~ /\A\d+\z/
       err(@current_line, line, Objekt.err_msg(:bad_field) % "weight") unless @weight =~ /^\d+$/
       err(@current_line, line, Objekt.err_msg(:bad_field) % "worth") unless @worth =~ /^\d+$/
     else

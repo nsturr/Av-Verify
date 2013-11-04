@@ -1,3 +1,5 @@
+require_relative "avconstants"
+
 module CorrelateSections
 
   def correlate_all
@@ -115,7 +117,7 @@ module CorrelateSections
 
   def correlate_obj_reset_vnum(reset, objects)
     return 1 if objects.nil?
-    unless objects.key? reset.vnum
+    unless objects.key?(reset.vnum) || known_vnum(reset.vnum)
       warn(reset.line_number, reset.line, "Object to spawn is not in the area")
     end
     0

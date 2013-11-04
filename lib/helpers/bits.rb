@@ -10,73 +10,86 @@
 
 class Bits < Array
 
-	@@powers_of_two = [1] # Stored in descending order
+  @@powers_of_two = [1] # Stored in descending order
 
-	def self.powers_of_two # Only every used to confirm that storing
-		@@powers_of_two      # precalculated powers of 2 is working
-	end
+  def self.powers_of_two # Only every used to confirm that storing
+    @@powers_of_two      # precalculated powers of 2 is working
+  end
 
-	def self.pattern
-		/^#{self.insert}$/
-	end
+  def self.pattern
+    /^#{self.insert}$/
+  end
 
-	def self.insert
-		/\d+(?:\|\d+)*/
-	end
+  def self.insert
+    /\d+(?:\|\d+)*/
+  end
 
-	def initialize(bits)
-		# Because to_i returns 0 if element is NaN, you still have to check for
-		# non-number inputs before calling this method
-		if bits.is_a? String
-			bits = bits.split("|")
-			bits.map!(&:to_i)
-		end
+  def initialize(bits)
+    # Because to_i returns 0 if element is NaN, you still have to check for
+    # non-number inputs before calling this method
+    if bits.is_a? String
+      if bits.include? "|"
+        bits = bits.split("|")
+        bits.map!(&:to_i)
+      else
+        bits = Bits.break_down(bits.to_i)
+      end
+    end
 
-		bits.each do |bit|
-			self << bit
-			@error ||= true unless bit == 0 || Bits.power_of_two?(bit)
-		end
-		@error ||= false
-		self.sort!
-	end
+    bits.each do |bit|
+      self << bit
+      @error ||= true unless bit == 0 || Bits.power_of_two?(bit)
+    end
+    @error ||= false
+    self.sort!
+  end
 
-	def error?
-		@error
-	end
+  def error?
+    @error
+  end
 
-	def bit?(n)
-		raise ArgumentError.new("not a power of two (#{n})") unless Bits.power_of_two?(n)
-		self.include?(n)
-	end
+  def bit?(n)
+    raise ArgumentError.new("not a power of two (#{n})") unless Bits.power_of_two?(n)
+    self.include?(n)
+  end
 
-	def to_a
-		Array.new(self)
-	end
+  def to_a
+    Array.new(self)
+  end
 
-	def sum
-		self.inject(&:+)
-	end
+  def sum
+    self.inject(&:+)
+  end
 
-	private
+  private
 
-		def self.power_of_two?(number)
-			return true if @@powers_of_two.include? number
+    def self.break_down(number)
+      arr = []
+      while number > 0
+        arr << Bits.highest_power_of_two_at(number)
+        number -= arr.last
+      end
+      arr
+    end
 
-			until @@powers_of_two.first >= number
-				@@powers_of_two.unshift(@@powers_of_two.first * 2)
-			end
-			number == @@powers_of_two.first
-		end
+    def self.power_of_two?(number)
+      return true if @@powers_of_two.include? number
 
-		def self.highest_power_of_two_below(number)
-			if (number / 2) > @@powers_of_two.first
-				while (number / 2) > @@powers_of_two.first
-					@@powers_of_two.unshift(@@powers_of_two.first * 2)
-				end
-				@@powers_of_two.first
-			else
-				@@powers_of_two.find { |el| el < number }
-			end
-		end
+      until @@powers_of_two.first >= number
+        @@powers_of_two.unshift(@@powers_of_two.first * 2)
+      end
+      number == @@powers_of_two.first
+    end
+
+    def self.highest_power_of_two_at(number)
+      if number >= (@@powers_of_two.first * 2)
+        while number >= (@@powers_of_two.first * 2)
+          @@powers_of_two.unshift(@@powers_of_two.first * 2)
+        end
+        @@powers_of_two.first
+      else
+        @@powers_of_two.find { |el| el <= number }
+      end
+    end
 
 end
