@@ -27,6 +27,26 @@ class Specials < Section
     "#SPECIALS: #{self.specials.size} entries, line #{self.line_number}"
   end
 
+  def key?(vnum)
+    @specials.key? vnum
+  end
+
+  def [](vnum)
+    @specials[vnum]
+  end
+
+  def each(&prc)
+    @specials.each_value(&prc)
+  end
+
+  def length
+    @specials.length
+  end
+
+  def size
+    length
+  end
+
   def split_specials
     @delimiter = slice_delimiter
 

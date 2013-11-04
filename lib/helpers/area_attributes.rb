@@ -124,12 +124,12 @@ module AreaAttributes
 
   def shops
     @shops ||= self.main_sections["shops"]
-    @resets ? @resets.resets : nil
+    # @resets ? @resets.resets : nil
   end
 
   def specials
     @specials ||= self.main_sections["specials"]
-    @specials ? @specials.specials : nil
+    # @specials ? @specials.specials : nil
   end
 
 end

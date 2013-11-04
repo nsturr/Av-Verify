@@ -1,12 +1,18 @@
 module CorrelateSections
 
   def correlate_all
+    # correlate_doors(self.rooms)
     correlate_resets(self.resets, self.mobiles, self.objects, self.rooms)
-    # correlate_shops(self.shops, self.mobiles)
-    # correlate_specials(self.specials, self.mobiles)
+    correlate_shops(self.shops, self.mobiles)
+    correlate_specials(self.specials, self.mobiles)
+  end
+
+  def correlate_doors(rooms)
+    return if rooms.nil?
   end
 
   def correlate_resets(resets, mobiles, objects, rooms)
+    return if resets.nil?
 
     skipped_mobs, skipped_objects, skipped_rooms = 0, 0, 0
 
@@ -34,7 +40,7 @@ module CorrelateSections
         skipped_rooms += correlate_obj_reset_room(reset, rooms)
       when :container
         skipped_objects += correlate_obj_reset_vnum(reset, objects)
-        skipped_objects += correlate_container(reset, objects)
+        skipped_objects += correlate_container_reset(reset, objects)
       when :door
         skipped_rooms += correlate_door_reset(reset, rooms)
       when :random
@@ -54,17 +60,28 @@ module CorrelateSections
   end
 
   def correlate_shops(shops, mobiles)
+    return if shops.nil?
     if mobiles.nil?
-      warn(shops.line_number, nil, "No MOBILES section in area, can't check shopkeeper VNUMs")
+      warn(shops.line_number, nil, "No MOBILES section in area, #{shops.length} mob references in SHOPS skipped")
       return
     end
-
+    shops.each do |shop|
+      unless mobiles.key? shop.vnum
+        warn(shop.line_number, shop.vnum.to_s, "Shopkeeper mob is not in the area")
+      end
+    end
   end
 
   def correlate_specials(specials, mobiles)
+    return if specials.nil?
     if mobiles.nil?
-      warn(specials.line_number, nil, "No MOBILES section in area, can't check spec_fun VNUMs")
+      nb(specials.line_number, nil, "No MOBILES section in area, #{specials.length} mob references in SPECIALS skipped")
       return
+    end
+    specials.each do |special|
+      unless mobiles.key? special.vnum
+        warn(special.line_number, special.line, "Spec_fun's mob is not in the area")
+      end
     end
   end
 

@@ -20,6 +20,22 @@ class Shops < Section
     split_shops
   end
 
+  def length
+    @shops.length
+  end
+
+  def size
+    length
+  end
+
+  def each(&prc)
+    @shops.each(&prc)
+  end
+
+  def [](index)
+    @shops[index]
+  end
+
   def to_s
     "#SHOPS: #{self.shops.size} entries, line #{self.line_number}"
   end
@@ -88,7 +104,7 @@ class Shop < LineByLineObject
     return if line.empty?
 
     if line =~ /^\d+(?:\s+.*)?$/
-      @shopkeeper = line.to_i
+      @vnum = line.to_i
     else
       err(@current_line, line, "Invalid shopkeeper VNUM")
     end
