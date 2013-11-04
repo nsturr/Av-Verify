@@ -271,9 +271,9 @@ class Objekt < LineByLineObject
       expect :misc
       unless trailing_tilde? line
         err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
-        unless isolated_tilde? line
-          ugly(@current_line, line, Objekt.err_msg(:tilde_not_alone) % "Edesc body")
-        end
+      end
+      unless isolated_tilde? line
+        ugly(@current_line, line, Objekt.err_msg(:tilde_not_alone) % "Edesc body")
       end
     end
 
