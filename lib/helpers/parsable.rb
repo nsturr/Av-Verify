@@ -56,11 +56,12 @@ module Parsable
   end
 
   def error_report(nocolor=false)
-    unless @errors.empty?
+    error_list = self.errors
+    unless error_list.empty?
       nocolor = @flags ? @flags.include?(:nocolor) : nocolor
 
       errors, warnings, notices, cosmetic = 0, 0, 0, 0
-      @errors.each do |item|
+      error_list.each do |item|
         errors += 1 if item.type == :error
         warnings += 1 if item.type == :warning
         notices += 1 if item.type == :nb
@@ -92,7 +93,7 @@ module Parsable
       puts summary
 
       suppressed = 0
-      @errors.each do |error|
+      error_list.each do |error|
         if error.type == :error
           puts error.to_s(nocolor)
         elsif error.type == :warning && !@flags.include?(:nowarning)

@@ -7,6 +7,7 @@ module CorrelateSections
     correlate_resets(self.resets, self.mobiles, self.objects, self.rooms)
     correlate_shops(self.shops, self.mobiles)
     correlate_specials(self.specials, self.mobiles)
+    nil
   end
 
   def correlate_doors(rooms)
