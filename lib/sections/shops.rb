@@ -42,6 +42,9 @@ class Shops < Section
 
   def split_shops
     @delimiter = slice_delimiter!
+
+    slice_leading_whitespace!
+
     # split on exactly one number in a line, maybe some invalid non-numbers after,
     # whatever. Shops sucks so much.
     @entries = @contents.split(/^(?=\d+\b[^\d]*$)/)
@@ -102,7 +105,6 @@ class Shop < LineByLineObject
 
   def parse_vnum line
     return if line.empty?
-
     if line =~ /^\d+(?:\s+.*)?$/
       @vnum = line.to_i
     else

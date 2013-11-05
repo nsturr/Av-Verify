@@ -28,6 +28,11 @@ class Section
     @contents.slice!(/\A.*(?:\n|\Z)/)
   end
 
+  def slice_leading_whitespace!
+    blank_lines = @contents.slice!(/\A\s*/m)
+    @current_line += blank_lines.count("\n")
+  end
+
   def slice_delimiter!
     @contents.slice!(/^#{self.class.delimiter}.*\z/m)
   end
