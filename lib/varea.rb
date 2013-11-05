@@ -43,6 +43,8 @@
   objects rooms resets shops specials
 }.each { |section| require_relative "sections/#{section}" }
 
+# Area class
+
 class Area
   include Parsable # bestows an errors getter
   include AreaAttributes # bestows getters for all its attributes
@@ -78,6 +80,8 @@ class Area
     @main_sections = extract_main_sections(data)
   end
 
+  # get_section accepts a string, symbol, or class
+  # Returns the Section object that matches the paramameter, either by id or class
   def get_section section
     if section.is_a? Symbol
       section = section.to_s
@@ -93,17 +97,29 @@ class Area
     end
   end
 
+  # Runs parse on each of the classes
   def verify_all
     self.main_sections.each_value do |section|
       next if section.parsed?
       puts "Found ##{section.id} on line #{section.line_number}" if @flags.include?(:debug)
       section.parse
-      @errors += section.errors
     end
+  end
+
+  # Overrides the getter supplied by Parsable
+  # Repeatedly calling verify_all won't pollute the area's errors array with
+  # duplicates (but correlating all repeatedly will. TODO)
+  def errors
+    @section_errors = self.main_sections.inject([]) { |arr, s| arr += s[1].errors }
+    # @errors is populated by CorrelateSections's methods
+    @errors + @section_errors
   end
 
   private
 
+  # This splits the area file at the start of any line beginning with # followed by
+  # letters (not numbers, those are VNUMs inside a section). Matches with a lookahead
+  # so that the first line is kept as part of the section.
   def extract_main_sections(data)
     lines_so_far = 1
 
@@ -124,6 +140,11 @@ class Area
 
       new_section = make_section(content, line_start_section)
 
+      # TODO: some areas (mostly old ones) have more than one section of the same
+      # type. Which is valid because I believe that when the game is run, all
+      # area files all get mashed together internally anyway. If it makes sense
+      # to put the effort in, remove this check for duplicate sections and add
+      # in the ability to merge sections of the same type.
       if sections.any? { |s| s.class == new_section.class }
         warn(new_section.line_number, nil, "Another #{new_section.class} section? This bodes ill. Skipping")
         next
@@ -135,14 +156,15 @@ class Area
   end
 
   def make_section(content, line_num)
-    # Identify area name
     first_line = content.match(/^#.*?$/).to_s.rstrip
-    # AREA section has its contents on the same line as the section name
+
+    # Grab the first line of the section, where the header is, to detect
+    # what type it is. #AREA is a one-liner, so it gets special treatment.
+    # (Technically all sections can have their data on the same line as
+    # the header, but I'm enforcing good syntax.)
     if first_line.downcase.start_with?("#area ", "#area\t")
       name = "area"
     else
-      # Other sections technically can have contents on same line as section,
-      # name, but I'm enforcing good syntax anyway.
       first_line = content.slice(/\A.*(?:\n|\Z)/).rstrip
       name = first_line.match(/[a-zA-Z\$]+/).to_s.downcase
 
