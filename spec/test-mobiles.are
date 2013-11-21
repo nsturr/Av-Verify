@@ -1,0 +1,191 @@
+#MOBILES
+
+#12650
+man death guard~
+a former Death Guard~
+An imposing man dressed as a Death Guard beckons for challengers!
+~
+This frightening individual removes his shirt and tosses it to the
+crowd, who cheer in appreciation. Grinning at the crowd's reaction,
+the former Death Guard throws his arms open, calling for more
+challengers to step forward---or to be thrown into the pit by the
+bloodthirsty onlookers. As he sees you, the Death Guard's grin spreads
+from ear to ear, and he readies his weapons to attack.
+~
+1|2|32 8|32|128 -1000 S
+75 0 0
+0d0+0 0d0+0 0 0
+0 0 1
+R 0
+C 19
+K 4 2 12698 -1 As the crowd roars in applause, the bartender tosses you your prize!~
+
+#12651
+slender figure captured wizard~
+a captured wizard~
+A slender figure traces runes in the fighting pit's dirt floor.
+~
+This tall, well dressed woman seems a bit out of place in the blood-
+soaked dirt of the pit. Nevertheless, if the pile of charred bodies
+encircling her are any indication, she is not above killing her way
+out of the arena.
+~
+1|64|65536 8|32 0 S
+65 0 0
+0d0+0 0d0+0 0 0
+0 0 2
+R 0
+C 14
+K 4 2 12698 -1 As the crowd roars in applause, the bartender tosses you your prize!~
+
+#12652
+man adventurer~
+the adventurer~
+A man in adventurer's garb looks ready to throw himself into the fray.
+~
+Still wincing from a blackjack blow to his neck, the man shakes off the
+last traces of dizziness and pain, and gathers his surroundings with a
+surprised look on his face. Throwing away his inhibitions, he sees you
+and raises his fists to attack! Maybe he didn't learn his lesson the
+first time when his hastiness got him thrown in here.
+~
+1|2|32 0 500 S
+65 0 0
+0d0+0 0d0+0 0 0
+0 0 1
+R 0
+C 3
+K 4 2 12698 -1 As the crowd roars in applause, the bartender tosses you your prize!~
+
+#12653
+diminutive cowering prisoner man~
+a cowering prisoner~
+A diminutive man sticks to the shadows.
+~
+Paralyzed by the grisly sights around him, this prisoner is huddled on
+the floor. He stares at you as you approach, obviously frightened but
+at the same time frozen still, perhaps hoping that you will ignore him.
+~
+1|2 256|1024|8388608 0 S
+55 0 0
+0d0+0 0d0+0 0 0
+0 0 1
+R 0
+C 2
+K 4 2 12698 -1 As the crowd roars in applause, the bartender tosses you your prize!~
+
+#12654
+diminutive cowering prisoner man~
+a cowering prisoner~
+A terrified prisoner clings to the sides of the pit.
+~
+This pathetic man must have been tossed into the pit against his will,
+either captured by the town watchmen, or by the mob of overeager fans
+in the stands above. Apparently, he has decided that the best plan of
+action is to hide until everyone loses interest in him. Which is never.
+~
+1|2 256|1024|8388608 0 S
+55 0 0
+0d0+0 0d0+0 0 0
+0 0 1
+R 0
+C 2
+K 4 2 12698 -1 As the crowd roars in applause, the bartender tosses you your prize!~
+
+#12655
+man soldier guard light~
+Guard of the Light~
+A man dressed as a Midgaard soldier sits at a table, sipping ale.
+~
+The Guard of the Light lifts his tankard to greet you, then takes a
+delicate sip. Inviting you to sit down, he says, "Greetings, traveler!
+Come here often?" He chuckles to himself. "No, I'm not a regular
+myself. I came to test my skill in the arena. Normally, I'd just dismiss
+this place and never give it another passing thought---so long as the
+fine folk here stay out of "proper" Midgaard's business---but I've
+heard stories of an ex-member of the Queen's Death Guard who made a name
+for himself in the pit. An honest-to-goodness celebrity, in fact. And
+that, my friend, is a challenge I can't ignore."
+
+"They say he's a beast in the pit." The Guard of the Light slams his
+tankard on the table and flashes a broad smile. "But we'll see about
+that!"
+~
+1|2 8|32|64|128 1000 S
+75 0 0
+0d0+0 0d0+0 0 0
+0 0 1
+R 0
+C 3
+
+
+#12656
+woman bartender~
+the bartender~
+A large woman stands behind a bar, taking orders and bets.
+~
+The bartender hustles through the crowd, sliding drinks down the length
+of the bar as she also shouts to the crowd gathered around the fighting
+pit. Despite the commotion between the pit, its onlookers, and the
+merrymakers at the bar, she picks your face out of the crowd and yells,
+"Step up, already! Drinks are half price during a match. Or follow me to
+risk life and limb in the pit, if that's more to your liking!"
+~
+1|2 8|32 -200 S
+70 0 0
+0d0+0 0d0+0 0 0
+0 0 2
+R 0
+C 2
+
+#12657
+skinny rogue weaponsmith vendor~
+the rogue weaponsmith~
+A skinny rogue leisurely balances a rapier on his finger.
+~
+The rogue vendor almost blends in to the wall behind him, his body more
+resembling the rapier in his hands than his fellow townsfolk. He keeps
+a beady eye on you while he adjusts his coat---no doubt concealing all
+sorts of illicit wares.
+~
+1|2 8|32|8388608 -500 S
+70 0 0
+0d0+0 0d0+0 0 0
+0 0 1
+R 2
+C 2
+
+
+#12658
+jerome! leader~
+Jerome, Paradise's master thief~
+Jerome sits in seclusion, worrying himself away.
+~
+The aged thief is hunched over a table, arms crossed and brow furrowed.
+He idly twirls a dagger between his fingers, and as you enter he gives
+you a cursory glance and grumbles to himself.
+
+"I told everyone in town not to bother me, so begone already. If you've
+come to warn me again about the Black Circle, pipe down already. I said
+I'd get rid of them, and I will just as long as you folks keep quiet and
+let me concentrate!" He smirks. "Oh, and if you think you have the
+bright idea of taking my place, go right ahead. Your first job as mayor
+will be protecting Paradise from invisible assassins. So pick who you
+want to deal with: me or them!"
+
+With that, Jerome stabs his dagger into the table and points to the
+door.
+
+"I just need to figure out what they're planning, that's all... I think
+I know what they're after, and I think they haven't found it yet." With
+that, Jerome trails off, mumbling ideas to himself.
+~
+1|2 8|32 750 S
+80 0 0
+0d0+0 0d0+0 0 0
+0 0 1
+R 0
+C 2
+
+
+#0

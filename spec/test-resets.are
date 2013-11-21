@@ -1,0 +1,30 @@
+#RESETS
+
+* Special
+M 0 11400 1 11406 * Questmaster -> Northern Forge
+O 0 11455 0 11406   Inscription to imms
+P 0 11431 0 11444   You know how it is
+M 0 11401 1 11400 * Senior Producer of Special Effects -> Pools of Iron (Hidden)
+E 0 21 0 0          Ball of light
+
+* Entryway
+M 0 11499 1 11423 * White Raven -> In a narrow canyon
+O 0 11488 0 11423   Ancient stone altar
+M 0 11409 4 11422 * Red skinned orc -> Entry pass
+E 0 11400 0 16       Hand axe, wield
+M 0 11409 4 11424 * Red skinned orc -> Entry pass
+E 0 11400 0 16       Hand axe, wield
+M 0 11409 4 11425 * Red skinned orc -> Entry pass
+E 0 11400 0 16       Hand axe, wield
+G 0 11431 0          Red glowing dust, inventory
+M 0 11409 4 11426 * Red skinned orc -> Entry pass
+E 0 11400 0 16       Hand axe, wield
+M 0 11476 1 11427 * Mountain giant -> Entry pass cache
+E 0 11420 0 16       Iron baton, wield
+D 0 11427 0 2        Gate north to crater rim (locked but passable)
+D 0 11442 2 2        Gate south from crater rim to entrance (locked)
+R 0 11450 3       * Only randomize the first 3 exits (west remains untouched)
+
+
+S
+
