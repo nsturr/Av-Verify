@@ -2,6 +2,8 @@
 # it line by line, comparing the structure of the current line to the
 # structure of the expected line.
 
+require_relative "../helpers/tilde"
+
 class LineByLineObject
   include Parsable
   include TheTroubleWithTildes
