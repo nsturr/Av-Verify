@@ -50,7 +50,7 @@ class Area
   include AreaAttributes # bestows getters for all its attributes
   include CorrelateSections
 
-  attr_reader :main_sections, :flags
+  attr_reader :flags
 
   def initialize(filename, flags=[])
     # How 'bout a little FILE, Scarecrow! >:D
@@ -80,6 +80,14 @@ class Area
     @main_sections = extract_main_sections(data)
   end
 
+  def main_sections
+    @main_sections.values
+  end
+
+  def sections_by_name
+    @main_sections
+  end
+
   # get_section accepts a string, symbol, or class
   # Returns the Section object that matches the paramameter, either by id or class
   def get_section section
@@ -88,18 +96,18 @@ class Area
     end
 
     if section == "areaheader"
-      self.main_sections["area"]
+      @main_sections["area"]
     elsif section.is_a? String
       section = section.downcase.gsub("_", "")
-      self.main_sections[section]
+      @main_sections[section]
     elsif section.is_a? Class
-      self.main_sections.find { |_, s| s.class == section }
+      @main_sections.find { |_, s| s.class == section }
     end
   end
 
   # Runs parse on each of the classes
   def verify_all
-    self.main_sections.each_value do |section|
+    self.main_sections.each do |section|
       next if section.parsed?
       puts "Found ##{section.id} on line #{section.line_number}" if @flags.include?(:debug)
       section.parse
@@ -110,7 +118,7 @@ class Area
   # Repeatedly calling verify_all won't pollute the area's errors array with
   # duplicates (but correlating all repeatedly will. TODO)
   def errors
-    @section_errors = self.main_sections.inject([]) { |arr, s| arr += s[1].errors }
+    @section_errors = self.main_sections.inject([]) { |arr, s| arr += s.errors }
     # @errors is populated by CorrelateSections's methods
     @errors + @section_errors
   end
@@ -122,10 +130,9 @@ class Area
   # so that the first line is kept as part of the section.
   def extract_main_sections(data)
     lines_so_far = 1
-
-    separated = data.split(/^(?=#[a-zA-Z\$]+)/)
     sections = {}
 
+    separated = data.split(/^(?=#[a-zA-Z\$]+)/)
     separated.each do |content|
       # Keep track of how many lines per section, so that the next section
       # has an accurate line number
@@ -146,7 +153,10 @@ class Area
       # to put the effort in, remove this check for duplicate sections and add
       # in the ability to merge sections of the same type.
       if sections.any? { |s| s.class == new_section.class }
-        warn(new_section.line_number, nil, "Another #{new_section.class} section? This bodes ill. Skipping")
+        warn(
+          new_section.line_number,
+          nil,
+          "Another #{new_section.class} section? This bodes ill. Skipping")
         next
       end
       sections[new_section.id] = new_section
@@ -208,7 +218,7 @@ if __FILE__ == $PROGRAM_NAME
       puts "Parsing #{ARGV[0]}..."
       new_area = Area.new(ARGV[0], ARGV[1..-1])
       new_area.verify_all
-      new_area.correlate_all
+      new_area.correlate_all # This can't be run before verify_all
       new_area.error_report
     else
       puts "#{ARGV[0]} not found, skipping."
