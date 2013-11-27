@@ -357,7 +357,10 @@ class Mobile < LineByLineObject
     self.kspawn[:text] << "\n" + line
     ugly(@current_line, line, Mobile.err_msg(:visible_tab)) if line.include?("\t")
     # This type is only ever expected if a killspawn text field spans multiple lines
-    expect :misc if line.end_with?("~")
+    if has_tilde?(line)
+      validate_tilde(line: line, line_number: @current_line, present: false)
+      expect :misc
+    end
   end
 
 end
