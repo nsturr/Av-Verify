@@ -1,5 +1,19 @@
 module TheTroubleWithTildes
 
+  # Let's add some error messages for Tildes
+  class << self
+    ERROR_MESSAGES = {
+      missing: "Line lacks terminating ~",
+      invalid_text: "Invalid text after terminating ~",
+      extra: "Misplaced tilde on line",
+      not_alone: "Tilde should be on its own line"
+    }
+
+    def err_msgs(sym)
+      ERROR_MESSAGES[sym]
+    end
+  end
+
   def has_tilde? line
     line.include? "~"
   end
