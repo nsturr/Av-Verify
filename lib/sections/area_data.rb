@@ -16,9 +16,9 @@ class AreaData < Section
     zone_out_of_range: "Areadata zone out of bounds 0 to #{ZONE_MAX}",
     bad_bit: "%s not a power of 2",
     bad_line: "Bad %s line in #AREADATA",
-    kspawn_no_tilde: "Kspawn lacks terminating ~",
-    kspawn_extra_tilde: "Misplaced tildes in Kspawn line",
-    kspawn_text_after_tilde: "Invalid text on kspawn line after terminating ~",
+    # kspawn_no_tilde: "Kspawn lacks terminating ~",
+    # kspawn_extra_tilde: "Misplaced tildes in Kspawn line",
+    # kspawn_text_after_tilde: "Invalid text on kspawn line after terminating ~",
     not_enough_tokens: "Not enough tokens on #AREADATA %s line"
   }
 
@@ -63,7 +63,7 @@ class AreaData < Section
         if line.include?("~")
           @kspawn_multiline = false
           # However nothing but whitespace can follow that tilde!
-          err(@current_line, line, AreaData.err_msg(:kspawn_text_after_tilde)) if line =~ /~.*?\S/
+          err(@current_line, line, TheTroubleWithTildes.err_msg(:extra_text)) if line =~ /~.*?\S/
         end
         next
       end
@@ -99,7 +99,7 @@ class AreaData < Section
       end
 
     end
-    err(@current_line, nil, AreaData.err_msg(:kspawn_no_tilde)) if @kspawn_multiline
+    err(@current_line, nil, TheTroubleWithTildes.err_msg(:absent, "Kspawn")) if @kspawn_multiline
     err(@current_line, nil, AreaData.err_msg(:no_delimiter)) unless section_end
 
     self
@@ -197,7 +197,7 @@ class AreaData < Section
     # Check to see if the text ends on this line or continues on
     if text
       if text.include?("~")
-        err(@current_line, line, AreaData.err_msg(:kspawn_extra_tilde)) unless text =~ /^[^~]*~$/
+        err(@current_line, line, TheTroubleWithTildes.err_msg(:extra)) unless text =~ /^[^~]*~$/
       else
         @kspawn_multiline = true
       end

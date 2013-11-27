@@ -182,7 +182,7 @@ describe AreaData do
       # you don't see THEM varnishing the shingles at the barnyard corral,
       # now do ya. Nope, you sure don't.
       expect(area_data.errors.one? do |error|
-        error.description == AreaData.err_msg(:kspawn_no_tilde)
+        error.description == TheTroubleWithTildes.err_msg(:absent)
       end)
       # This emporary insanity brought to you by Lumoloth, the deceiver.
     end
@@ -191,7 +191,7 @@ describe AreaData do
       i = area_data.contents.index("~")
       area_data.contents.insert(i, " Hey, look at me!~")
 
-      expect_one_error(area_data, AreaData.err_msg(:kspawn_extra_tilde))
+      expect_one_error(area_data, TheTroubleWithTildes.err_msg(:extra))
     end
 
     it "parses the area kspawn" do

@@ -3,14 +3,16 @@ module TheTroubleWithTildes
   # Let's add some error messages for Tildes
   class << self
     ERROR_MESSAGES = {
-      missing: "Line lacks terminating ~",
-      invalid_text: "Invalid text after terminating ~",
+      absent: "%s has no terminating ~",
+      absent_between: "%s has no terminating ~ between lines %d and %d",
+      absent_or_spans: "%s has no terminating ~ or spans multiple lines",
+      extra_text: "Invalid text after terminating ~",
       extra: "Misplaced tilde on line",
-      not_alone: "Tilde should be on its own line"
+      not_alone: "Terminating ~ should be on its own line"
     }
 
-    def err_msgs(sym)
-      ERROR_MESSAGES[sym]
+    def err_msg(sym, desc="Line", line_start=1, line_end=2)
+      ERROR_MESSAGES[sym] % [desc, line_start, line_end]
     end
   end
 
@@ -31,18 +33,18 @@ module TheTroubleWithTildes
     line
   end
 
-  def tilde(sym, description="Line")
-    case sym
-    when :absent
-      "#{description} has no terminating ~"
-    when :absent_or_spans
-      "#{description} has no terminating ~ or spans multiple lines"
-    when :extra_text
-      "#{description} has invalid text after terminating ~"
-    when :not_alone
-      "Terminating ~ should be on its own line"
-    end
-  end
+  # def tilde(sym, description="Line")
+  #   case sym
+  #   when :absent
+  #     "#{description} has no terminating ~"
+  #   when :absent_or_spans
+  #     "#{description} has no terminating ~ or spans multiple lines"
+  #   when :extra_text
+  #     "#{description} has invalid text after terminating ~"
+  #   when :not_alone
+  #     "Terminating ~ should be on its own line"
+  #   end
+  # end
 
   # TODO: incorporate this, as it'll be cleaner than using all the separate ones
   def validate_tilde(line, line_number, options={})
