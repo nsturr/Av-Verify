@@ -99,9 +99,9 @@ class HelpFile
 
   @ERROR_MESSAGES = {
     no_level: "Help file doesn't start with a level",
-    tilde_absent: "Line has no terminating ~",
-    tilde_invalid_text: "Invalid text after terminating ~",
-    tilde_not_alone: "Help file's terminating ~ should be on its own line"
+    # tilde_absent: "Line has no terminating ~",
+    # tilde_invalid_text: "Invalid text after terminating ~",
+    # tilde_not_alone: "Help file's terminating ~ should be on its own line"
   }
 
   attr_reader :level, :keywords, :body, :line_number, :contents
@@ -119,7 +119,7 @@ class HelpFile
 
   def parse
     super # set parsed to true
-    
+
     @body = @contents.dup
     first_line = @body.slice!(/\A.*(?:\n|\Z)/).strip
 
@@ -128,11 +128,12 @@ class HelpFile
       @level = m[1].to_i
 
       keywords = m.post_match
-      unless has_tilde?(keywords)
-        err(@current_line, first_line, HelpFile.err_msg(:tilde_absent))
-      else
-        err(@current_line, first_line, HelpFile.err_msg(:tilde_invalid_text)) unless trailing_tilde?(keywords)
-      end
+      validate_tilde(line: first_line, line_number: @current_line)
+      # unless has_tilde?(keywords)
+      #   err(@current_line, first_line, TheTroubleWithTildes.err_msg(:absent))
+      # else
+      #   err(@current_line, first_line, TheTroubleWithTildes.err_msg(:extra_text)) unless trailing_tilde?(keywords)
+      # end
       nab_tilde(keywords)
 
       # see HasQuotedKeywords module for details
@@ -145,14 +146,21 @@ class HelpFile
 
     # First line done with. Onto the body.
     @current_line += @body.count("\n") + 1
-    end_line = @body[/^.*~.*$/]
-    if !has_tilde?(@body)
-      err(@current_line, nil, HelpFile.err_msg(:tilde_absent))
-    elsif !trailing_tilde?(end_line)
-      err(@current_line, end_line, HelpFile.err_msg(:tilde_invalid_text))
-    elsif !isolated_tilde?(end_line)
-      ugly(@current_line, end_line, HelpFile.err_msg(:tilde_not_alone))
-    end
+    # end_line = @body[/^.*~.*$/]
+    end_line = @body[/^[^\n]*\z/] # TODO : Ensure this captures what I expect
+
+    validate_tilde(
+      line: end_line,
+      line_number: @current_line,
+      should_be_alone: true
+    )
+    # if !has_tilde?(@body)
+    #   err(@current_line, nil, TheTroubleWithTildes.err_msg(:absent))
+    # elsif !trailing_tilde?(end_line)
+    #   err(@current_line, end_line, TheTroubleWithTildes.err_msg(:extra_text))
+    # elsif !isolated_tilde?(end_line)
+    #   ugly(@current_line, end_line, TheTroubleWithTildes.err_msg(:not_alone))
+    # end
     self
   end
 

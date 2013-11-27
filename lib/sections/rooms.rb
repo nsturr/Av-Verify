@@ -86,11 +86,16 @@ class Room < LineByLineObject
 
   def parse_name line
     return if invalid_blank_line? line
-    if has_tilde? line
-      err(@current_line, line, tilde(:extra_text, "Room name")) unless trailing_tilde? line
-    else
-      err(@current_line, line, tilde(:absent_or_spans, "Room name"))
-    end
+    validate_tilde(
+      line: line,
+      line_number: @current_line,
+      might_span_lines: true
+    )
+    # if has_tilde? line
+    #   err(@current_line, line, tilde(:extra_text, "Room name")) unless trailing_tilde? line
+    # else
+    #   err(@current_line, line, tilde(:absent_or_spans, "Room name"))
+    # end
     @name = line[/\A[^~]*/]
     expect :description
   end
@@ -108,12 +113,18 @@ class Room < LineByLineObject
       @description << line << "\n"
     end
     if has_tilde? line
+      validate_tilde(
+        line: line,
+        line_number: @current_line,
+        present: false,
+        should_be_alone: true
+      )
       expect :roomflags_sector
-      if trailing_tilde? line
-        ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
-      else
-        err(@current_line, line, tilde(:extra_text, "Description"))
-      end
+      # if trailing_tilde? line
+      #   ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
+      # else
+      #   err(@current_line, line, tilde(:extra_text, "Description"))
+      # end
     end
   end
 
@@ -202,8 +213,14 @@ class Room < LineByLineObject
 
     if has_tilde? line
       expect :door_keyword
-      err(@current_line, line, tilde(:extra_text, "Door desc")) unless trailing_tilde? line
-      ugly(@current_line, line, tilde(:not_alone, "Door desc")) unless isolated_tilde? line
+      validate_tilde(
+        line: line,
+        line_number: @current_line,
+        should_be_alone: true,
+        present: false
+      )
+      # err(@current_line, line, tilde(:extra_text, "Door desc")) unless trailing_tilde? line
+      # ugly(@current_line, line, tilde(:not_alone, "Door desc")) unless isolated_tilde? line
     end
   end
 
@@ -212,13 +229,18 @@ class Room < LineByLineObject
 
     @recent_door[:keywords] = parse_quoted_keywords(line[/^[^~]*/], line)
 
-    if line =~ /^[^~]*~$/
-      #
-    elsif line =~ /~./
-      err(@current_line, line, "Invalid text after terminating ~")
-    else
-      err(@current_line, line, "Door keywords lack terminating ~ or spans multiple lines")
-    end
+    validate_tilde(
+      line: line,
+      line_number: @current_line,
+      might_span_lines: true
+    )
+    # if line =~ /^[^~]*~$/
+    #   #
+    # elsif line =~ /~./
+    #   err(@current_line, line, "Invalid text after terminating ~")
+    # else
+    #   err(@current_line, line, "Door keywords lack terminating ~ or spans multiple lines")
+    # end
 
     expect :door_locks
   end
@@ -269,6 +291,8 @@ class Room < LineByLineObject
 
     @last_multiline = @current_line
     expect :multiline_edesc
+
+    #TODO: Do I need tilde checks here??
   end
 
   def parse_multiline_edesc line
@@ -278,8 +302,14 @@ class Room < LineByLineObject
     if has_tilde? line
       expect :misc
       @recent_keywords = nil
-      err(@current_line, line, tilde(:extra_text, "Edesc body")) unless trailing_tilde? line
-      ugly(@current_line, line, tilde(:not_alone, "Edesc body")) unless isolated_tilde? line
+      validate_tilde(
+        line: line,
+        line_number: @current_line,
+        present: false,
+        should_be_alone: true
+      )
+      # err(@current_line, line, tilde(:extra_text, "Edesc body")) unless trailing_tilde? line
+      # ugly(@current_line, line, tilde(:not_alone, "Edesc body")) unless isolated_tilde? line
     end
   end
 

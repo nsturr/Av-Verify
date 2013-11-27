@@ -6,8 +6,8 @@ class AreaHeader < Section
     bad_range: "Level range should be 8 chars long, including braces",
     no_braces: "Level range not enclosed in braces { }",
     multi_line: "#AREA section spans more than one line",
-    extra_tilde: "#AREA section contains more than one ~",
-    missing_tilde: "#AREA section contains no ~"
+    # extra_tilde: "#AREA section contains more than one ~",
+    # missing_tilde: "#AREA section contains no ~"
   }
 
   attr_reader :name, :level, :author
@@ -40,11 +40,13 @@ class AreaHeader < Section
     if @contents.include? "\n"
       err(@line_number, @contents, AreaHeader.err_msg(:multi_line))
     end
-    if @contents.count("~") > 1
-      err(@line_number, @contents, AreaHeader.err_msg(:extra_tilde))
-    elsif @contents.count("~") == 0
-      err(@line_number, @contents, AreaHeader.err_msg(:missing_tilde))
-    end
+
+    validate_tilde(line: @contents, line_number: line_number)
+    # if @contents.count("~") > 1
+    #   err(@line_number, @contents, TheTroubleWithTildes.err_msg(:extra))
+    # elsif @contents.count("~") == 0
+    #   err(@line_number, @contents, TheTroubleWithTildes.err_msg(:absent))
+    # end
 
     self
   end

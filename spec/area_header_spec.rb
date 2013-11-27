@@ -35,11 +35,11 @@ describe AreaHeader do
   end
 
   it "detects a missing tilde" do
-    expect_one_error(missing_tilde, AreaHeader.err_msg(:missing_tilde))
+    expect_one_error(missing_tilde, TheTroubleWithTildes.err_msg(:absent))
   end
 
   it "detects an extra invalid tilde" do
-    expect_one_error(extra_tilde, AreaHeader.err_msg(:extra_tilde))
+    expect_one_error(extra_tilde, TheTroubleWithTildes.err_msg(:extra))
   end
 
   it "detects a header spanning multiple lines" do

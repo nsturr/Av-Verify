@@ -35,10 +35,10 @@ class Objekt < LineByLineObject
   @ERROR_MESSAGES = {
     visible_tab: "Visible text contains a tab character",
     invalid_text_after: "Invalid text after %s",
-    tilde_absent: "%s has no terminating ~",
-    tilde_absent_or_spans: "%s has no terminating ~ or spans multiple lines",
-    tilde_invalid_text: "Invalid text after terminating ~",
-    tilde_not_alone: "%s's terminating ~ should be on its own line",
+    # tilde_absent: "%s has no terminating ~",
+    # tilde_absent_or_spans: "%s has no terminating ~ or spans multiple lines",
+    # tilde_invalid_text: "Invalid text after terminating ~",
+    # tilde_not_alone: "%s's terminating ~ should be on its own line",
     short_desc_spans: "Object short desc spans multiple lines",
     long_desc_spans: "Long desc has more than one line of text",
     adesc_no_tilde: "Doesn't look like part of an adesc. Forget a ~ somewhere?",
@@ -97,11 +97,16 @@ class Objekt < LineByLineObject
 
   def parse_name line
     return if invalid_blank_line? line
-    if has_tilde? line
-      err(@current_line, line, Objekt.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
-    else
-      err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Object name")
-    end
+    validate_tilde(
+      line: line,
+      line_number: @current_line,
+      might_span_lines: true
+    )
+    # if has_tilde? line
+    #   err(@current_line, line, Objekt.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
+    # else
+    #   err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Object name")
+    # end
     @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "object")
     expect :short_desc
   end
@@ -111,11 +116,16 @@ class Objekt < LineByLineObject
       err(@current_line, nil, Objekt.err_msg(:short_desc_spans))
     else
       ugly(@current_line, line, Objekt.err_msg(:visible_tab)) if line.include?("\t")
-      if has_tilde? line
-        err(@current_line, line, Objekt.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
-      else
-        err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Short desc")
-      end
+      validate_tilde(
+        line: line,
+        line_number: @current_line,
+        might_span_lines: true
+      )
+      # if has_tilde? line
+      #   err(@current_line, line, Objekt.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
+      # else
+      #   err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Short desc")
+      # end
       @short_desc = line[/\A[^~]*/]
       expect :long_desc
     end
@@ -127,10 +137,11 @@ class Objekt < LineByLineObject
 
     @long_desc << line << "\n"
 
+    # TODO: Use validate_tilde to some degree
     if has_tilde? line
       expect :adesc
       if line =~ /~./
-        err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
+        err(@current_line, line, TheTroubleWithTildes.err_msg(:extra_text))
       end
     end
     if @long_line == 2
@@ -150,10 +161,17 @@ class Objekt < LineByLineObject
     end
 
     if has_tilde? line
+      # Adescs can span multiple lines, doncha know
+      validate_tilde(
+      line: line,
+      line_number: @current_line,
+      present: false
+      )
       expect :type_extra_wear
-      unless trailing_tilde? line
-        err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
-      end
+    #   expect :type_extra_wear
+    #   unless trailing_tilde? line
+    #     err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
+    #   end
     end
   end
 
@@ -245,13 +263,18 @@ class Objekt < LineByLineObject
       return
     end
 
-    unless has_tilde? line
-      err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Edesc keywords")
-    else
-      if !trailing_tilde? line
-        err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
-      end
-    end
+    validate_tilde(
+      line: line,
+      line_number: @current_line,
+      might_span_lines: true
+    )
+    # unless has_tilde? line
+    #   err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Edesc keywords")
+    # else
+    #   if !trailing_tilde? line
+    #     err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
+    #   end
+    # end
 
     keywords = parse_quoted_keywords(line[/[^~]*/], line)
 
@@ -269,12 +292,18 @@ class Objekt < LineByLineObject
   def parse_multiline_edesc line
     if has_tilde? line
       expect :misc
-      unless trailing_tilde? line
-        err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
-      end
-      unless isolated_tilde? line
-        ugly(@current_line, line, Objekt.err_msg(:tilde_not_alone) % "Edesc body")
-      end
+      validate_tilde(
+        line: line,
+        line_number: @current_line,
+        should_be_alone: true,
+        present: false
+      )
+      # unless trailing_tilde? line
+      #   err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
+      # end
+      # unless isolated_tilde? line
+      #   ugly(@current_line, line, Objekt.err_msg(:tilde_not_alone) % "Edesc body")
+      # end
     end
 
     @edesc[@recent_keywords] << line[/[^~]*/] << "\n"

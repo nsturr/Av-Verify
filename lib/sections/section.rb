@@ -1,7 +1,9 @@
 require_relative '../helpers/parsable'
+require_relative '../helpers/tilde'
 
 class Section
   include Parsable
+  include TheTroubleWithTildes
 
   attr_reader :line_number, :id, :contents
 

@@ -45,35 +45,35 @@ describe HelpFile do
     i = help_file.contents.index("~")
     help_file.contents[i] = " "
 
-    expect_one_error(help_file, HelpFile.err_msg(:tilde_absent))
+    expect_one_error(help_file, TheTroubleWithTildes.err_msg(:absent))
   end
 
   it "detects invalid text after a tilde on the keyword line" do
     i = help_file.contents.index("~")
     help_file.contents.insert(i+1, " RSPEC BAAAAD")
 
-    expect_one_error(help_file, HelpFile.err_msg(:tilde_invalid_text))
+    expect_one_error(help_file, TheTroubleWithTildes.err_msg(:extra_text))
   end
 
   it "detects missing tildes in the body" do
     i = help_file.contents.rindex("~")
     help_file.contents[i] = "!"
 
-    expect_one_error(help_file, HelpFile.err_msg(:tilde_absent))
+    expect_one_error(help_file, TheTroubleWithTildes.err_msg(:absent))
   end
 
   it "detects invalid text after a tilde in the body" do
     i = help_file.contents.rindex("~")
     help_file.contents.insert(i+1, " RSPEC BAAAAD")
 
-    expect_one_error(help_file, HelpFile.err_msg(:tilde_invalid_text))
+    expect_one_error(help_file, TheTroubleWithTildes.err_msg(:extra_text))
   end
 
   it "detects a tilde on the same line as the body" do
     i = help_file.contents.rindex(/\n(?=~)/)
     help_file.contents.slice!(i)
 
-    expect_one_error(help_file, HelpFile.err_msg(:tilde_not_alone))
+    expect_one_error(help_file, TheTroubleWithTildes.err_msg(:not_alone))
   end
 
   it "detects invalid level" do

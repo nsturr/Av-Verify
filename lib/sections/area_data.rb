@@ -16,9 +16,6 @@ class AreaData < Section
     zone_out_of_range: "Areadata zone out of bounds 0 to #{ZONE_MAX}",
     bad_bit: "%s not a power of 2",
     bad_line: "Bad %s line in #AREADATA",
-    # kspawn_no_tilde: "Kspawn lacks terminating ~",
-    # kspawn_extra_tilde: "Misplaced tildes in Kspawn line",
-    # kspawn_text_after_tilde: "Invalid text on kspawn line after terminating ~",
     not_enough_tokens: "Not enough tokens on #AREADATA %s line"
   }
 
