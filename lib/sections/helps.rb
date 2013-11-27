@@ -74,7 +74,7 @@ class Helps < Section
     split_help_files
 
     @help_files.each do |help_file|
-      # help_file.parse
+      help_file.parse
       @errors += help_file.errors
     end
 
