@@ -11,7 +11,11 @@ class Specials < Section
     duplicate_spec: "This will override mob's existing special: %s"
   }
 
-  attr_reader :specials, :errors
+  def self.child_class
+    Special
+  end
+
+  attr_reader :specials
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
@@ -21,6 +25,10 @@ class Specials < Section
     @specials = {}
 
     slice_first_line!
+  end
+
+  def has_children?
+    true
   end
 
   def to_s
@@ -47,7 +55,7 @@ class Specials < Section
     length
   end
 
-  def split_specials
+  def split_children
     @delimiter = slice_delimiter!
 
     @contents.each_line do |line|
@@ -60,7 +68,8 @@ class Specials < Section
 
   def parse
     super # set parsed to true
-    split_specials
+    # split_specials
+    split_children
 
     @raw_lines.each do |special|
       special.parse
@@ -71,8 +80,6 @@ class Specials < Section
       @specials[special.vnum] = special
       @errors += special.errors
     end
-
-    # warn(current_line, line, "This will override mob's existing special: #{@specials[mob_vnum]}") if @specials.key? mob_vnum
 
     # TODO: should be able to dry up the code below. Into Section maybe?
 

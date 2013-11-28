@@ -16,6 +16,10 @@ class Resets < Section
     continues_after_delimiter: "#RESETS section continues after terminating S"
   }
 
+  def self.child_class
+    Reset
+  end
+
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "resets"

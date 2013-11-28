@@ -33,8 +33,8 @@ describe HelpFile do
 
   let (:help_file) do
     help_section = Helps.new(help.dup)
-    help_section.parse
-    help_section.help_files.first
+    help_section.split_children
+    help_section.children.first
   end
 
   it_should_behave_like Parsable do

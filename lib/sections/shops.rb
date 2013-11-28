@@ -10,6 +10,10 @@ class Shops < Section
 
   attr_reader :shops
 
+  def self.child_class
+    Shop
+  end
+
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "shops"

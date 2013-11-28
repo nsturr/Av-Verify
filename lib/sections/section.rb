@@ -5,7 +5,7 @@ class Section
   include Parsable
   include TheTroubleWithTildes
 
-  attr_reader :line_number, :id, :contents
+  attr_reader :line_number, :id, :contents, :children
 
   def self.delimiter(*options)
     if @section_delimiter
@@ -22,8 +22,24 @@ class Section
     @errors = []
   end
 
+  def has_children?
+    true
+  end
+
   def parse
-    super
+    super # Parsable
+  end
+
+  def split_children
+    return unless has_children?
+
+    @delimiter = slice_delimiter!
+    slice_leading_whitespace!
+    entries = self.contents.split(self.child_regex)
+    entries.each do |entry|
+      self.children << self.child_class.new(entry, @current_line)
+      @current_line += entry.count("\n")
+    end
   end
 
   def slice_first_line!

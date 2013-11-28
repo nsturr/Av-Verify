@@ -11,12 +11,17 @@ class VnumSection < Section
     empty: "%s section is empty!"
   }
 
-  def initialize(contents, line_number)
+  def initialize(contents, line_number=1)
     super(contents, line_number)
     @raw_entries = [] # Unparsed, has no VNUM yet, etc.
     @entries = {} # Parsed and validated, keyed by VNUM
     slice_first_line!
+    slice_leading_whitespace!
     split_entries
+  end
+
+  def has_children?
+    true
   end
 
   def [](vnum)
@@ -50,8 +55,6 @@ class VnumSection < Section
       entry_line_number = @current_line
       @current_line += entry.count("\n")
 
-      # Only happens if whitespace between header and 1st vnum
-      next if entry.rstrip.empty?
       unless entry =~ /\A#\d+\b/ # bad VNUM
         err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
         next
@@ -65,7 +68,7 @@ class VnumSection < Section
     super # set @parsed to true
 
     if @raw_entries.empty?
-      err(self.line_number, nil, VnumSection.err_msg(:empty) % self.class.name.capitalize)
+      err(self.line_number, nil, VnumSection.err_msg(:empty) % self.class.name)
       @parsed = true
     end
 

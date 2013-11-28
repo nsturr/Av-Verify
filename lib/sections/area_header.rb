@@ -17,6 +17,10 @@ class AreaHeader < Section
     @id = "area"
   end
 
+  def has_children?
+    false
+  end
+
   def parse
     super # set parsed to true
 

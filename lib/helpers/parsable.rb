@@ -14,7 +14,7 @@ module Parsable
     end
   end
 
-  attr_reader :errors
+  attr_accessor :errors
 
   def parse
     @parsed = true
@@ -26,30 +26,30 @@ module Parsable
 
   def err(line, context, description)
     error = Error.new(line, :error, context, description)
-    @errors << error
+    self.errors << error
   end
 
   # Returns a new Error struct, but only for non-critical errors
   def warn(line, context, description)
     error = Error.new(line, :warning, context, description)
-    @errors << error
+    self.errors << error
   end
 
   # Nothing creates these yet, so ignore
   def nb(line, context, description)
     error = Error.new(line, :nb, context, description)
-    @errors << error
+    self.errors << error
   end
 
   # The least important errors, primarily cosmetic things
   def ugly(line, context, description)
     error = Error.new(line, :ugly, context, description)
-    @errors << error
+    self.errors << error
   end
 
-  def errors
-    @errors || []
-  end
+  # def errors
+  #   @errors || []
+  # end
 
   def valid?
     self.errors.none? { |error| error.type == :error }
@@ -115,6 +115,8 @@ module Parsable
   class Error
     attr_accessor :line, :type, :context, :description
 
+    # The CC! method takes a symbol to to determine its color.
+    # Maps color to error type.
     COLOR = {
       warning: :R,
       error: :BR,
