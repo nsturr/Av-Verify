@@ -60,7 +60,12 @@ class AreaData < Section
         if line.include?("~")
           @kspawn_multiline = false
           # However nothing but whitespace can follow that tilde!
-          err(@current_line, line, TheTroubleWithTildes.err_msg(:extra_text)) if line =~ /~.*?\S/
+          validate_tilde(
+            line: line,
+            line_number: @current_line,
+            present: false
+          )
+          # err(@current_line, line, TheTroubleWithTildes.err_msg(:extra_text)) if line =~ /~.*?\S/
         end
         next
       end
