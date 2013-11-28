@@ -289,10 +289,14 @@ class Room < LineByLineObject
     @recent_keywords = keywords
     @edesc[keywords] = ""
 
+    validate_tilde(
+      line: line,
+      line_number: @current_line,
+      might_span_lines: true
+    )
+
     @last_multiline = @current_line
     expect :multiline_edesc
-
-    #TODO: Do I need tilde checks here??
   end
 
   def parse_multiline_edesc line
