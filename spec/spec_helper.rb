@@ -36,7 +36,8 @@ end
 
 shared_examples_for Section do
   it "ignores leading and trailing white space" do
-    section.contents.prepend("\n"*10)
+    i = section.contents.index("\n")
+    section.contents.insert(i+1, "\n"*10)
     section.contents << "\n"*10
 
     section.parse
@@ -50,17 +51,18 @@ shared_examples_for VnumSection do
 
   it "detects invalid text after vnums"
 
-  it "detects an empty section" #do
-    # section = VnumSection.new("#FAKESECTION\n#0\n")
-    # expect_one_error(section, VnumSection.err_msg(:empty) % section.class)
-  # end
+  it "detects an empty section" do
+    section = VnumSection.new("#FAKESECTION\n#0\n")
+    expect_one_error(section, VnumSection.err_msg(:empty) % section.class)
+  end
 
   it "detects a missing delimiter"
 
   it "detects invalid text after the delimiter"
 
   it "detects duplicate vnums"  do
-    e = section.instance_variable_get(:@raw_entries)
+    e = section.instance_variable_get(:@children)
+    p e
     e << e.last.dup
     # TODO: Gotta make a specific error message :
     expect_one_error(section, VnumSection.err_msg(:duplicate))
