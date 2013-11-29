@@ -30,7 +30,7 @@ class Section
     super # Parsable
   end
 
-  def split_children(per_child=nil)
+  def split_children(valid_child=nil)
     return unless has_children?
 
     @delimiter = slice_delimiter!
@@ -38,12 +38,11 @@ class Section
 
     entries = self.contents.rstrip.split(self.child_regex)
     entries.each do |entry|
-      if per_child
-        # per_child is a proc that performs section specific validations on each entry
-        # see vnum_section for an example
-        per_child.call(entry)
+      # valid_entry both returns true/false to determine if the entry can be
+      # added to children, and also raises errors/warnings if applicable
+      if valid_child.nil? || valid_child.call(entry)
+        self.children << self.child_class.new(entry, @current_line)
       end
-      self.children << self.child_class.new(entry, @current_line)
       @current_line += entry.count("\n")
     end
   end

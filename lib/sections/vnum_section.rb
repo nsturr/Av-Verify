@@ -53,12 +53,21 @@ class VnumSection < Section
     super # set @parsed to true
 
     validate_vnum = Proc.new do |child|
-      unless child =~ /\A#\d+\b/
+      child_vnum = child[/\A#\d+\b/]
+      invalid = false
+
+      unless child_vnum
+        # invalid vnums won't be added (sorry!)
         err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
+        invalid == true
       end
-      unless child =~ /\A#\d+\s*$/
+      unless child =~ /\A#\w+\s*$/
         err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum))
       end
+
+      invalid ||= self.children.include? child_vnum.to_i
+
+      !invalid
     end
 
     split_children(validate_vnum)
