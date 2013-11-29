@@ -18,8 +18,7 @@ class VnumSection < Section
   end
 
   # A proc to pass to Section#split_children to determine whether or not to add
-  # the the child to the instance var @children
-  # This one prohibits non-numeric vnums and duplicate vnums
+  # the the child to the instance var @children. Also raises errors
   def valid_vnum?
     Proc.new do |child|
       child_vnum = child[/\A#\d+\b/]
@@ -33,15 +32,6 @@ class VnumSection < Section
       unless child =~ /\A#\w+\s*$/
         err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum))
       end
-
-      # child_vnum = child_vnum.to_i
-      # if self.children.include? child_vnum
-      #   err(
-      #     entry.line_number, nil, VnumSection.err_msg(:duplicate) %
-      #     [entry.class.name.downcase, child_vnum, self.children[child_vnum].line_number]
-      #   )
-      #   invalid = true
-      # end
 
       !invalid
     end

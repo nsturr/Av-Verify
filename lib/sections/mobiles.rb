@@ -137,11 +137,6 @@ class Mobile < LineByLineObject
         line_number: @current_line,
         should_be_alone: true
       )
-      # if line =~ /~./
-      #   err(@current_line, line, Mobile.err_msg(:tilde_invalid_text))
-      # elsif line.length > 1
-      #   ugly(@current_line, line, Mobile.err_msg(:tilde_not_alone) % "Long desc")
-      # end
     elsif @long_line == 2
       ugly(@current_line, line, Mobile.err_msg(:long_desc_spans))
     end
