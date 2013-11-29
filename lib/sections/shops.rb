@@ -6,7 +6,7 @@ require_relative "line_by_line_object"
 
 class Shops < Section
 
-  @section_delimiter = "^0\\b[^\\d\\n]*$"
+  @section_delimiter = /^0\b[^\d\n]*$/
 
   attr_reader :shops
 

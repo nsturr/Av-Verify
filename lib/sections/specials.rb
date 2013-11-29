@@ -3,7 +3,7 @@ require_relative '../helpers/avconstants'
 
 class Specials < Section
 
-  @section_delimiter = "^S"
+  @section_delimiter = /^S/
 
   @ERROR_MESSAGES = {
     no_delimiter: "#SPECIALS section lacks terminating S",

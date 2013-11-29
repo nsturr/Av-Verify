@@ -19,7 +19,7 @@ class AreaData < Section
     not_enough_tokens: "Not enough tokens on #AREADATA %s line"
   }
 
-  @section_delimiter = "^S"
+  @section_delimiter = /^S/
 
   attr_reader :plane, :zone, :flags, :outlaw, :kspawn, :modifiers, :group_exp
 

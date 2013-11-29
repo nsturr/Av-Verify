@@ -9,9 +9,10 @@ class Section
 
   def self.delimiter(*options)
     if @section_delimiter
-      delim = @section_delimiter.dup
-      delim.prepend("\\A") if options.include? :start
-      options.include?(:string) ? delim : /#{delim}/
+      # delim = @section_delimiter.dup
+      # delim.prepend("\\A") if options.include? :start
+      # options.include?(:string) ? delim : /#{delim}/
+      options.include?(:start) ? /\A#{@section_delimiter}/ : @section_delimiter
     end
   end
 
