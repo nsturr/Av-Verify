@@ -15,7 +15,7 @@ module CorrelateSections
     rooms.each do |room|
       room.doors.each_value do |door|
         next if door[:dest].between?(-1, 0)
-        unless rooms.key? door[:dest]
+        unless rooms.include? door[:dest]
           rebuilt_line = "#{door[:lock]} #{door[:key]} #{door[:dest]}"
           nb(door[:lock_line_number], rebuilt_line, "Door destination room is not in the area")
         end
@@ -78,7 +78,7 @@ module CorrelateSections
       return
     end
     shops.each do |shop|
-      unless mobiles.key? shop.vnum
+      unless mobiles.include? shop.vnum
         warn(shop.line_number, shop.vnum.to_s, "Shopkeeper mob is not in the area")
       end
     end
@@ -91,7 +91,7 @@ module CorrelateSections
       return
     end
     specials.each do |special|
-      unless mobiles.key? special.vnum
+      unless mobiles.include? special.vnum
         warn(special.line_number, special.line, "Spec_fun's mob is not in the area")
       end
     end
@@ -103,7 +103,7 @@ module CorrelateSections
 
   def correlate_mob_reset_vnum(reset, mobiles)
     return 1 if mobiles.nil?
-    unless mobiles.key? reset.vnum
+    unless mobiles.include? reset.vnum
       warn(reset.line_number, reset.line, "Mobile to spawn is not in the area")
     end
     0
@@ -111,7 +111,7 @@ module CorrelateSections
 
   def correlate_mob_reset_room(reset, rooms)
     return 1 if rooms.nil?
-    unless rooms.key? reset.target
+    unless rooms.include? reset.target
       warn(reset.line_number, reset.line, "Mobile spawn location is not in the area")
     end
     0
@@ -119,7 +119,7 @@ module CorrelateSections
 
   def correlate_obj_reset_vnum(reset, objects)
     return 1 if objects.nil?
-    unless objects.key?(reset.vnum) || known_vnum(reset.vnum)
+    unless objects.include?(reset.vnum) || known_vnum(reset.vnum)
       warn(reset.line_number, reset.line, "Object to spawn is not in the area")
     end
     0
@@ -127,7 +127,7 @@ module CorrelateSections
 
   def correlate_obj_reset_room(reset, rooms)
     return 1 if rooms.nil?
-    unless rooms.key? reset.target
+    unless rooms.include? reset.target
       warn(reset.line_number, reset.line, "Object spawn location is not in the area")
     end
     0
@@ -135,7 +135,7 @@ module CorrelateSections
 
   def correlate_container_reset(reset, objects)
     return 1 if objects.nil?
-    unless objects.key? reset.target
+    unless objects.include? reset.target
       warn(reset.line_number, reset.line, "Object spawn container is not in the area")
     end
     0
@@ -143,7 +143,7 @@ module CorrelateSections
 
   def correlate_door_reset(reset, rooms)
     return 1 if rooms.nil?
-    if rooms.key?(reset.vnum) == false
+    if rooms.include?(reset.vnum) == false
       err(reset.line_number, reset.line, "Door reset's room is not in the area")
     elsif rooms[reset.vnum].doors.nil?
       err(reset.line_number, reset.line, "Door reset's room does not have this exit")
@@ -157,7 +157,7 @@ module CorrelateSections
 
   def correlate_random_reset(reset, rooms)
     return 1 if rooms.nil?
-    unless rooms.key? reset.vnum
+    unless rooms.include? reset.vnum
       err(reset.line_number, reset.line, "Room to randomize isn't in the area")
     end
     0

@@ -13,27 +13,28 @@ class VnumSection < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @raw_entries = [] # Unparsed, has no VNUM yet, etc.
-    @entries = {} # Parsed and validated, keyed by VNUM
+    @children = []
     slice_first_line!
-    slice_leading_whitespace!
-    split_entries
   end
 
   def has_children?
     true
   end
 
-  def [](vnum)
-    @entries[vnum]
+  def child_regex
+    /^(?=#\d\S*)/
   end
 
-  def key?(vnum)
-    @entries.key? vnum
+  def [](vnum)
+    self.children.find { |child| child.vnum == vnum }
+  end
+
+  def include?(vnum)
+    self.children.any? { |child| child.vnum == vnum }
   end
 
   def length
-    @entries.length
+    self.children.length
   end
 
   def size
@@ -41,48 +42,66 @@ class VnumSection < Section
   end
 
   def each(&prc)
-    @entries.each_value(&prc)
+    self.children.each(&prc)
   end
 
-  def split_entries
-
-    @delimiter = slice_delimiter!
-    @current_line += 1
-
-    entries = @contents.rstrip.split(/^(?=#\d\S*)/)
-
-    entries.each do |entry|
-      entry_line_number = @current_line
-      @current_line += entry.count("\n")
-
-      unless entry =~ /\A#\d+\b/ # bad VNUM
-        err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
-        next
-      end
-      err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum)) unless entry =~ /\A#\d+\s*$/
-      @raw_entries << self.class.child_class.new(entry, entry_line_number)
-    end
+  def split_children(prc=nil)
+    super(prc)
   end
+
+  # def split_entries
+  # def split_children
+
+  #   @delimiter = slice_delimiter!
+  #   @current_line += 1
+  #   slice_leading_whitespace!
+
+  #   entries = @contents.rstrip.split(self.child_regex)
+
+  #   entries.each do |entry|
+  #     entry_line_number = @current_line
+  #     @current_line += entry.count("\n")
+
+  #     unless entry =~ /\A#\d+\b/ # bad VNUM
+  #       err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
+  #       next
+  #     end
+  #     err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum)) unless entry =~ /\A#\d+\s*$/
+  #     @raw_entries << self.class.child_class.new(entry, entry_line_number)
+  #   end
+  # end
 
   def parse
     super # set @parsed to true
 
-    if @raw_entries.empty?
+    validate_vnum = Proc.new do |child|
+      unless child =~ /\A#\d+\b/
+        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
+      end
+      unless child =~ /\A#\d+\s*$/
+        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum))
+      end
+    end
+
+    split_children(validate_vnum)
+
+    # if @raw_entries.empty?
+    if self.children.empty?
       err(self.line_number, nil, VnumSection.err_msg(:empty) % self.class.name)
       @parsed = true
     end
 
-    @raw_entries.each do |entry|
+    self.children.each do |entry|
       entry.parse
-      unless @entries.key? entry.vnum
-        @entries[entry.vnum] = entry
-      else
-        err(
-          entry.line_number, nil, VnumSection.err_msg(:duplicate) %
-          [entry.class.name.downcase, entry.vnum, @entries[entry.vnum].line_number]
-        )
-      end
-      @errors += entry.errors
+      # unless @entries.key? entry.vnum
+      #   @entries[entry.vnum] = entry
+      # else
+      #   err(
+      #     entry.line_number, nil, VnumSection.err_msg(:duplicate) %
+      #     [entry.class.name.downcase, entry.vnum, @entries[entry.vnum].line_number]
+      #   )
+      # end
+      self.errors += entry.errors
     end
 
     if @delimiter.nil?
@@ -93,7 +112,7 @@ class VnumSection < Section
         err(line_num, bad_line, VnumSection.err_msg(:continues_after_delimiter) % self.id.updase)
       end
     end
-    @entries
+    self.children
   end
 
 end

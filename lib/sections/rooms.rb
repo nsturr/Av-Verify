@@ -8,7 +8,7 @@ class Rooms < VnumSection
 
   @section_delimiter = "^#0\\b" # N.B. some valid vnums regrettably begin with a 0
 
-  def self.child_class
+  def child_class
     Room
   end
 
