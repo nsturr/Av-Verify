@@ -10,22 +10,26 @@ class Shops < Section
 
   attr_reader :shops
 
-  def self.child_class
+  def child_class
     Shop
   end
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "shops"
-    @shops = []
+    @children = []
 
     slice_first_line!
     @current_line += 1
-    split_shops
+    # split_shops
+  end
+
+  def child_regex
+    /^(?=\d+\b[^\d]*$)/
   end
 
   def length
-    @shops.length
+    @children.length
   end
 
   def size
@@ -33,35 +37,23 @@ class Shops < Section
   end
 
   def each(&prc)
-    @shops.each(&prc)
+    @children.each(&prc)
   end
 
   def [](index)
-    @shops[index]
+    @children[index]
   end
 
   def to_s
     "#SHOPS: #{self.shops.size} entries, line #{self.line_number}"
   end
 
-  def split_shops
-    @delimiter = slice_delimiter!
-
-    slice_leading_whitespace!
-
-    # split on exactly one number in a line, maybe some invalid non-numbers after,
-    # whatever. Shops sucks so much.
-    @entries = @contents.split(/^(?=\d+\b[^\d]*$)/)
-    @entries.each do |entry|
-      @shops << Shop.new(entry, @current_line)
-      @current_line += entry.count("\n")
-    end
-  end
-
   def parse
     super # set parsed to true
 
-    @shops.each do |shop|
+    split_children
+
+    @children.each do |shop|
       shop.parse
       @errors += shop.errors
     end
