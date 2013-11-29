@@ -8,6 +8,11 @@ class Shops < Section
 
   @section_delimiter = /^0\b[^\d\n]*$/
 
+  @ERROR_MESSAGES = {
+    continues_after_delimiter: "#SHOPS section continues after terminating 0$~",
+    no_delimiter: "Shops section ends without terminating 0",
+  }
+
   attr_reader :shops
 
   def child_class
@@ -21,7 +26,6 @@ class Shops < Section
 
     slice_first_line!
     @current_line += 1
-    # split_shops
   end
 
   def child_regex
@@ -45,7 +49,7 @@ class Shops < Section
   end
 
   def to_s
-    "#SHOPS: #{self.shops.size} entries, line #{self.line_number}"
+    "<#SHOPS: #{self.shops.size} entries, line #{self.line_number}>"
   end
 
   def parse
@@ -61,10 +65,10 @@ class Shops < Section
     if @delimiter
       unless @delimiter.rstrip =~ /#{Shops.delimiter(:start)}\z/
         line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, "#SHOPS section continues after terminating 0$~")
+        err(line_num, bad_line, Shops.err_msg(:continues_after_delimiter))
       end
     else
-      err(@current_line, nil, "Shops section ends without terminating 0")
+      err(@current_line, nil, Shops.err_msg(:no_delimiter))
     end
     self.shops
   end
@@ -72,6 +76,17 @@ class Shops < Section
 end
 
 class Shop < LineByLineObject
+
+  @ERROR_MESSAGES = {
+    missing_line: "Shop terminates without %s line",
+    bad_vnum: "Invalid shopkeeper VNUM",
+    bad_object_type: "Invalid object type",
+    not_enough_tokens: "Not enough tokens in %s line",
+    negative_profit_margin: "Profit margin can't be negative",
+    invalid_profit_margin: "Invalid profit margin",
+    hours_out_of_bounds: "Hours out of bounds 0 to 23",
+    bad_hour: "Invalid hour"
+  }
 
   ATTRIBUTES = [:vnum, :types, :profit_buy, :profit_sell, :hour_open, :hour_close]
 
@@ -94,7 +109,7 @@ class Shop < LineByLineObject
         when :profit then "protit"
         when :hours then "business hours"
         end
-      err(@current_line, nil, "Shop terminates without #{expectation} line")
+      err(@current_line, nil, Shop.err_msg(:missing_line) % expectation.to_s)
     end
     self
   end
@@ -104,7 +119,7 @@ class Shop < LineByLineObject
     if line =~ /^\d+(?:\s+.*)?$/
       @vnum = line.to_i
     else
-      err(@current_line, line, "Invalid shopkeeper VNUM")
+      err(@current_line, line, Shop.err_msg(:bad_vnum))
     end
 
     expect :types
@@ -120,11 +135,11 @@ class Shop < LineByLineObject
         if types[i] =~ /^\d+$/
           @types << types[i]
         else
-          err(@current_line, line, "Invalid object type")
+          err(@current_line, line, Shop.err_msg(:bad_object_type))
         end
       end
     else
-      err(@current_line, line, "Not enough tokens in shop type line")
+      err(@current_line, line, Shop.err_msg(:not_enough_tokens) % "shop type")
     end
 
     expect :profit
@@ -137,18 +152,18 @@ class Shop < LineByLineObject
     unless profit_sell.nil?
       if profit_buy =~ /^-?\d+$/
         @profit_buy = profit_buy.to_i
-        err(@current_line, line, "Profit margin can't be negative") if @profit_buy < 0
+        err(@current_line, line, Shop.err_msg(:negative_profit_margin)) if @profit_buy < 0
       else
-        err(@current_line, line, "Invalid profit margin")
+        err(@current_line, line, Shop.err_msg(:invalid_profit_margin))
       end
       if profit_sell =~ /^-?\d+$/
         @profit_sell = profit_sell.to_i
-        err(@current_line, line, "Profit margin can't be negative") if @profit_sell < 0
+        err(@current_line, line, Shop.err_msg(:negative_profit_margin)) if @profit_sell < 0
       else
-        err(@current_line, line, "Invalid profit margin")
+        err(@current_line, line, Shop.err_msg(:invalid_profit_margin))
       end
     else
-      err(@current_line, line, "Not enough tokens in profit line")
+      err(@current_line, line, Shop.err_msg(:not_enough_tokens) % "profit")
     end
 
     expect :hours
@@ -161,18 +176,18 @@ class Shop < LineByLineObject
     unless hour_close.nil?
       if hour_open =~ /^\d+$/
         @hour_open = hour_open.to_i
-        err(@current_line, line, "Hours out of bounds 0 to 23") unless @hour_open.between?(0,23)
+        err(@current_line, line, Shop.err_msg(:hours_out_of_bounds)) unless @hour_open.between?(0,23)
       else
-        err(@current_line, line, "Invalid hour")
+        err(@current_line, line, Shop.err_msg(:bad_hour))
       end
       if hour_close =~ /^\d+$/
         @hour_close = hour_close.to_i
-        err(@current_line, line, "hours out of bounds 0 to 23") unless @hour_close.between?(0,23)
+        err(@current_line, line, Shop.err_msg(:hours_out_of_bounds)) unless @hour_close.between?(0,23)
       else
-        err(@current_line, line, "Invalid hour")
+        err(@current_line, line, Shop.err_msg(:bad_hour))
       end
     else
-      err(@current_line, line, "Not enough tokens in hours line")
+      err(@current_line, line, Shop.err_msg(:not_enough_tokens) % "hours")
     end
 
     expect :vnum
