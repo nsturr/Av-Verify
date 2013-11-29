@@ -49,28 +49,6 @@ class VnumSection < Section
     super(prc)
   end
 
-  # def split_entries
-  # def split_children
-
-  #   @delimiter = slice_delimiter!
-  #   @current_line += 1
-  #   slice_leading_whitespace!
-
-  #   entries = @contents.rstrip.split(self.child_regex)
-
-  #   entries.each do |entry|
-  #     entry_line_number = @current_line
-  #     @current_line += entry.count("\n")
-
-  #     unless entry =~ /\A#\d+\b/ # bad VNUM
-  #       err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
-  #       next
-  #     end
-  #     err(entry_line_number, entry[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum)) unless entry =~ /\A#\d+\s*$/
-  #     @raw_entries << self.class.child_class.new(entry, entry_line_number)
-  #   end
-  # end
-
   def parse
     super # set @parsed to true
 
@@ -85,7 +63,6 @@ class VnumSection < Section
 
     split_children(validate_vnum)
 
-    # if @raw_entries.empty?
     if self.children.empty?
       err(self.line_number, nil, VnumSection.err_msg(:empty) % self.class.name)
       @parsed = true

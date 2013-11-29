@@ -34,7 +34,6 @@ class Section
     return unless has_children?
 
     @delimiter = slice_delimiter!
-    # slice_first_line!
     slice_leading_whitespace!
 
     entries = self.contents.rstrip.split(self.child_regex)

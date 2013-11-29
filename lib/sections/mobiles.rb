@@ -36,10 +36,6 @@ class Mobile < LineByLineObject
   @ERROR_MESSAGES = {
     visible_tab: "Visible text contains a tab character",
     invalid_text_after: "Invalid text after %s",
-    # tilde_absent: "%s has no terminating ~",
-    # tilde_absent_or_spans: "%s has no terminating ~ or spans multiple lines",
-    # tilde_invalid_text: "Invalid text after terminating ~",
-    # tilde_not_alone: "%s's terminating ~ should be on its own line",
     short_desc_spans: "Mob short desc spans multiple lines",
     long_desc_spans: "Long desc has more than one line of text",
     description_no_tilde: "This doesn't look like part of a description. Forget a terminating ~ above?",
@@ -108,11 +104,6 @@ class Mobile < LineByLineObject
       line_number: @current_line,
       might_span_lines: true
       )
-    # if has_tilde? line
-    #   err(@current_line, line, Mobile.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
-    # else
-    #   err(@current_line, line, Mobile.err_msg(:tilde_absent_or_spans) % "Mob name")
-    # end
 
     @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "mob")
     expect :short_desc
@@ -128,11 +119,6 @@ class Mobile < LineByLineObject
         line_number: @current_line,
         might_span_lines: true
       )
-      # if has_tilde? line
-      #   err(@current_line, line, Mobile.err_msg(:invalid_text)) unless trailing_tilde? line
-      # else
-      #   err(@current_line, line, Mobile.err_msg(:absent_or_spans) % "Short desc")
-      # end
       @short_desc = line[/\A[^~]*/]
       expect :long_desc
     end
@@ -182,11 +168,6 @@ class Mobile < LineByLineObject
         line_number: @current_line,
         should_be_alone: true
       )
-      # if trailing_tilde? line
-      #   ugly(@current_line, line, Mobile.err_msg(:tilde_not_alone) % "Description") unless isolated_tilde? line
-      # else
-      #   err(@current_line, line, Mobile.err_msg(:tilde_invalid_text))
-      # end
     end
   end
 
