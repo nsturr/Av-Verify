@@ -20,10 +20,6 @@ class Section
     @errors = []
   end
 
-  def parse
-    super # Parsable
-  end
-
   def split_children(valid_child=nil)
     return if self.children.nil?
 

@@ -16,7 +16,7 @@ class LineByLineObject
   end
 
   def parse
-    super # set parsed to true
+    @parsed = true
 
     expect :vnum
     @contents.each_line do |line|

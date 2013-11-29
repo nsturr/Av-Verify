@@ -64,7 +64,8 @@ class Specials < Section
   end
 
   def parse
-    super # set parsed to true
+    @parsed = true
+
     split_children(Specials.valid_special)
 
     self.children.each do |special|
@@ -118,7 +119,7 @@ class Special
   end
 
   def parse
-    super # set parsed to true
+    @parsed = true
 
     if self.line.start_with? "M\s"
 

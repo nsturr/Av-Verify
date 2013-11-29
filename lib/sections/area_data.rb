@@ -40,7 +40,7 @@ class AreaData < Section
   end
 
   def parse
-    super # set parsed to true
+    @parsed = true
 
     section_end = false
 

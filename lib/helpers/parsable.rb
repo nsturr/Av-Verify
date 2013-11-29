@@ -16,10 +16,6 @@ module Parsable
 
   attr_accessor :errors
 
-  def parse
-    @parsed = true
-  end
-
   def parsed?
     @parsed || false
   end

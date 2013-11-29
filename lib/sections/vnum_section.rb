@@ -66,7 +66,7 @@ class VnumSection < Section
   end
 
   def parse
-    super # set @parsed to true
+    @parsed = true
 
     split_children(self.valid_vnum?)
 

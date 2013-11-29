@@ -18,7 +18,7 @@ class AreaHeader < Section
   end
 
   def parse
-    super # set parsed to true
+    @parsed = true
 
     @errors = []
     bracket_open = @contents.index("{")

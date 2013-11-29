@@ -74,7 +74,7 @@ class Helps < Section
   end
 
   def parse
-    super # set parsed to true
+    @parsed = true
 
     # split_help_files
     split_children
@@ -125,7 +125,7 @@ class HelpFile
   end
 
   def parse
-    super # set parsed to true
+    @parsed = true
 
     @body = @contents.dup
     first_line = @body.slice!(/\A.*(?:\n|\Z)/).strip
