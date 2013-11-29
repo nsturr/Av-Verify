@@ -24,6 +24,10 @@ module Parsable
     @parsed || false
   end
 
+  # have to use @errors rather than self.errors for the next few methods,
+  # on account that Area#errors (possibly more in the future) is actually
+  # a computed value, and doesn't read straight from @errors
+
   def err(line, context, description)
     error = Error.new(line, :error, context, description)
     @errors << error
@@ -46,10 +50,6 @@ module Parsable
     error = Error.new(line, :ugly, context, description)
     @errors << error
   end
-
-  # def errors
-  #   @errors || []
-  # end
 
   def valid?
     self.errors.none? { |error| error.type == :error }

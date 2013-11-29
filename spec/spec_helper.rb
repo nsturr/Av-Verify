@@ -36,6 +36,8 @@ end
 
 shared_examples_for Section do
   it "ignores leading and trailing white space" do
+    # Find the index of the first line break (after #SECTION_NAME)
+    # to insert whitespace
     i = section.contents.index("\n")
     section.contents.insert(i+1, "\n"*10)
     section.contents << "\n"*10
@@ -61,11 +63,13 @@ shared_examples_for VnumSection do
   it "detects invalid text after the delimiter"
 
   it "detects duplicate vnums"  do
-    e = section.instance_variable_get(:@children)
-    p e
-    e << e.last.dup
-    # TODO: Gotta make a specific error message :
-    expect_one_error(section, VnumSection.err_msg(:duplicate))
+    _, item, _ = section.contents.split(section.child_regex, 3)
+    i = section.contents.index(section.class.delimiter)
+    section.contents.insert(i, item)
+
+    # TODO: Make this less brittle
+    expect_one_error(section, VnumSection.err_msg(:duplicate) %
+      [section.child_class.name.downcase, 12650, 2])
   end
 
 end

@@ -110,7 +110,7 @@ class Area
     self.main_sections.each do |section|
       next if section.parsed?
       puts "Found ##{section.id} on line #{section.line_number}" if @flags.include?(:debug)
-      # section.split_children if section.has_children?
+      # section.split_children if section.children.nil?
       section.parse
     end
   end

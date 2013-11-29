@@ -31,7 +31,7 @@ class Section
   end
 
   def split_children(valid_child=nil)
-    return unless has_children?
+    return if self.children.nil?
 
     @delimiter = slice_delimiter!
     slice_leading_whitespace!

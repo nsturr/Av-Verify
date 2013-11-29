@@ -11,13 +11,13 @@ describe Mobiles do
     let(:section) { mobiles }
   end
 
-  it_should_behave_like Parsable do
-    let(:item) { mobiles }
-  end
-
-  # it_should_behave_like VnumSection do
-  #   let(:section) { mobiles }
+  # it_should_behave_like Parsable do
+  #   let(:item) { mobiles }
   # end
+
+  it_should_behave_like VnumSection do
+    let(:section) { mobiles }
+  end
 
 end
 
@@ -31,9 +31,9 @@ describe Mobile do
     mobiles_section.mobiles.values.first
   end
 
-  it_should_behave_like Parsable do
-    let(:item) { mobile }
-  end
+  # it_should_behave_like Parsable do
+  #   let(:item) { mobile }
+  # end
 
   # it_should_behave_like LineByLineObject do
   #   let(:item) { mobile }

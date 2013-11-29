@@ -17,6 +17,36 @@ class VnumSection < Section
     slice_first_line!
   end
 
+  # A proc to pass to Section#split_children to determine whether or not to add
+  # the the child to the instance var @children
+  # This one prohibits non-numeric vnums and duplicate vnums
+  def valid_vnum?
+    Proc.new do |child|
+      child_vnum = child[/\A#\d+\b/]
+      invalid = false
+
+      unless child_vnum
+        # invalid vnums won't be added (sorry!)
+        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
+        invalid == true
+      end
+      unless child =~ /\A#\w+\s*$/
+        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum))
+      end
+
+      # child_vnum = child_vnum.to_i
+      # if self.children.include? child_vnum
+      #   err(
+      #     entry.line_number, nil, VnumSection.err_msg(:duplicate) %
+      #     [entry.class.name.downcase, child_vnum, self.children[child_vnum].line_number]
+      #   )
+      #   invalid = true
+      # end
+
+      !invalid
+    end
+  end
+
   def has_children?
     true
   end
@@ -52,25 +82,7 @@ class VnumSection < Section
   def parse
     super # set @parsed to true
 
-    validate_vnum = Proc.new do |child|
-      child_vnum = child[/\A#\d+\b/]
-      invalid = false
-
-      unless child_vnum
-        # invalid vnums won't be added (sorry!)
-        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
-        invalid == true
-      end
-      unless child =~ /\A#\w+\s*$/
-        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_after_vnum))
-      end
-
-      invalid ||= self.children.include? child_vnum.to_i
-
-      !invalid
-    end
-
-    split_children(validate_vnum)
+    split_children(self.valid_vnum?)
 
     if self.children.empty?
       err(self.line_number, nil, VnumSection.err_msg(:empty) % self.class.name)
@@ -79,14 +91,15 @@ class VnumSection < Section
 
     self.children.each do |entry|
       entry.parse
-      # unless @entries.key? entry.vnum
-      #   @entries[entry.vnum] = entry
-      # else
-      #   err(
-      #     entry.line_number, nil, VnumSection.err_msg(:duplicate) %
-      #     [entry.class.name.downcase, entry.vnum, @entries[entry.vnum].line_number]
-      #   )
-      # end
+
+      existing_entry = self[entry.vnum]
+      unless existing_entry.equal?(entry)
+        err(
+          entry.line_number, nil, VnumSection.err_msg(:duplicate) %
+          [entry.class.name.downcase, entry.vnum, existing_entry.line_number]
+        )
+      end
+
       self.errors += entry.errors
     end
 
