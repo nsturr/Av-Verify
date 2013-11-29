@@ -11,8 +11,22 @@ class Specials < Section
     duplicate_spec: "This will override mob's existing special: %s"
   }
 
-  def self.child_class
+  def child_class
     Special
+  end
+
+  def child_regex
+    /\n/
+  end
+
+  def self.valid_special
+    Proc.new do |special|
+      line = special.lstrip
+      skip_line = false
+      skip_line = true if line.empty? || line.start_with?("*")
+
+      !skip_line
+    end
   end
 
   attr_reader :specials
@@ -21,9 +35,7 @@ class Specials < Section
     super(contents, line_number)
     @id = "specials"
 
-    @raw_lines = []
-    @specials = {}
-
+    @children = []
     slice_first_line!
   end
 
@@ -35,16 +47,16 @@ class Specials < Section
     "#SPECIALS: #{self.specials.size} entries, line #{self.line_number}"
   end
 
-  def key?(vnum)
-    @specials.key? vnum
+  def include?(vnum)
+    self.children.any? { |special| special.vnum == vnum }
   end
 
   def [](vnum)
-    @specials[vnum]
+    self.children.find { |special| special.vnum == vnum }
   end
 
   def each(&prc)
-    @specials.each_value(&prc)
+    self.children.each(&prc)
   end
 
   def length
@@ -55,29 +67,17 @@ class Specials < Section
     length
   end
 
-  def split_children
-    @delimiter = slice_delimiter!
-
-    @contents.each_line do |line|
-      @current_line += 1
-      next if line.strip.empty?
-      next if line.strip.start_with? "*"
-      @raw_lines << Special.new(line, @current_line)
-    end
-  end
-
   def parse
     super # set parsed to true
-    # split_specials
-    split_children
+    split_children(Specials.valid_special)
 
-    @raw_lines.each do |special|
+    self.children.each do |special|
       special.parse
       vnum = special.vnum
-      if @specials.key? vnum
-        warn(special.line_number, special.line, Specials.err_msg(:duplicate_spec) % @specials[vnum].spec)
+      existing_entry = self[vnum]
+      unless existing_entry.equal? special
+        warn(special.line_number, special.line, Specials.err_msg(:duplicate_spec) % self[vnum].spec)
       end
-      @specials[special.vnum] = special
       @errors += special.errors
     end
 
