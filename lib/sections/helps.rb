@@ -43,10 +43,6 @@ class Helps < Section
     "#HELPS: #{self.children.size} entries, line #{self.line_number}"
   end
 
-  def has_children?
-    true
-  end
-
   def split_children
 
     # TODO: I really gotta change this method to be less messy

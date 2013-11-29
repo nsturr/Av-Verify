@@ -37,10 +37,6 @@ class VnumSection < Section
     end
   end
 
-  def has_children?
-    true
-  end
-
   def child_regex
     /^(?=#\d\S*)/
   end

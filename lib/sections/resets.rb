@@ -64,19 +64,6 @@ class Resets < Section
     "#RESETS: #{self.resets.size} entries, line #{self.line_number}"
   end
 
-  # def split_resets
-  #   @delimiter = slice_delimiter!
-
-  #   # Conveniently has a line-by-line structure to it. Easy street.
-  #   @contents.each_line do |line|
-  #     @current_line += 1
-  #     next if line.strip.empty?
-  #     next if line.strip.start_with? "*"
-  #     @resets << Reset.new(line.rstrip, @current_line)
-  #   end
-
-  # end
-
   def parse
     super # set parsed to true
 

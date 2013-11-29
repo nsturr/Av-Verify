@@ -39,10 +39,6 @@ class Specials < Section
     slice_first_line!
   end
 
-  def has_children?
-    true
-  end
-
   def to_s
     "#SPECIALS: #{self.specials.size} entries, line #{self.line_number}"
   end

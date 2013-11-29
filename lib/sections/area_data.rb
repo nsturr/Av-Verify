@@ -32,10 +32,6 @@ class AreaData < Section
     slice_first_line!
   end
 
-  def has_children?
-    false
-  end
-
   def to_hash
     {
       plane: @plane, zone: @zone, flags: @flags, outlaw: @outlaw,
