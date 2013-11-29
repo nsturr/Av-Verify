@@ -16,15 +16,29 @@ class Resets < Section
     continues_after_delimiter: "#RESETS section continues after terminating S"
   }
 
-  def self.child_class
+  def child_class
     Reset
+  end
+
+  def child_regex
+    /\n/
+  end
+
+  def self.valid_reset
+    Proc.new do |reset|
+      line = reset.lstrip
+      skip_line = false
+      skip_line = true if line.empty? || line.start_with?("*")
+
+      !skip_line
+    end
   end
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "resets"
 
-    @resets = []
+    @children = []
     @reset_counts = Hash.new(0)
 
     @recent_mob_reset
@@ -35,40 +49,40 @@ class Resets < Section
   end
 
   def [](index)
-    @resets[index]
+    self.children[index]
   end
 
   def <<(reset)
-    @resets << reset
+    self.children << reset
   end
 
   def each(&prc)
-    @resets.each(&prc)
+    self.children.each(&prc)
   end
 
   def to_s
     "#RESETS: #{self.resets.size} entries, line #{self.line_number}"
   end
 
-  def split_resets
-    @delimiter = slice_delimiter!
+  # def split_resets
+  #   @delimiter = slice_delimiter!
 
-    # Conveniently has a line-by-line structure to it. Easy street.
-    @contents.each_line do |line|
-      @current_line += 1
-      next if line.strip.empty?
-      next if line.strip.start_with? "*"
-      @resets << Reset.new(line.rstrip, @current_line)
-    end
+  #   # Conveniently has a line-by-line structure to it. Easy street.
+  #   @contents.each_line do |line|
+  #     @current_line += 1
+  #     next if line.strip.empty?
+  #     next if line.strip.start_with? "*"
+  #     @resets << Reset.new(line.rstrip, @current_line)
+  #   end
 
-  end
+  # end
 
   def parse
     super # set parsed to true
 
-    split_resets
+    split_children(Resets.valid_reset)
 
-    @resets.each do |reset|
+    self.children.each do |reset|
 
       reset.parse
       @errors += reset.errors
