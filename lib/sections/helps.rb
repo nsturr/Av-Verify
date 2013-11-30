@@ -25,8 +25,6 @@ class Helps < Section
     continues_after_delimiter: "#HELPS section continues after terminating 0$~"
   }
 
-  # @section_delimiter = /0 ?\$~/
-
   def self.delimiter(option=nil)
     case option
     when :regex
@@ -95,17 +93,7 @@ class Helps < Section
       self.errors += help_file.errors
     end
 
-    @current_line += 1
-
     verify_delimiter
-    # if @delimiter.nil?
-    #   err(@current_line, nil, Helps.err_msg(:no_delimiter))
-    # else
-    #   unless @delimiter.rstrip =~ /#{Helps.delimiter(:start)}\z/
-    #     line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-    #     err(line_num, bad_line, Helps.err_msg(:continues_after_delimiter))
-    #   end
-    # end
     self.children
   end
 

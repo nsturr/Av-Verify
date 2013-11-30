@@ -6,8 +6,6 @@ require_relative "line_by_line_object"
 
 class Shops < Section
 
-  # @section_delimiter = /^0\b[^\d\n]*$/
-
   @ERROR_MESSAGES = {
     continues_after_delimiter: "#SHOPS section continues after terminating 0$~",
     no_delimiter: "Shops section ends without terminating 0",
@@ -75,14 +73,6 @@ class Shops < Section
     end
 
     verify_delimiter
-    # if @delimiter
-    #   unless @delimiter.rstrip =~ /#{Shops.delimiter(:start)}\z/
-    #     line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-    #     err(line_num, bad_line, Shops.err_msg(:continues_after_delimiter))
-    #   end
-    # else
-    #   err(@current_line, nil, Shops.err_msg(:no_delimiter))
-    # end
     self.shops
   end
 

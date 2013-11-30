@@ -78,18 +78,7 @@ class Specials < Section
       @errors += special.errors
     end
 
-    # TODO: should be able to dry up the code below. Into Section maybe?
-
     verify_delimiter
-    # @current_line += 1
-    # if @delimiter.nil?
-    #   err(@current_line, nil, Specials.err_msg(:no_delimiter))
-    # else
-    #   unless @delimiter.rstrip =~ /#{Specials.delimiter(:start)}\z/
-    #     line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-    #     err(line_num, bad_line, Specials.err_msg(:continues_after_delimiter))
-    #   end
-    # end
     self.specials
   end
 
