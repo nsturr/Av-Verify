@@ -26,14 +26,6 @@ def expect_one_error(item, message, printout=false)
   expect(item.errors.first.description).to eq(message)
 end
 
-shared_examples_for Parsable do
-  it "marks itself as parsed" do
-    item.parse
-
-    expect(item.parsed?).to be_true
-  end
-end
-
 shared_examples_for Section do
   it "ignores leading and trailing white space" do
     # Find the index of the first line break (after #SECTION_NAME)

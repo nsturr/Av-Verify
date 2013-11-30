@@ -11,10 +11,6 @@ describe Helps do
     let(:section) { helps }
   end
 
-  it_should_behave_like Parsable do
-    let(:item) { helps }
-  end
-
   it "detects invalid text after the delimiter" do
     helps.contents << "\n\nHey, good times man."
 
@@ -35,10 +31,6 @@ describe HelpFile do
     help_section = Helps.new(help.dup)
     help_section.split_children
     help_section.children.first
-  end
-
-  it_should_behave_like Parsable do
-    let(:item) { help_file }
   end
 
   it "detects missing tildes on the keyword line" do

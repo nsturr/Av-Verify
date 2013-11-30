@@ -11,10 +11,6 @@ describe Specials do
     let(:section) { specials }
   end
 
-  it_should_behave_like Parsable do
-    let(:item) { specials }
-  end
-
   it "ignores whitespace and comments" do
     specials.parse
 
@@ -49,10 +45,6 @@ describe Special do
   let(:spec_fun) { Special.new("M 11467 SPEC_PRIEST_LITE") }
   let(:i_vnum) { spec_fun.line.index(/\b11467\b/) }
   let(:i_spec) { spec_fun.line.index(/\bSPEC\w+\b/) }
-
-  it_should_behave_like Parsable do
-    let(:item) { spec_fun }
-  end
 
   it "detects an invalid special line" do
     spec_fun.line[0] = "Z"

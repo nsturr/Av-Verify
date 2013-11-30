@@ -7,10 +7,6 @@ describe AreaData do
 
   let(:area_data) { AreaData.new(data.rstrip) }
 
-  it_should_behave_like Parsable do
-    let(:item) { area_data }
-  end
-
   it "detects invalid text after its terminating S" do
     area_data.contents << "\nHi there"
 

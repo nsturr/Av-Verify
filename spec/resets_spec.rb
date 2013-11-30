@@ -11,10 +11,6 @@ describe Resets do
     let(:section) { resets }
   end
 
-  it_should_behave_like Parsable do
-    let(:item) { resets }
-  end
-
   it "ignores whitespace and comments" do
     resets.parse
 
@@ -78,10 +74,6 @@ describe Reset do
     let(:i_mob) { reset.line.index("11400") }
     let(:i_limit) { reset.line.index(/\b1\b/) }
     let(:i_room) { reset.line.index("11406") }
-
-    it_should_behave_like Parsable do
-      let(:item) { reset }
-    end
 
     it "detects invalid placeholder zero" do
       reset.line[i_zero] = "A"
