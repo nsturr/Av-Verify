@@ -21,25 +21,41 @@ describe Mobile do
 
   # Test LineByLineObject separately
 
-  let(:mobile) do
-    mobiles_section = Mobiles.new(data.dup)
-    mobiles_section.parse
-    mobiles_section.mobiles.values.first
-  end
-
   # it_should_behave_like LineByLineObject do
   #   let(:item) { mobile }
   # end
 
   context "parsing text fields" do
+    let(:mobile) do
+      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section.split_children
+      mobiles_section.children.first
+    end
 
-    it "detects a tab character"
+    let(:tildes) do
+      t = []
+      mobile.contents.scan(/~/) do
+        t << Regexp.last_match.begin(0)
+      end
+      t
+    end
 
-    it "detects a short desc that spans more than one line"
+    it "detects a tab character" do
+      short_desc = mobile.contents[tildes[0]..tildes[1]]
+      mobile.contents[tildes[0]..tildes[1]] = short_desc.gsub!(" ", "\t")
 
-    it "detects a long desc that spans more than one line"
+      expect_one_error(mobile, Mobile.err_msg(:visible_tab))
+    end
 
-    it "detects a missing tilde in the description field"
+    it "detects a long desc that spans more than one line" do
+      mobile.contents.insert(tildes[2], "\nThis is neat!\n")
+      expect_one_error(mobile, Mobile.err_msg(:long_desc_spans))
+    end
+
+    it "detects a missing tilde in the description field" do
+      mobile.contents[tildes[3]] = "x"
+      expect_one_error(mobile, Mobile.err_msg(:description_no_tilde))
+    end
 
   end
 

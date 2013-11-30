@@ -8,6 +8,8 @@ class LineByLineObject
   include Parsable
   include TheTroubleWithTildes
 
+  attr_reader :contents, :line_number
+
   def initialize(contents, line_number=1)
     @contents = contents.rstrip
     @line_number = line_number
