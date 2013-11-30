@@ -49,18 +49,36 @@ end
 
 shared_examples_for VnumSection do
 
-  it "detects invalid vnums"
+  it "detects invalid vnums" do
+    i = section.contents.match(/#\d+/).end(0) - 1
+    section.contents[i] = "x"
 
-  it "detects invalid text after vnums"
-
-  it "detects an empty section" do
-    section = VnumSection.new("#FAKESECTION\n#0\n")
-    expect_one_error(section, VnumSection.err_msg(:empty, section.class))
+    expect_one_error(section, VnumSection.err_msg(:invalid_vnum, section.id.upcase))
   end
 
-  it "detects a missing delimiter"
+  it "detects invalid text after vnums" do
+    i = section.contents.match(/#\d+/).end(0) - 1
+    section.contents.insert(i, " Oh hi there!")
 
-  it "detects invalid text after the delimiter"
+    expect_one_error(section, VnumSection.err_msg(:invalid_after_vnum))
+  end
+
+  it "detects an empty section" do
+    fake_section = VnumSection.new("##{section.id.upcase}\n#0\n")
+    expect_one_error(fake_section, VnumSection.err_msg(:empty, fake_section.class))
+  end
+
+  it "detects a missing delimiter" do
+    section.contents.slice!(section.class.delimiter)
+
+    expect_one_error(section, VnumSection.err_msg(:no_delimiter, section.id.upcase))
+  end
+
+  it "detects invalid text after the delimiter" do
+    section.contents << "\nHey, babe."
+
+    expect_one_error(section, VnumSection.err_msg(:continues_after_delimiter, section.id.upcase))
+  end
 
   it "detects duplicate vnums"  do
     _, item, _ = section.contents.split(section.child_regex, 3)
