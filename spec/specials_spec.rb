@@ -39,7 +39,7 @@ describe Specials do
     i, j = specials.contents.match(/^M.*\n/).offset(0)
     specials.contents.insert(i, specials.contents[i...j])
 
-    expect_one_error(specials, Specials.err_msg(:duplicate_spec) % "spec_cast_wizard")
+    expect_one_error(specials, Specials.err_msg(:duplicate_spec, "spec_cast_wizard"))
   end
 
 end

@@ -25,7 +25,7 @@ describe Resets do
     i = resets.contents.rindex(/(?<=M 0 11409 )4/)
     resets.contents[i] = "3"
 
-    expect_one_error(resets, Resets.err_msg(:reset_limit) % [3, 3])
+    expect_one_error(resets, Resets.err_msg(:reset_limit, 3, 3))
   end
 
   it "detects eqipment resets targeting a slot that's filled" do
@@ -39,7 +39,7 @@ describe Resets do
     i = resets.contents.index("E 0 11400")
     resets.contents.insert(i, "O 0 11455 0 11406\n")
 
-    expect_one_error(resets, Resets.err_msg(:reset_doesnt_follow_mob) % "Equipment")
+    expect_one_error(resets, Resets.err_msg(:reset_doesnt_follow_mob, "Equipment"))
   end
 
   it "detects a missing delimiter" do
@@ -92,25 +92,25 @@ describe Reset do
     it "detects invalid mob vnum" do
       reset.line[i_mob] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "mob")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "mob"))
     end
 
     it "detects invalid spawn limit" do
       reset.line[i_limit] = "a"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_limit) % "mob")
+      expect_one_error(reset, Reset.err_msg(:invalid_limit, "mob"))
     end
 
     it "detects invalid room vnum" do
       reset.line[i_room] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "room")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "room"))
     end
 
     it "detects missing tokens on the line" do
       reset.line.replace("M 0 ")
 
-      expect_one_error(reset, Reset.err_msg(:not_enough_tokens) % "mob")
+      expect_one_error(reset, Reset.err_msg(:not_enough_tokens, "mob"))
     end
 
     it "parses the mob vnum, limit, and spawn room" do
@@ -134,13 +134,13 @@ describe Reset do
     it "detects invalid spawn limit" do
       reset.line[i_limit] = "A"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_limit) % "inventory")
+      expect_one_error(reset, Reset.err_msg(:invalid_limit, "inventory"))
     end
 
     it "detects invalid object vnum" do
       reset.line[i_vnum] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "object")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "object"))
     end
 
     it "detects an invalid placeholder zero" do
@@ -152,7 +152,7 @@ describe Reset do
     it "detects an incomplete line" do
       reset.line.replace("G 0 ")
 
-      expect_one_error(reset, Reset.err_msg(:not_enough_tokens) % "inventory")
+      expect_one_error(reset, Reset.err_msg(:not_enough_tokens, "inventory"))
     end
 
     it "parses the object vnum and spawn limit" do
@@ -177,13 +177,13 @@ describe Reset do
     it "detects invalid spawn limit" do
       reset.line[i_limit] = "A"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_limit) % "equipment")
+      expect_one_error(reset, Reset.err_msg(:invalid_limit, "equipment"))
     end
 
     it "detects invalid object vnum" do
       reset.line[i_vnum] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "object")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "object"))
     end
 
     it "detects an invalid placeholder zero" do
@@ -195,7 +195,7 @@ describe Reset do
     it "detects an invalid wear location" do
       reset.line[i_wear] = "hi"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_field) % "wear location")
+      expect_one_error(reset, Reset.err_msg(:invalid_field, "wear location"))
     end
 
     it "detects a wear location out of bounds" do
@@ -207,7 +207,7 @@ describe Reset do
     it "detects an incomplete line" do
       reset.line.replace("E 0 ")
 
-      expect_one_error(reset, Reset.err_msg(:not_enough_tokens) % "equipment")
+      expect_one_error(reset, Reset.err_msg(:not_enough_tokens, "equipment"))
     end
 
     it "parses the object vnum and wear location" do
@@ -237,19 +237,19 @@ describe Reset do
     it "detects invalid object vnum" do
       reset.line[i_object] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "object")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "object"))
     end
 
     it "detects invalid room vnum" do
       reset.line[i_room] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "room")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "room"))
     end
 
     it "detects missing tokens on the line" do
       reset.line.replace("O 0 ")
 
-      expect_one_error(reset, Reset.err_msg(:not_enough_tokens) % "object")
+      expect_one_error(reset, Reset.err_msg(:not_enough_tokens, "object"))
     end
 
     it "parses the object vnum and spawn room" do
@@ -279,19 +279,19 @@ describe Reset do
     it "detects invalid object vnum" do
       reset.line[i_object] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "object")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "object"))
     end
 
     it "detects invalid container vnum" do
       reset.line[i_container] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "container")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "container"))
     end
 
     it "detects missing tokens on the line" do
       reset.line.replace("P 0 ")
 
-      expect_one_error(reset, Reset.err_msg(:not_enough_tokens) % "container")
+      expect_one_error(reset, Reset.err_msg(:not_enough_tokens, "container"))
     end
 
     it "parses the object vnum and container vnum" do
@@ -322,7 +322,7 @@ describe Reset do
     it "detects invalid room vnum" do
       reset.line[i_vnum] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "room")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "room"))
     end
 
     it "detects invalid door direction" do
@@ -352,7 +352,7 @@ describe Reset do
     it "detects an incomplete line" do
       reset.line.replace("D 0 ")
 
-      expect_one_error(reset, Reset.err_msg(:not_enough_tokens) % "door")
+      expect_one_error(reset, Reset.err_msg(:not_enough_tokens, "door"))
     end
 
     it "parses the room vnum, door direction, and state" do
@@ -381,7 +381,7 @@ describe Reset do
     it "detects invalid room vnum" do
       reset.line[i_vnum] = "howdy"
 
-      expect_one_error(reset, Reset.err_msg(:invalid_vnum) % "room")
+      expect_one_error(reset, Reset.err_msg(:invalid_vnum, "room"))
     end
 
     it "detects an invalid number of doors" do
@@ -399,7 +399,7 @@ describe Reset do
     it "detects an incomplete line" do
       reset.line.replace("R 0 ")
 
-      expect_one_error(reset, Reset.err_msg(:not_enough_tokens) % "random")
+      expect_one_error(reset, Reset.err_msg(:not_enough_tokens, "random"))
     end
   end
 

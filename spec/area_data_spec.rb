@@ -35,7 +35,7 @@ describe AreaData do
     line, i = m[0], m.begin(0)
     area_data.contents.insert(i, line)
 
-    expect_one_error(area_data, AreaData.err_msg(:duplicate) % line[0])
+    expect_one_error(area_data, AreaData.err_msg(:duplicate, line[0]))
   end
 
   it "calls the correct parse method for each line type" do
@@ -54,7 +54,7 @@ describe AreaData do
       i, j = area_data.contents.match(/^P.*$/).offset(0)
       area_data.contents.insert(j, " writing rspec isn't my idea of a good saturday")
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text) % "plane")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text, "plane"))
     end
 
     it "detects out-of-range planes" do
@@ -68,7 +68,7 @@ describe AreaData do
       i = area_data.contents.index(/(?<=P )\d/)
       area_data.contents[i] = "a"
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area plane")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field, "area plane"))
     end
 
     it "detects out-of-range zone" do
@@ -82,7 +82,7 @@ describe AreaData do
       i = area_data.contents.index(/(?<=P \d )\d/)
       area_data.contents[i] = "a"
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area zone")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field, "area zone"))
     end
 
     it "parses the plane and zone data" do
@@ -100,21 +100,21 @@ describe AreaData do
       i, j = area_data.contents.match(/^F.*$/).offset(0)
       area_data.contents.insert(j, " writing rspec isn't my idea of a good sturday")
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text) % "area flags")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text, "area flags"))
     end
 
     it "detects invalid bitfields" do
       i, j = area_data.contents.match(/^F.*$/).offset(0)
       area_data.contents.insert(j, "|abcdefg")
 
-      expect_one_error(area_data, AreaData.err_msg(:bad_line) % "area flags")
+      expect_one_error(area_data, AreaData.err_msg(:bad_line, "area flags"))
     end
 
     it "detects bit flags that aren't a power of two" do
       i, j = area_data.contents.match(/^F.*$/).offset(0)
       area_data.contents.insert(j, "|19")
 
-      expect_one_error(area_data, AreaData.err_msg(:bad_bit) % "Area flags")
+      expect_one_error(area_data, AreaData.err_msg(:bad_bit, "Area flags"))
     end
 
     it "parses the area flag data" do
@@ -133,14 +133,14 @@ describe AreaData do
       i, j = area_data.contents.match(/^O.*$/).offset(0)
       area_data.contents.insert(j, " writing rspec isn't my idea of a goot saturday")
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text) % "outlaw")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text, "outlaw"))
     end
 
     it "detects invalid non-numeric elements" do
       i, j = area_data.contents.match(/(?<=O )\d+/).offset(0)
       area_data.contents[i,2] = "hi"
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "outlaw")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field, "outlaw"))
     end
 
     it "parses the outlaw data" do
@@ -161,7 +161,7 @@ describe AreaData do
       i = area_data.contents.index("-1")
       area_data.contents.insert(i, "hi")
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "seeker")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field, "seeker"))
     end
 
     it "can parse a kspawn spanning multiple lines" do
@@ -213,14 +213,14 @@ describe AreaData do
       i, j = area_data.contents.match(/^M.*$/).offset(0)
       area_data.contents.insert(j, " writing rspec isn't my idea of a goot saturday")
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text) % "area modifiers")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text, "area modifiers"))
     end
 
     it "detects invalid non-numeric elements" do
       i, j = area_data.contents.match(/(?<=M )\d+/).offset(0)
       area_data.contents[i] = "h"
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "area modifiers")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field, "area modifiers"))
     end
 
     it "parses the area modifiers data" do
@@ -243,14 +243,14 @@ describe AreaData do
       i, j = area_data.contents.match(/^G.*$/).offset(0)
       area_data.contents.insert(j, " writing rspec isn't my idea of a goot saturday")
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text) % "group exp")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_extra_text, "group exp"))
     end
 
     it "detects invalid non-numeric elements" do
       i, j = area_data.contents.match(/(?<=G )\d+/).offset(0)
       area_data.contents[i,2] = "hi"
 
-      expect_one_error(area_data, AreaData.err_msg(:invalid_field) % "group exp")
+      expect_one_error(area_data, AreaData.err_msg(:invalid_field, "group exp"))
     end
 
     it "parses the group exp data" do

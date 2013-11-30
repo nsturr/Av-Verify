@@ -55,7 +55,7 @@ shared_examples_for VnumSection do
 
   it "detects an empty section" do
     section = VnumSection.new("#FAKESECTION\n#0\n")
-    expect_one_error(section, VnumSection.err_msg(:empty) % section.class)
+    expect_one_error(section, VnumSection.err_msg(:empty, section.class))
   end
 
   it "detects a missing delimiter"
@@ -68,8 +68,7 @@ shared_examples_for VnumSection do
     section.contents.insert(i, item)
 
     # TODO: Make this less brittle
-    expect_one_error(section, VnumSection.err_msg(:duplicate) %
-      [section.child_class.name.downcase, 12650, 2])
+    expect_one_error(section, VnumSection.err_msg(:duplicate, section.child_class.name.downcase, 12650, 2))
   end
 
 end
