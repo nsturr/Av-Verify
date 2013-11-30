@@ -32,7 +32,7 @@ describe Mobile do
       mobiles_section.children.first
     end
 
-    # A handy array of indices to located the four tilde-
+    # A handy array of indices to locate the four tilde-
     # delimited text fields
     let(:tildes) do
       t = []
