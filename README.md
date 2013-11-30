@@ -29,16 +29,16 @@ Sections are accessible in Area#main_sections.
 Includes `Parsable` module. Most sections that are a collection of smaller things (so anything except `AreaHeader` and `AreaData`) present a hash-like interface, in which they have `[]`, `each`, `length`, and `key?` methods. Keyed by VNUM where appropriate. These are not inherited, though they should be (a task for later improvement)
 
 Subclasses of Section:
-* `**AreaHeader**`
-* `**AreaData**`
-* `**Helps**`
-* `**VnumSection**`
-  * `**Mobiles**`
-  * `**Objects**`
-  * `**Rooms**`
-* `**Resets**`
-* `**Shops**`
-* `**Specials**`
+* `AreaHeader`
+* `AreaData`
+* `Helps`
+* `VnumSection`
+  * `Mobiles`
+  * `Objects`
+  * `Rooms`
+* `Resets`
+* `Shops`
+* `Specials`
 
 #### VnumSection
 
@@ -48,10 +48,10 @@ Since #Mobiles, #Objects, and #Rooms are all structured similarly, they share th
 Includes `Parsable` and `TheTroubleWithTildes`. Its subclasses are all parsed the same way (line by line, if you couldn't guess)
 
 Its subclasses are:
-* `**Mobile**` includes `HasApplyFlag` and `HasQuotedKeywords`
-* `**Object**` includes `HasApplyFlag` and `HasQuotedKeywords`
-* `**Room**` includes `HasQuotedKeywords`
-* `**Shop**` (is the bane of my existance)
+* `Mobile` includes `HasApplyFlag` and `HasQuotedKeywords`
+* `Object` includes `HasApplyFlag` and `HasQuotedKeywords`
+* `Room` includes `HasQuotedKeywords`
+* `Shop` (is the bane of my existance)
 
 #### HelpFile
 Includes `Parsable`, `HasQuotedKeywords`, and `TheTroubleWithTildes` modules.
