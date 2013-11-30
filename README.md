@@ -105,8 +105,10 @@ Each getter will return nil if the section that contains the data it's looking f
 #### Parsable
 Supplies the `Error` class and bestows the `err` method (and its ilk), and the `error_report` method that prints all of the object's errors.
 
+Also supplies the `err_msg` method as a class method, which accepts a symbol and any number of optional arguments, and returns an error string corresponding to the symbol with the arguments interpolated into it.
+
 #### HasApplyFlag
-Bestows the `parse_apply_flag` method.
+Bestows the `parse_apply_flag` method. Both objects and mobiles use this.
 
 #### HasQuotedKeywords
 Bestows the `parse_quoted_keywords` method which turns a string of keywords into an array of keywords, taking single quotes into account.
