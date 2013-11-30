@@ -32,6 +32,8 @@ describe Mobile do
       mobiles_section.children.first
     end
 
+    # A handy array of indices to located the four tilde-
+    # delimited text fields
     let(:tildes) do
       t = []
       mobile.contents.scan(/~/) do
@@ -61,41 +63,110 @@ describe Mobile do
 
   context "parsing act/aff/align line" do
 
-    it "detects a missing 'S'"
+    # These specs are a bit brittle because they depend on the
+    # specific MOBILES sample from Pariah's Paradise rather than
+    # working for any valid mob.
 
-    it "detects a missing ACT_NPC flag"
+    let(:mobile) do
+      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section.split_children
+      mobiles_section.children.first
+    end
 
-    it "detects a bad act bit"
+    # let(:line_begin) { mobile.contents.index(/^\d+(?:|\d+)* \d+(?:|\d+)* -?\d+ ?S\s*?$/) }
+    # let(:act) { mobile.contents.index(/\d+/)] }
 
-    it "detects a non-numeric act field"
+    it "detects a missing 'S'" do
+      mobile.contents[/S$/] = ""
+      expect_one_error(mobile, Mobile.err_msg(:no_terminating, "S"))
+    end
 
-    it "detects a bad affect bit"
+    it "detects a missing ACT_NPC flag" do
+      # Delete the 1 (act_npc) bitflag. Should be the first
+      # 1 or 2 characters on the line
+      mobile.contents[/^\d+\|/] = ""
+      expect_one_error(mobile, Mobile.err_msg(:act_not_npc))
+    end
 
-    it "detects a non-numeric affect field"
+    it "detects a bad act bit" do
+      mobile.contents["1|2|32"] = "1|3|32"
+      expect_one_error(mobile, Mobile.err_msg(:bad_bit, "Act"))
+    end
 
-    it "detects an invalid align field"
+    it "detects a non-numeric act field" do
+      mobile.contents["1|2|32"] = "1|a|32"
+      expect_one_error(mobile, Mobile.err_msg(:bad_field, "act flags"))
+    end
 
-    it "detects an out-of-range alignment"
+    it "detects a bad affect bit" do
+      mobile.contents["8|32|128"] = "8|66|128"
+      expect_one_error(mobile, Mobile.err_msg(:bad_bit, "Affect"))
+    end
 
-    it "detects invalid line syntax"
+    it "detects a non-numeric affect field" do
+      mobile.contents["8|32|128"] = "a|32|128"
+      expect_one_error(mobile, Mobile.err_msg(:bad_field, "affect flags"))
+    end
+
+    it "detects an invalid align field" do
+      mobile.contents["-1000"] = "bad"
+      expect_one_error(mobile, Mobile.err_msg(:bad_field, "align"))
+    end
+
+    it "detects an out-of-range alignment" do
+      mobile.contents["-1000"] = "-1050"
+      expect_one_error(mobile, Mobile.err_msg(:bad_align_range))
+    end
+
+    it "detects invalid line syntax" do
+      mobile.contents[/^\d+(?:\|\d+)* \d+(?:\|\d+)* -?\d+ S$/] = "1 1 1 hey, bro, how's it going? S"
+      expect_one_error(mobile, Mobile.err_msg(:act_aff_align_matches))
+    end
 
   end
 
   context "parsing those boring middle lines" do
 
-    it "detects an invalid mob level"
+    let(:mobile) do
+      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section.split_children
+      mobiles_section.children.first
+    end
 
-    it "detects wrong level line syntax"
+    it "detects an invalid mob level" do
+      mobile.contents[/^\d+ 0 0/] = "-5 0 0"
+      expect_one_error(mobile, Mobile.err_msg(:bad_field, "level"))
+    end
 
-    it "detects wrong '0d0+0' line syntax"
+    it "detects wrong level line syntax" do
+      mobile.contents[/^\d+ 0 0/] = "75 a a"
+      expect_one_error(mobile, Mobile.err_msg(:level_matches))
+    end
 
-    it "detects invalid sex field"
+    it "detects wrong '0d0+0' line syntax" do
+      mobile.contents[/0d0\+0/] = "ad0+0"
+      expect_one_error(mobile, Mobile.err_msg(:constant_matches))
+    end
 
-    it "detects invalid sex line syntax"
+    it "detects invalid sex field" do
+      mobile.contents[/^0 0 \d/] = "0 0 4"
+      expect_one_error(mobile, Mobile.err_msg(:bad_sex_range))
+    end
+
+    it "detects invalid sex line syntax" do
+      mobile.contents[/^0 0 \d/] = "a b c"
+      expect_one_error(mobile, Mobile.err_msg(:sex_matches))
+    end
 
   end
 
   context "parsing misc fields" do
+
+    let(:mobile) do
+      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section.split_children
+      mobiles_section.children.first
+    end
 
     it "detects an out-of-range race"
 
@@ -126,6 +197,12 @@ describe Mobile do
   end
 
   context "parsing a kspawn" do
+
+    let(:mobile) do
+      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section.split_children
+      mobiles_section.children.first
+    end
 
     it "detects a duplicated kspawn field"
 
