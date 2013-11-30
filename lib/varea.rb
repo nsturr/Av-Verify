@@ -52,6 +52,14 @@ class Area
 
   attr_reader :flags
 
+  @ERROR_MESSAGES = {
+    file_not_found: "%s not found, skipping.",
+    no_delimiter: "Area file does not end with #$",
+    duplicate_section: "Another %s section? This bodes ill. Skipping",
+    bad_section_name: "Invalid section name #%s",
+    invalid_text_after_section: "Invalid text on same line as section name"
+  }
+
   def initialize(filename, flags=[])
     # How 'bout a little FILE, Scarecrow! >:D
     unless File.exist?(filename)
@@ -74,7 +82,7 @@ class Area
       # section-parsing methods have to worry about it
       data.slice!(-2..-1)
     else
-      err(total_lines, nil, "Area file does not end with \#$")
+      err(total_lines, nil, Area.err_msg(:no_delimiter))
     end
 
     @main_sections = extract_main_sections(data)
@@ -110,7 +118,6 @@ class Area
     self.main_sections.each do |section|
       next if section.parsed?
       puts "Found ##{section.id} on line #{section.line_number}" if @flags.include?(:debug)
-      # section.split_children if section.children.nil?
       section.parse
     end
   end
@@ -157,7 +164,7 @@ class Area
         warn(
           new_section.line_number,
           nil,
-          "Another #{new_section.class} section? This bodes ill. Skipping")
+          Area.err_msg(:duplicate_section) % new_section.class.name)
         next
       end
       sections[new_section.id] = new_section
@@ -180,12 +187,12 @@ class Area
       name = first_line.match(/[a-zA-Z\$]+/).to_s.downcase
 
       if first_line.include?(" ")
-        err(line_start_section, first_line, "Invalid text on same line as section name")
+        err(line_start_section, first_line, Area.err_msg(:invalid_text_after_section))
       end
     end
 
     unless SECTIONS.include? name
-      err(line_num, nil, "Invalid section name ##{name}") and return
+      err(line_num, nil, Area.err_msg(:bad_section_name) % name) and return
     end
 
     case name
