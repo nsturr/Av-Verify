@@ -60,7 +60,8 @@ class Helps < Section
 
     # grabs the delimiter and whatever (erroneous) content is after it
     slice_leading_whitespace!
-    @delimiter = slice_delimiter!
+    # @delimiter = slice_delimiter!
+    slice_delimiter!
 
     expect_header = true
     help_body = ""

@@ -46,7 +46,7 @@ class Section
 
     @current_line += 1
 
-    @delimiter = slice_delimiter!
+    slice_delimiter!
     slice_leading_whitespace!
 
     entries = self.contents.rstrip.split(self.child_regex)
@@ -70,7 +70,7 @@ class Section
   end
 
   def slice_delimiter!
-    @contents.slice!(/#{self.class.delimiter(:regex)}.*\z/m)
+    @delimiter = @contents.slice!(/#{self.class.delimiter(:regex)}.*\z/m)
   end
 
   def verify_delimiter
