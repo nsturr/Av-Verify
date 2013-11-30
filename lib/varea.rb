@@ -54,7 +54,7 @@ class Area
 
   @ERROR_MESSAGES = {
     file_not_found: "%s not found, skipping.",
-    no_delimiter: "Area file does not end with #$",
+    no_delimiter: "Area file does not end with \#$",
     duplicate_section: "Another %s section? This bodes ill. Skipping",
     bad_section_name: "Invalid section name #%s",
     invalid_text_after_section: "Invalid text on same line as section name"
