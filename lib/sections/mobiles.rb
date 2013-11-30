@@ -174,7 +174,7 @@ class Mobile < LineByLineObject
 
     err(@current_line, line, Mobile.err_msg(:no_terminating, "S")) unless line.end_with?("S")
     items = line.split
-    if items.length >= 3
+    if (3..4).cover? items.length # 4 items, but the S can be smooshed into the alignment
       if items[0] =~ Bits.pattern
         @act = Bits.new(items[0])
         warn(@current_line, line, Mobile.err_msg(:act_not_npc)) unless @act.bit? 1
