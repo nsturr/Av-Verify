@@ -40,11 +40,6 @@ class AreaHeader < Section
     end
 
     validate_tilde(line: @contents, line_number: line_number)
-    # if @contents.count("~") > 1
-    #   err(@line_number, @contents, TheTroubleWithTildes.err_msg(:extra))
-    # elsif @contents.count("~") == 0
-    #   err(@line_number, @contents, TheTroubleWithTildes.err_msg(:absent))
-    # end
 
     self
   end

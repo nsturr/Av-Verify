@@ -65,7 +65,6 @@ class AreaData < Section
             line_number: @current_line,
             present: false
           )
-          # err(@current_line, line, TheTroubleWithTildes.err_msg(:extra_text)) if line =~ /~.*?\S/
         end
         next
       end
@@ -81,6 +80,7 @@ class AreaData < Section
         err(@current_line, line, AreaData.err_msg(:duplicate, line[0]))
       end
 
+      # Determine which type of line to parse based on the first letter
       case line[0]
       when "P"
         parse_plane_line line
