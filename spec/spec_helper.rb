@@ -73,12 +73,15 @@ shared_examples_for VnumSection do
   end
 
   it "detects duplicate vnums"  do
-    _, item, _ = section.contents.split(section.child_regex, 3)
+    m = section.contents.match(/#\d+.*?(?=#\d+)/m)
+    item = m[0]
+
+    vnum = item[/(?<=#)\d+/].to_i
     i = section.contents.index(section.class.delimiter)
     section.contents.insert(i, item)
 
-    # TODO: Make this less brittle
-    expect_one_error(section, VnumSection.err_msg(:duplicate, section.child_class.name.downcase, 12650, 2))
+    # TODO: Make the line number (last arg) way less brittle
+    expect_one_error(section, VnumSection.err_msg(:duplicate, section.child_class.name.downcase, vnum, 2))
   end
 
 end
