@@ -12,6 +12,10 @@ class Rooms < VnumSection
     Room
   end
 
+  def child_regex
+    /^(?=#\d\S*)/
+  end
+
   def initialize(contents, line_number)
     super(contents, line_number)
     @id = "rooms"

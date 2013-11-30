@@ -14,6 +14,10 @@ class Mobiles < VnumSection
     Mobile
   end
 
+  def child_regex
+    /^(?=#\d\S*)/
+  end
+
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "mobiles"

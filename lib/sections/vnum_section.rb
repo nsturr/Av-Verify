@@ -17,6 +17,10 @@ class VnumSection < Section
     slice_first_line!
   end
 
+  def child_regex
+    /^(?=\d+\b[^\d]*$)/
+  end
+
   # A proc to pass to Section#split_children to determine whether or not to add
   # the the child to the instance var @children. Also raises errors
   def valid_vnum?
@@ -35,10 +39,6 @@ class VnumSection < Section
 
       !invalid
     end
-  end
-
-  def child_regex
-    /^(?=#\d\S*)/
   end
 
   def [](vnum)
@@ -91,14 +91,15 @@ class VnumSection < Section
       self.errors += entry.errors
     end
 
-    if @delimiter.nil?
-      err(@current_line, nil, VnumSection.err_msg(:no_delimiter, self.id.upcase))
-    else
-      unless @delimiter.rstrip =~ /#{self.class.delimiter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, VnumSection.err_msg(:continues_after_delimiter, self.id.upcase))
-      end
-    end
+    verify_delimiter
+    # if @delimiter.nil?
+    #   err(@current_line, nil, VnumSection.err_msg(:no_delimiter, self.id.upcase))
+    # else
+    #   unless @delimiter.rstrip =~ /#{self.class.delimiter(:start)}\z/
+    #     line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
+    #     err(line_num, bad_line, VnumSection.err_msg(:continues_after_delimiter, self.id.upcase))
+    #   end
+    # end
     self.children
   end
 

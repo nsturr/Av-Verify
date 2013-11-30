@@ -19,6 +19,10 @@ class Shops < Section
     Shop
   end
 
+  def child_regex
+    /^(?=\d+\b[^\d]*$)/
+  end
+
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @id = "shops"
@@ -26,10 +30,6 @@ class Shops < Section
 
     slice_first_line!
     @current_line += 1
-  end
-
-  def child_regex
-    /^(?=\d+\b[^\d]*$)/
   end
 
   def length
@@ -62,14 +62,15 @@ class Shops < Section
       @errors += shop.errors
     end
 
-    if @delimiter
-      unless @delimiter.rstrip =~ /#{Shops.delimiter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, Shops.err_msg(:continues_after_delimiter))
-      end
-    else
-      err(@current_line, nil, Shops.err_msg(:no_delimiter))
-    end
+    verify_delimiter
+    # if @delimiter
+    #   unless @delimiter.rstrip =~ /#{Shops.delimiter(:start)}\z/
+    #     line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
+    #     err(line_num, bad_line, Shops.err_msg(:continues_after_delimiter))
+    #   end
+    # else
+    #   err(@current_line, nil, Shops.err_msg(:no_delimiter))
+    # end
     self.shops
   end
 

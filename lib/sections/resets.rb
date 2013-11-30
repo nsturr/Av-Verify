@@ -107,15 +107,16 @@ class Resets < Section
       end
     end
 
-    @current_line += 1
-    if @delimiter.nil?
-      err(@current_line, nil, Resets.err_msg(:no_delimiter))
-    else
-      unless @delimiter.rstrip =~ /#{Resets.delimiter(:start)}\z/
-        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, Resets.err_msg(:continues_after_delimiter))
-      end
-    end
+    verify_delimiter
+    # @current_line += 1
+    # if @delimiter.nil?
+    #   err(@current_line, nil, Resets.err_msg(:no_delimiter))
+    # else
+    #   unless @delimiter.rstrip =~ /#{Resets.delimiter(:start)}\z/
+    #     line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
+    #     err(line_num, bad_line, Resets.err_msg(:continues_after_delimiter))
+    #   end
+    # end
 
     self.resets
   end

@@ -8,8 +8,13 @@ module Parsable
 
   module ParsableErrors
     def err_msg(message, *vars)
-      raise ArgumentError.new "Error message #{message} not found" unless @ERROR_MESSAGES.key?(message)
-      @ERROR_MESSAGES[message] % vars
+      unless @ERROR_MESSAGES
+        # Propogate up hierarchy if one class doesn't have its own error messages
+        superclass.err_msg(message, *vars)
+      else
+        raise ArgumentError.new "Error message #{message} not found" unless @ERROR_MESSAGES.key?(message)
+        @ERROR_MESSAGES[message] % vars
+      end
     end
   end
 

@@ -50,6 +50,18 @@ class Section
     @contents.slice!(/^#{self.class.delimiter}.*\z/m)
   end
 
+  def verify_delimiter
+    @current_line += 1
+    if @delimiter.nil?
+      err(@current_line, nil, self.class.err_msg(:no_delimiter, self.id.upcase))
+    else
+      unless @delimiter.rstrip =~ /#{self.class.delimiter(:start)}\z/
+        line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
+        err(line_num, bad_line, self.class.err_msg(:continues_after_delimiter, self.id.upcase))
+      end
+    end
+  end
+
   # returns an array of offending line and line number
   def invalid_text_after_delimiter(line_number, text)
     unless text =~ /#{self.class.delimiter(:string)}\s*?$/
