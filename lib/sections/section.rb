@@ -25,6 +25,9 @@ class Section
     end
   end
 
+  # Sections call this method directly so they don't have to all deal with
+  # passing their the interpolated arguments to the error messages. This is the
+  # single point of access for these error messages, even in the specs
   def delimiter_errors(type)
     case type
     when :no_delimiter

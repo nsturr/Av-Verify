@@ -175,17 +175,17 @@ class Area
   end
 
   def make_section(content, line_num)
-    first_line = content.match(/^#.*?$/).to_s.rstrip
+    first_line = content[/^#.*?$/].rstrip.downcase
 
     # Grab the first line of the section, where the header is, to detect
     # what type it is. #AREA is a one-liner, so it gets special treatment.
     # (Technically all sections can have their data on the same line as
     # the header, but I'm enforcing good syntax.)
-    if first_line.downcase.start_with?("#area ", "#area\t")
+    if first_line.start_with?("#area ", "#area\t")
       name = "area"
     else
-      first_line = content.slice(/\A.*(?:\n|\Z)/).rstrip
-      name = first_line.match(/[a-zA-Z\$]+/).to_s.downcase
+      # first_line = content.slice(/\A.*(?:\n|\Z)/).rstrip
+      name = first_line[/[a-zA-Z\$]+/]
 
       if first_line.include?(" ")
         err(line_start_section, first_line, Area.err_msg(:invalid_text_after_section))
