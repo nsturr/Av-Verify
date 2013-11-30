@@ -54,7 +54,7 @@ class Specials < Section
   end
 
   def length
-    @specials.length
+    self.children.length
   end
 
   def size
