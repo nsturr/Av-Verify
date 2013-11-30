@@ -25,6 +25,15 @@ class Section
     end
   end
 
+  def delimiter_errors(type)
+    case type
+    when :no_delimiter
+      Section.err_msg(:no_delimiter, self.id.upcase, self.class.delimiter)
+    when :continues_after_delimiter
+      Section.err_msg(:continues_after_delimiter, self.id.upcase, self.class.delimiter)
+    end
+  end
+
   def initialize(contents, line_number=1)
     @line_number = line_number
     @current_line = line_number
@@ -65,11 +74,11 @@ class Section
   def verify_delimiter
     @current_line += 1
     if @delimiter.nil?
-      err(@current_line, nil, Section.err_msg(:no_delimiter, self.id.upcase, self.class.delimiter))
+      err(@current_line, nil, delimiter_errors(:no_delimiter))
     else
       unless @delimiter.rstrip =~ /#{self.class.delimiter(:regex)}\z/
         line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, Section.err_msg(:continues_after_delimiter, self.id.upcase, self.class.delimiter))
+        err(line_num, bad_line, delimiter_errors(:continues_after_delimiter))
       end
     end
   end

@@ -63,13 +63,13 @@ shared_examples_for VnumSection do
   it "detects a missing delimiter" do
     section.contents.slice!(section.class.delimiter)
 
-    expect_one_error(section, Section.err_msg(:no_delimiter, section.id.upcase, section.class.delimiter))
+    expect_one_error(section, section.delimiter_errors(:no_delimiter))
   end
 
   it "detects invalid text after the delimiter" do
     section.contents << "\nHey, babe."
 
-    expect_one_error(section, Section.err_msg(:continues_after_delimiter, section.id.upcase, section.class.delimiter))
+    expect_one_error(section, section.delimiter_errors(:continues_after_delimiter))
   end
 
   it "detects duplicate vnums"  do

@@ -14,13 +14,13 @@ describe Helps do
   it "detects invalid text after the delimiter" do
     helps.contents << "\n\nHey, good times man."
 
-    expect_one_error(helps, Section.err_msg(:continues_after_delimiter, "HELPS", Helps.delimiter))
+    expect_one_error(helps, helps.delimiter_errors(:continues_after_delimiter))
   end
 
   it "detects a missing delimiter" do
     helps.contents.slice!(/0\$~.*\z/m)
 
-    expect_one_error(helps, Section.err_msg(:no_delimiter, "HELPS", Helps.delimiter))
+    expect_one_error(helps, helps.delimiter_errors(:no_delimiter))
   end
 
 end

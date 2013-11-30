@@ -20,13 +20,13 @@ describe Specials do
   it "detects a missing delimiter" do
     specials.contents.chop!
 
-    expect_one_error(specials, Section.err_msg(:no_delimiter, "SPECIALS", Specials.delimiter))
+    expect_one_error(specials, specials.delimiter_errors(:no_delimiter))
   end
 
   it "detects invalid text after its delimiter" do
     specials.contents << "\nOh hi there!"
 
-    expect_one_error(specials, Section.err_msg(:continues_after_delimiter, "SPECIALS", Specials.delimiter))
+    expect_one_error(specials, specials.delimiter_errors(:continues_after_delimiter))
   end
 
   it "detects multiple specs for a single mob" do

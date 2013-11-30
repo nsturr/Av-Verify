@@ -41,13 +41,13 @@ describe Resets do
   it "detects a missing delimiter" do
     resets.contents.chop!
 
-    expect_one_error(resets, Section.err_msg(:no_delimiter, "RESETS", Resets.delimiter))
+    expect_one_error(resets, resets.delimiter_errors(:no_delimiter))
   end
 
   it "detects invalid text after its delimiter" do
     resets.contents << "\nOh hi there!"
 
-    expect_one_error(resets, Section.err_msg(:continues_after_delimiter, "RESETS", Resets.delimiter))
+    expect_one_error(resets, resets.delimiter_errors(:continues_after_delimiter))
   end
 
 end
