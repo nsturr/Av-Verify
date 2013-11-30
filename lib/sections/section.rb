@@ -44,6 +44,8 @@ class Section
   def split_children(valid_child=nil)
     return if self.children.nil?
 
+    @current_line += 1
+
     @delimiter = slice_delimiter!
     slice_leading_whitespace!
 
@@ -60,7 +62,6 @@ class Section
 
   def slice_first_line!
     @contents.slice!(/\A.*(?:\n|\Z)/)
-    @current_line += 1
   end
 
   def slice_leading_whitespace!

@@ -39,7 +39,6 @@ class Shops < Section
     @children = []
 
     slice_first_line!
-    @current_line += 1
   end
 
   def length

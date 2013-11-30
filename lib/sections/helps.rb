@@ -67,6 +67,7 @@ class Helps < Section
     line_number = @current_line
 
     @contents.each_line do |line|
+      @current_line += 1
 
       next if line.strip.empty? && expect_header
       help_body << line
@@ -80,7 +81,6 @@ class Helps < Section
         help_body = ""
       end
 
-      @current_line += 1
     end
     # One more Help file just in case it lacked a tilde and wasn't pushed on before
     self.children << HelpFile.new(help_body, line_number) unless help_body.empty?
