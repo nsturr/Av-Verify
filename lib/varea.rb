@@ -154,6 +154,7 @@ class Area
       next if content.empty?
 
       new_section = make_section(content, line_start_section)
+      next if new_section.nil? # Indicates an invalid section name detected in make_section
 
       # TODO: some areas (mostly old ones) have more than one section of the same
       # type. Which is valid because I believe that when the game is run, all
