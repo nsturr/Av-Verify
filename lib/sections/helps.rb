@@ -20,10 +20,7 @@ require_relative '../helpers/has_quoted_keywords'
 
 class Helps < Section
 
-  @ERROR_MESSAGES = {
-    # no_delimiter: "#HELPS section lacks terminating 0$~",
-    # continues_after_delimiter: "#HELPS section continues after terminating 0$~"
-  }
+  @ERROR_MESSAGES = {}
 
   def self.delimiter(option=nil)
     case option
@@ -45,7 +42,7 @@ class Helps < Section
     @id = "helps"
 
     @children = []
-    slice_first_line! # Takes off section name header
+    slice_first_line!
   end
 
   def to_s
@@ -60,7 +57,6 @@ class Helps < Section
 
     # grabs the delimiter and whatever (erroneous) content is after it
     slice_leading_whitespace!
-    # @delimiter = slice_delimiter!
     slice_delimiter!
 
     expect_header = true

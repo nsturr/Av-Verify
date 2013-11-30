@@ -11,9 +11,7 @@ class Resets < Section
   @ERROR_MESSAGES = {
     reset_limit: "Mob reset limit is %i, but %i mobs load before it.",
     wear_loc_filled: "Wear location already filled on this mob reset.",
-    reset_doesnt_follow_mob: "%s reset doesn't immediately follow a mob",
-    # no_delimiter: "#RESETS section lacks terminating S",
-    # continues_after_delimiter: "#RESETS section continues after terminating S"
+    reset_doesnt_follow_mob: "%s reset doesn't immediately follow a mob"
   }
 
   def child_class

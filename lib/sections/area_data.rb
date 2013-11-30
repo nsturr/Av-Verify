@@ -2,6 +2,10 @@ require_relative 'section'
 require_relative '../helpers/avconstants'
 require_relative '../helpers/bits'
 
+# AreaData won't use Section's built-in delimiter parsing, because the AreaData
+# delimiter is just an 'S' and a multi-line seeker line could easily be mistaken
+# for one.
+
 class AreaData < Section
 
   @ERROR_MESSAGES = {

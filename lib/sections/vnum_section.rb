@@ -6,8 +6,6 @@ class VnumSection < Section
     invalid_vnum: "Invalid %s VNUM",
     invalid_after_vnum: "Invalid text on same line as VNUM",
     duplicate: "Duplicate %s #%i, first appears on line %i",
-    # no_delimiter: "#%s section lacks terminating #0",
-    # continues_after_delimiter: "#%s section continues after terminating #0",
     empty: "%s section is empty!"
   }
 

@@ -6,8 +6,6 @@ class Specials < Section
   @section_delimiter = "S"
 
   @ERROR_MESSAGES = {
-    # no_delimiter: "#SPECIALS section lacks terminating S",
-    # continues_after_delimiter: "#SPECIALS section continues after terminating S",
     duplicate_spec: "This will override mob's existing special: %s"
   }
 
