@@ -6,7 +6,7 @@ class Resets < Section
 
   attr_reader :resets, :reset_counts, :errors
 
-  @section_delimiter = /^S/
+  @section_delimiter = "S"
 
   @ERROR_MESSAGES = {
     reset_limit: "Mob reset limit is %i, but %i mobs load before it.",

@@ -25,7 +25,18 @@ class Helps < Section
     continues_after_delimiter: "#HELPS section continues after terminating 0$~"
   }
 
-  @section_delimiter = /0 ?\$~/
+  # @section_delimiter = /0 ?\$~/
+
+  def self.delimiter(option=nil)
+    case option
+    when :regex
+      /^0 ?\$~/
+    when :before
+      /^(?=0 ?\$~)/
+    else
+      "0$~"
+    end
+  end
 
   def self.child_class
     HelpFile

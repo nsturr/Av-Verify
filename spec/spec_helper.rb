@@ -42,14 +42,14 @@ end
 shared_examples_for VnumSection do
 
   it "detects invalid vnums" do
-    i = section.contents.match(/#\d+/).end(0) - 1
+    i = section.contents.match(/^#?\d+/).end(0) - 1
     section.contents[i] = "x"
 
     expect_one_error(section, VnumSection.err_msg(:invalid_vnum, section.id.upcase))
   end
 
   it "detects invalid text after vnums" do
-    i = section.contents.match(/#\d+/).end(0) - 1
+    i = section.contents.match(/^#?\d+/).end(0) - 1
     section.contents.insert(i, " Oh hi there!")
 
     expect_one_error(section, VnumSection.err_msg(:invalid_after_vnum))
@@ -63,13 +63,13 @@ shared_examples_for VnumSection do
   it "detects a missing delimiter" do
     section.contents.slice!(section.class.delimiter)
 
-    expect_one_error(section, VnumSection.err_msg(:no_delimiter, section.id.upcase))
+    expect_one_error(section, Section.err_msg(:no_delimiter, section.id.upcase, section.class.delimiter))
   end
 
   it "detects invalid text after the delimiter" do
     section.contents << "\nHey, babe."
 
-    expect_one_error(section, VnumSection.err_msg(:continues_after_delimiter, section.id.upcase))
+    expect_one_error(section, Section.err_msg(:continues_after_delimiter, section.id.upcase, section.class.delimiter))
   end
 
   it "detects duplicate vnums"  do

@@ -5,11 +5,23 @@ class Section
   include Parsable
   include TheTroubleWithTildes
 
+  @ERROR_MESSAGES = {
+    no_delimiter: "\#%s section has no terminating %s",
+    continues_after_delimiter: "\#%s section continues after terminating %s"
+  }
+
   attr_reader :line_number, :id, :contents, :children
 
-  def self.delimiter(*options)
+  def self.delimiter(option=nil)
     if @section_delimiter
-      options.include?(:start) ? /\A#{@section_delimiter}/ : @section_delimiter
+      case option
+      when :regex
+        /^#{@section_delimiter}\b/
+      when :before
+        /^(?=#{@section_delimiter}\b)/
+      else
+        @section_delimiter
+      end
     end
   end
 
@@ -47,29 +59,29 @@ class Section
   end
 
   def slice_delimiter!
-    @contents.slice!(/^#{self.class.delimiter}.*\z/m)
+    @contents.slice!(/#{self.class.delimiter(:regex)}.*\z/m)
   end
 
   def verify_delimiter
     @current_line += 1
     if @delimiter.nil?
-      err(@current_line, nil, self.class.err_msg(:no_delimiter, self.id.upcase))
+      err(@current_line, nil, Section.err_msg(:no_delimiter, self.id.upcase, self.class.delimiter))
     else
-      unless @delimiter.rstrip =~ /#{self.class.delimiter(:start)}\z/
+      unless @delimiter.rstrip =~ /#{self.class.delimiter(:regex)}\z/
         line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, self.class.err_msg(:continues_after_delimiter, self.id.upcase))
+        err(line_num, bad_line, Section.err_msg(:continues_after_delimiter, self.id.upcase, self.class.delimiter))
       end
     end
   end
 
   # returns an array of offending line and line number
   def invalid_text_after_delimiter(line_number, text)
-    unless text =~ /#{self.class.delimiter(:string)}\s*?$/
+    unless text =~ /#{self.class.delimiter(:regex)}\s*?$/
       offending_text = text[/\A.*$/]
     else
       offending_text = text.rstrip
       # This slices off the delimiter line, leaving the \n at the end, which is good
-      offending_text.slice!(/#{self.class.delimiter(:string)}.*$/)
+      offending_text.slice!(/#{self.class.delimiter(:regex)}.*$/)
       # This finds up to the first line with non-whitespace on it
       offending_text = offending_text[/\A.*?\S[^\n]*$/m]
       line_number += offending_text.count("\n")

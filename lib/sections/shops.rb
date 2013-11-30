@@ -6,7 +6,7 @@ require_relative "line_by_line_object"
 
 class Shops < Section
 
-  @section_delimiter = /^0\b[^\d\n]*$/
+  # @section_delimiter = /^0\b[^\d\n]*$/
 
   @ERROR_MESSAGES = {
     continues_after_delimiter: "#SHOPS section continues after terminating 0$~",
@@ -14,6 +14,18 @@ class Shops < Section
   }
 
   attr_reader :shops
+
+  # Shops needs its own implementation of self.delimiter
+  def self.delimiter(option=nil)
+    case option
+    when :regex
+      /^0\b[^\d\n]*$/
+    when :before
+      /^(?=0\b[^\d\n]*$)/
+    else
+      "0"
+    end
+  end
 
   def child_class
     Shop
