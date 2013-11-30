@@ -133,7 +133,6 @@ Danger: here (in the code) be dragons. This will likely never receive the same r
 ### Immediate
 
 * Clean up the "connections" parsing, as it's too brittle
-* Tilde related methods can be cleaned up a bit
 
 ### Long term
 
