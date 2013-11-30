@@ -266,19 +266,46 @@ describe Mobile do
 
     # test for invalid after tilde, for real
 
-    it "detects invalid kspawn syntax"
+    it "detects invalid kspawn syntax" do
+      mobile.contents[/^K.*~/] = "K 1 2 ~"
+      expect_one_error(mobile, Mobile.err_msg(:not_enough_tokens))
+    end
 
-    it "detects a bad kspawn condition"
+    it "detects a bad kspawn condition" do
+      mobile.contents[/(?<=^K )\d+/] = "a"
+      expect_one_error(mobile, Mobile.err_msg(:non_numeric_or_neg, "kspawn condition"))
+    end
 
-    it "detects a bad kspawn type bit"
+    it "detects a bad kspawn type bit" do
+      mobile.contents[/(?<=^K \d )\d+/] = "2|3"
+      expect_one_error(mobile, Mobile.err_msg(:bad_bit, "Kspawn type"))
+    end
 
-    it "detects a bad kspawn vnum"
+    it "detects a bad kspawn vnum" do
+      mobile.contents[/(?<=^K \d \d )\d+/] = "-12345"
+      expect_one_error(mobile, Mobile.err_msg(:non_numeric_or_neg, "kspawn vnum"))
+    end
 
-    it "detects a bad kspawn location"
+    it "detects a bad kspawn location" do
+      mobile.contents[/(?<=^K \d \d \d{5} )-?\d+/] = "-12345"
+      expect_one_error(mobile, Mobile.err_msg(:non_numeric_or_neg, "kspawn location"))
+    end
 
-    it "detects a visible tab"
+    it "detects a visible tab" do
+      line = mobile.contents[/^K.*~/].gsub(" ", "\t")
+      mobile.contents[/^K.*~/] = line
 
-    it "detects a kspawn with a missing tilde"
+      expect_one_error(mobile, Mobile.err_msg(:visible_tab))
+    end
+
+    it "detects a kspawn with a missing tilde" do
+      line = mobile.contents[/^K.*~/]
+      mobile.contents[/^K.*~/] = line[0...-1]
+
+      # TODO: The hardcoded line numbers (two params) are super brittle
+      # determine them programmatically somehow
+      expect_one_error(mobile, Mobile.err_msg(:kspawn_no_tilde, 21, 22))
+    end
 
   end
 

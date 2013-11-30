@@ -311,13 +311,15 @@ class Mobile < LineByLineObject
         end
 
         unless self.kspawn[:spawn] =~ /^-1$|^\d+$/
-          err(@current_line, line, Mobile.err_msg(:non_numeric, "kspawn vnum"))
+          err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg, "kspawn vnum"))
         end
 
         unless self.kspawn[:room] =~ /^-1$|^\d+$/
           err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg, "kspawn location"))
         end
       end
+
+      ugly(@current_line, line, Mobile.err_msg(:visible_tab)) if text && text.include?("\t")
 
       # The line's last field is text with can span multiple lines. If there's no tilde,
       # expect the next line to just be more text that can be ignored until a tilde
