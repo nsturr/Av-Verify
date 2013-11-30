@@ -60,6 +60,7 @@ class Section
 
   def slice_first_line!
     @contents.slice!(/\A.*(?:\n|\Z)/)
+    @current_line += 1
   end
 
   def slice_leading_whitespace!

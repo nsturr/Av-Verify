@@ -12,8 +12,8 @@ class Resets < Section
     reset_limit: "Mob reset limit is %i, but %i mobs load before it.",
     wear_loc_filled: "Wear location already filled on this mob reset.",
     reset_doesnt_follow_mob: "%s reset doesn't immediately follow a mob",
-    no_delimiter: "#RESETS section lacks terminating S",
-    continues_after_delimiter: "#RESETS section continues after terminating S"
+    # no_delimiter: "#RESETS section lacks terminating S",
+    # continues_after_delimiter: "#RESETS section continues after terminating S"
   }
 
   def child_class
@@ -21,7 +21,7 @@ class Resets < Section
   end
 
   def child_regex
-    /\n/
+    /^/
   end
 
   def self.valid_reset

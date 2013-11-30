@@ -227,7 +227,7 @@ class Room < LineByLineObject
       if line =~ /\Adoor\b/
         warn(@current_line, line, Room.err_msg(:door_bad_flag))
       else
-        err(@current_line, line, Room.err_msg(:invalid_room_field))
+        err(@current_line, line, Room.err_msg(:invalid_field))
       end
     end
   end

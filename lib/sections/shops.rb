@@ -7,8 +7,8 @@ require_relative "line_by_line_object"
 class Shops < Section
 
   @ERROR_MESSAGES = {
-    continues_after_delimiter: "#SHOPS section continues after terminating 0$~",
-    no_delimiter: "Shops section ends without terminating 0",
+    # continues_after_delimiter: "#SHOPS section continues after terminating 0$~",
+    # no_delimiter: "Shops section ends without terminating 0",
   }
 
   attr_reader :shops

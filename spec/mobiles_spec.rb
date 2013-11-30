@@ -304,7 +304,7 @@ describe Mobile do
 
       # TODO: The hardcoded line numbers (two params) are super brittle
       # determine them programmatically somehow
-      expect_one_error(mobile, Mobile.err_msg(:kspawn_no_tilde, 21, 22))
+      expect_one_error(mobile, Mobile.err_msg(:kspawn_no_tilde, 22, 23))
     end
 
   end

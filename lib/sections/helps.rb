@@ -21,8 +21,8 @@ require_relative '../helpers/has_quoted_keywords'
 class Helps < Section
 
   @ERROR_MESSAGES = {
-    no_delimiter: "#HELPS section lacks terminating 0$~",
-    continues_after_delimiter: "#HELPS section continues after terminating 0$~"
+    # no_delimiter: "#HELPS section lacks terminating 0$~",
+    # continues_after_delimiter: "#HELPS section continues after terminating 0$~"
   }
 
   def self.delimiter(option=nil)
@@ -55,6 +55,8 @@ class Helps < Section
   def split_children
 
     # TODO: I really gotta change this method to be less messy
+    # The gist is that unlike other sections, help files are separated only by tildes,
+    # but are also sparated internally by tildes too, so I have to go line by line
 
     # grabs the delimiter and whatever (erroneous) content is after it
     slice_leading_whitespace!
@@ -65,7 +67,8 @@ class Helps < Section
     line_number = @current_line
 
     @contents.each_line do |line|
-      @current_line += 1
+
+      next if line.strip.empty? && expect_header
       help_body << line
 
       if expect_header
@@ -76,6 +79,8 @@ class Helps < Section
         self.children << HelpFile.new(help_body, line_number)
         help_body = ""
       end
+
+      @current_line += 1
     end
     # One more Help file just in case it lacked a tilde and wasn't pushed on before
     self.children << HelpFile.new(help_body, line_number) unless help_body.empty?

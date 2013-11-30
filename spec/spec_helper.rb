@@ -74,6 +74,7 @@ shared_examples_for VnumSection do
 
   it "detects duplicate vnums"  do
     m = section.contents.match(/#\d+.*?(?=#\d+)/m)
+    first_line = m.pre_match.count("\n") + 2 # +2 because there's also the sliced off section name
     item = m[0]
 
     vnum = item[/(?<=#)\d+/].to_i
@@ -81,7 +82,7 @@ shared_examples_for VnumSection do
     section.contents.insert(i, item)
 
     # TODO: Make the line number (last arg) way less brittle
-    expect_one_error(section, VnumSection.err_msg(:duplicate, section.child_class.name.downcase, vnum, 2))
+    expect_one_error(section, VnumSection.err_msg(:duplicate, section.child_class.name.downcase, vnum, first_line))
   end
 
 end
