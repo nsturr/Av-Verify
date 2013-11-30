@@ -164,7 +164,7 @@ class Area
         warn(
           new_section.line_number,
           nil,
-          Area.err_msg(:duplicate_section) % new_section.class.name)
+          Area.err_msg(:duplicate_section, new_section.class.name))
         next
       end
       sections[new_section.id] = new_section
@@ -192,7 +192,7 @@ class Area
     end
 
     unless SECTIONS.include? name
-      err(line_num, nil, Area.err_msg(:bad_section_name) % name) and return
+      err(line_num, nil, Area.err_msg(:bad_section_name, name)) and return
     end
 
     case name

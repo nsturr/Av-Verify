@@ -85,7 +85,7 @@ class Mobile < LineByLineObject
   def parse
     super
     if @expectation == :multiline_kspawn
-      err(@current_line, nil, Mobile.err_msg(:kspawn_no_tilde) % [@last_multiline, @current_line])
+      err(@current_line, nil, Mobile.err_msg(:kspawn_no_tilde, @last_multiline, @current_line))
     end
     self
   end
@@ -172,27 +172,27 @@ class Mobile < LineByLineObject
     # TODO: handle an S smooshed up against align.
     # this method might let ' act aff 1000S S  ' with an extra S pass
 
-    err(@current_line, line, Mobile.err_msg(:no_terminating) % "S") unless line.end_with?("S")
+    err(@current_line, line, Mobile.err_msg(:no_terminating, "S")) unless line.end_with?("S")
     items = line.split
     if items.length >= 3
       if items[0] =~ Bits.pattern
         @act = Bits.new(items[0])
         warn(@current_line, line, Mobile.err_msg(:act_not_npc)) unless @act.bit? 1
-        err(@current_line, line, Mobile.err_msg(:bad_bit) % "Act") if @act.error?
+        err(@current_line, line, Mobile.err_msg(:bad_bit, "Act")) if @act.error?
       else
-        err(@current_line, line, Mobile.err_msg(:bad_field) % "act flags")
+        err(@current_line, line, Mobile.err_msg(:bad_field, "act flags"))
       end
       if items[1] =~ Bits.pattern
         @aff = Bits.new(items[1])
-        err(@current_line, line, Mobile.err_msg(:bad_bit) % "Affect") if @aff.error?
+        err(@current_line, line, Mobile.err_msg(:bad_bit, "Affect")) if @aff.error?
       else
-        err(@current_line, line, Mobile.err_msg(:bad_field) % "affect flags")
+        err(@current_line, line, Mobile.err_msg(:bad_field, "affect flags"))
       end
       if m = items[2].match(/(-?\d+(?:\b|S))/)
         @align = m[1].to_i
         err(@current_line, line, Mobile.err_msg(:bad_align_range)) unless @align.between?(-1000, 1000)
       else
-        err(@current_line, line, Mobile.err_msg(:bad_field) % "align")
+        err(@current_line, line, Mobile.err_msg(:bad_field, "align"))
       end
     else
       err(@current_line, line, Mobile.err_msg(:act_aff_align_matches))
@@ -207,7 +207,7 @@ class Mobile < LineByLineObject
       @level = m[1].to_i
     else
       unless line =~ /^\d+\b/
-        err(@current_line, line, Mobile.err_msg(:bad_field) % "level")
+        err(@current_line, line, Mobile.err_msg(:bad_field, "level"))
       else
         err(@current_line, line, Mobile.err_msg(:level_matches))
       end
@@ -249,9 +249,9 @@ class Mobile < LineByLineObject
         @race = race.to_i
         err(@current_line, line, Mobile.err_msg(:race_out_of_bounds)) unless @race.between?(0, RACE_MAX)
       else
-        err(@current_line, line, Mobile.err_msg(:non_numeric) % "race")
+        err(@current_line, line, Mobile.err_msg(:non_numeric, "race"))
       end
-      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "race") unless error.nil?
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after, "race")) unless error.nil?
 
     when"C"
       err(@current_line, line, Mobile.err_msg(:class_duplicated)) && return if self.klass
@@ -260,9 +260,9 @@ class Mobile < LineByLineObject
         @klass = klass.to_i
         err(@current_line, line, Mobile.err_msg(:class_out_of_bounds)) unless @klass.between?(0, CLASS_MAX)
       else
-        err(@current_line, line, Mobile.err_msg(:non_numeric) % "class")
+        err(@current_line, line, Mobile.err_msg(:non_numeric, "class"))
       end
-      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "class") unless error.nil?
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after, "class")) unless error.nil?
 
     when "L"
       err(@current_line, line, Mobile.err_msg(:team_duplicated)) && return if self.team
@@ -271,9 +271,9 @@ class Mobile < LineByLineObject
         @team = team.to_i
         err(@current_line, line, Mobile.err_msg(:team_out_of_bounds)) unless @team.between?(0, TEAM_MAX)
       else
-        err(@current_line, line, Mobile.err_msg(:non_numeric) % "team")
+        err(@current_line, line, Mobile.err_msg(:non_numeric, "team"))
       end
-      err(@current_line, line, Mobile.err_msg(:invalid_text_after) % "team") unless error.nil?
+      err(@current_line, line, Mobile.err_msg(:invalid_text_after, "team")) unless error.nil?
 
     when "A"
       # see HasApplyFlag module for this
@@ -303,19 +303,19 @@ class Mobile < LineByLineObject
         err(@current_line, line, Mobile.err_msg(:not_enough_tokens))
       else
         unless self.kspawn[:condition] =~ /^\d+$/
-          err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg) % "kspawn condition")
+          err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg, "kspawn condition"))
         end
 
         if self.kspawn[:type].error?
-          err(@current_line, line, Mobile.err_msg(:bad_bit) % "Kspawn type")
+          err(@current_line, line, Mobile.err_msg(:bad_bit, "Kspawn type"))
         end
 
         unless self.kspawn[:spawn] =~ /^-1$|^\d+$/
-          err(@current_line, line, Mobile.err_msg(:non_numeric) % "kspawn vnum")
+          err(@current_line, line, Mobile.err_msg(:non_numeric, "kspawn vnum"))
         end
 
         unless self.kspawn[:room] =~ /^-1$|^\d+$/
-          err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg) % "kspawn location")
+          err(@current_line, line, Mobile.err_msg(:non_numeric_or_neg, "kspawn location"))
         end
       end
 

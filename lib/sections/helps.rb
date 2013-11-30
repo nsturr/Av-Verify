@@ -106,9 +106,6 @@ class HelpFile
 
   @ERROR_MESSAGES = {
     no_level: "Help file doesn't start with a level",
-    # tilde_absent: "Line has no terminating ~",
-    # tilde_invalid_text: "Invalid text after terminating ~",
-    # tilde_not_alone: "Help file's terminating ~ should be on its own line"
   }
 
   attr_reader :level, :keywords, :body, :line_number, :contents
@@ -136,11 +133,6 @@ class HelpFile
 
       keywords = m.post_match
       validate_tilde(line: first_line, line_number: @current_line)
-      # unless has_tilde?(keywords)
-      #   err(@current_line, first_line, TheTroubleWithTildes.err_msg(:absent))
-      # else
-      #   err(@current_line, first_line, TheTroubleWithTildes.err_msg(:extra_text)) unless trailing_tilde?(keywords)
-      # end
       nab_tilde(keywords)
 
       # see HasQuotedKeywords module for details
@@ -161,13 +153,6 @@ class HelpFile
       line_number: @current_line,
       should_be_alone: true
     )
-    # if !has_tilde?(@body)
-    #   err(@current_line, nil, TheTroubleWithTildes.err_msg(:absent))
-    # elsif !trailing_tilde?(end_line)
-    #   err(@current_line, end_line, TheTroubleWithTildes.err_msg(:extra_text))
-    # elsif !isolated_tilde?(end_line)
-    #   ugly(@current_line, end_line, TheTroubleWithTildes.err_msg(:not_alone))
-    # end
     self
   end
 

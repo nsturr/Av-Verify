@@ -198,8 +198,8 @@ class Room < LineByLineObject
     when "A"
       if m = line.match(/^A +(#{Bits.insert})/)
         @align = Bits.new(m[1])
-        err(@current_line, line, Room.err_msg(:flag_not_power_of_two) % "Alignment restriction") if @align.error?
-        err(@current_line, line, Room.err_msg(:invalid_text_after) % "alignment restriction") unless line =~ /^A +#{Bits.insert}$/
+        err(@current_line, line, Room.err_msg(:flag_not_power_of_two, "Alignment restriction")) if @align.error?
+        err(@current_line, line, Room.err_msg(:invalid_text_after, "alignment restriction")) unless line =~ /^A +#{Bits.insert}$/
       else
         err(@current_line, line, Room.err_msg(:invalid_alignment_line))
       end
@@ -208,8 +208,8 @@ class Room < LineByLineObject
     when "C"
       if m = line.match(/^C +(#{Bits.insert})/)
         @klass = Bits.new(m[1])
-        err(@current_line, line, Room.err_msg(:flag_not_power_of_two) % "Class restriction") if klass.error?
-        err(@current_line, line, Room.err_msg(:invalid_text_after) % "class restriction") unless line =~ /^C +#{Bits.insert}$/
+        err(@current_line, line, Room.err_msg(:flag_not_power_of_two, "Class restriction")) if klass.error?
+        err(@current_line, line, Room.err_msg(:invalid_text_after, "class restriction")) unless line =~ /^C +#{Bits.insert}$/
       else
         err(@current_line, line, Room.err_msg(:invalid_class_line))
       end

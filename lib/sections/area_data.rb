@@ -78,7 +78,7 @@ class AreaData < Section
       end
 
       if @used_lines.include? line[0]
-        err(@current_line, line, AreaData.err_msg(:duplicate) % line[0])
+        err(@current_line, line, AreaData.err_msg(:duplicate, line[0]))
       end
 
       case line[0]
@@ -114,7 +114,7 @@ class AreaData < Section
       token = token.to_i
     else
       token = nil
-      err(@current_line, line, AreaData.err_msg(:invalid_field) % name)
+      err(@current_line, line, AreaData.err_msg(:invalid_field, name))
     end
     token
   end
@@ -125,7 +125,7 @@ class AreaData < Section
 
     plane, zone, error = line.split(" ", 4)[1..-1]
     if error
-      err(@current_line, line, AreaData.err_msg(:invalid_extra_text) % "plane")
+      err(@current_line, line, AreaData.err_msg(:invalid_extra_text, "plane"))
     end
 
     if plane && plane =~ /^-?\d+$/
@@ -133,7 +133,7 @@ class AreaData < Section
       err(@current_line, line, AreaData.err_msg(:invalid_plane_0)) if @plane == 0
       err(@current_line, line, AreaData.err_msg(:plane_out_of_range)) unless @plane.between?(PLANE_MIN, PLANE_MAX)
     else
-      err(@current_line, line, AreaData.err_msg(:invalid_field) % "area plane")
+      err(@current_line, line, AreaData.err_msg(:invalid_field, "area plane"))
     end
 
     if zone
@@ -141,7 +141,7 @@ class AreaData < Section
         @zone = zone.to_i
         err(@current_line, line, AreaData.err_msg(:zone_out_of_range)) unless @zone.between?(0, ZONE_MAX)
       else
-        err(@current_line, line, AreaData.err_msg(:invalid_field) % "area zone")
+        err(@current_line, line, AreaData.err_msg(:invalid_field, "area zone"))
       end
     end
   end
@@ -153,11 +153,11 @@ class AreaData < Section
     flags, error = line.split(" ", 3)[1..-1]
     if flags =~ Bits.pattern
       @flags = Bits.new(flags)
-      err(@current_line, line, AreaData.err_msg(:bad_bit) % "Area flags") if @flags.error?
+      err(@current_line, line, AreaData.err_msg(:bad_bit, "Area flags")) if @flags.error?
     else
-      err(@current_line, line, AreaData.err_msg(:bad_line) % "area flags")
+      err(@current_line, line, AreaData.err_msg(:bad_line, "area flags"))
     end
-    err(@current_line, line, AreaData.err_msg(:invalid_extra_text) % "area flags") if error
+    err(@current_line, line, AreaData.err_msg(:invalid_extra_text, "area flags")) if error
   end
 
   def parse_outlaw_line line
@@ -168,9 +168,9 @@ class AreaData < Section
     dump, jail, death_row, executioner, justice, error = line.split(" ", 7)[1..-1]
 
     if error
-      err(@current_line, line, AreaData.err_msg(:invalid_extra_text) % line_name)
+      err(@current_line, line, AreaData.err_msg(:invalid_extra_text, line_name))
     elsif justice.nil?
-      err(@current_line, line, AreaData.err_msg(:not_enough_tokens) % line_name)
+      err(@current_line, line, AreaData.err_msg(:not_enough_tokens, line_name))
     end
 
     # This will set the strings to an integer, or to nil if they're invalid
@@ -204,7 +204,7 @@ class AreaData < Section
         @kspawn_multiline = true
       end
     else
-      err(@current_line, line, AreaData.err_msg(:not_enough_tokens) % "seeker")
+      err(@current_line, line, AreaData.err_msg(:not_enough_tokens, "seeker"))
     end
 
     condition = ensure_numeric(condition, line, line_name)
@@ -227,9 +227,9 @@ class AreaData < Section
       respawn_room, zero, zero_two, error = line.split(" ", 10)[1..-1]
 
     if error
-      err(@current_line, line, AreaData.err_msg(:invalid_extra_text) % line_name)
+      err(@current_line, line, AreaData.err_msg(:invalid_extra_text, line_name))
     elsif zero_two.nil?
-      err(@current_line, line, AreaData.err_msg(:not_enough_tokens) % line_name)
+      err(@current_line, line, AreaData.err_msg(:not_enough_tokens, line_name))
     end
 
     xpgain_mod = ensure_numeric(xpgain_mod, line, line_name)
@@ -254,9 +254,9 @@ class AreaData < Section
     pct0, num1, pct1, num2, pct2, pct3, div, zero, error = line.split(" ", 10)[1..-1]
 
     if error
-      err(@current_line, line, AreaData.err_msg(:invalid_extra_text) % line_name)
+      err(@current_line, line, AreaData.err_msg(:invalid_extra_text, line_name))
     elsif zero.nil?
-      err(@current_line, line, AreaData.err_msg(:not_enough_tokens) % line_name)
+      err(@current_line, line, AreaData.err_msg(:not_enough_tokens, line_name))
     end
 
     pct0 = ensure_numeric(pct0, line, line_name)

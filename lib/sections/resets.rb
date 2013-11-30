@@ -81,7 +81,7 @@ class Resets < Section
         @recent_mob_reset = reset
         @previous_reset_type = :mobile
         if @reset_counts[reset.vnum] >= reset.limit
-          warn(reset.line_number, reset.line, Resets.err_msg(:reset_limit) % [reset.limit, @reset_counts[reset.vnum]])
+          warn(reset.line_number, reset.line, Resets.err_msg(:reset_limit, reset.limit, @reset_counts[reset.vnum]))
         end
         @reset_counts[reset.vnum] += 1
 
@@ -93,13 +93,13 @@ class Resets < Section
           @recent_mob_reset.attachments << reset
         end
         unless @previous_reset_type == :mobile
-          warn(reset.line_number, reset.line, Resets.err_msg(:reset_doesnt_follow_mob) % "Equipment")
+          warn(reset.line_number, reset.line, Resets.err_msg(:reset_doesnt_follow_mob, "Equipment"))
         end
 
       when :inventory
         @recent_mob_reset.attachments << reset if @recent_mob_reset
         unless @previous_reset_type == :mobile
-          warn(reset.line_number, reset.line, Resets.err_msg(:reset_doesnt_follow_mob) % "Inventory")
+          warn(reset.line_number, reset.line, Resets.err_msg(:reset_doesnt_follow_mob, "Inventory"))
         end
 
       else
@@ -195,28 +195,28 @@ class Reset
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, Reset.err_msg(:zero_or_negative) % "Mob VNUM") if @vnum < 1
+        err(@line_number, @line, Reset.err_msg(:zero_or_negative, "Mob VNUM")) if @vnum < 1
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "mob")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "mob"))
       end
 
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Mob limit") if @limit < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Mob limit")) if @limit < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_limit) % "mob")
+        err(@line_number, @line, Reset.err_msg(:invalid_limit, "mob"))
       end
 
       # Sometimes comments starting with * are smooshed up against the room vnum
       if room =~ /^-?\d+\*?$/
         @target = room[/^[^\*]*/].to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Target spawn room") if @target < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Target spawn room")) if @target < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "room"))
       end
 
     else
-      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "mob")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens, "mob"))
     end
 
   end
@@ -229,14 +229,14 @@ class Reset
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_limit) % "inventory")
+        err(@line_number, @line, Reset.err_msg(:invalid_limit, "inventory"))
       end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Object VNUM")) if @vnum < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "object"))
       end
 
       # The zero doesn't actually need to be a zero, just needs to be there
@@ -244,7 +244,7 @@ class Reset
         err(@line_number, @line, Reset.err_msg(:reset_g_matches))
       end
     else
-      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "inventory")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens, "inventory"))
     end
   end
 
@@ -256,14 +256,14 @@ class Reset
       if limit =~ /^-?\d+$/
         @limit = limit.to_i
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_limit) % "equipment")
+        err(@line_number, @line, Reset.err_msg(:invalid_limit, "equipment"))
       end
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Object VNUM")) if @vnum < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "object"))
       end
 
       # The zero doesn't need to be a zero, it just needs to be there
@@ -275,10 +275,10 @@ class Reset
         @slot = wear[/[^\*]*/].to_i
         err(@line_number, @line, Reset.err_msg(:wear_loc_out_of_bounds)) unless @slot.between?(0,WEAR_MAX)
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_field) % "wear location")
+        err(@line_number, @line, Reset.err_msg(:invalid_field, "wear location"))
       end
     else
-      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "equipment")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens, "equipment"))
     end
   end
 
@@ -294,19 +294,19 @@ class Reset
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Object VNUM")) if @vnum < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "object"))
       end
 
       if room =~ /^-?\d+\*?$/
         @target = room[/[^\*]*/].to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Target room VNUM") if @target < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Target room VNUM")) if @target < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "room"))
       end
     else
-      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "object")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens, "object"))
     end
   end
 
@@ -322,19 +322,19 @@ class Reset
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Object VNUM") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Object VNUM")) if @vnum < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "object")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "object"))
       end
 
       if container =~ /^-?\d+\*?$/
         @target = container[/^[^*]*/].to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Target container VNUM") if @target < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Target container VNUM")) if @target < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "container")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "container"))
       end
     else
-      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "container")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens, "container"))
     end
   end
 
@@ -350,9 +350,9 @@ class Reset
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Room VNUM") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Room VNUM")) if @vnum < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "room"))
       end
 
       if direction =~ /^-?\d+$/
@@ -369,7 +369,7 @@ class Reset
         err(@line_number, @line, Reset.err_msg(:bad_door_state))
       end
     else
-      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "door")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens, "door"))
     end
   end
 
@@ -385,9 +385,9 @@ class Reset
 
       if vnum =~ /^-?\d+$/
         @vnum = vnum.to_i
-        err(@line_number, @line, Reset.err_msg(:negative) % "Room VNUM") if @vnum < 0
+        err(@line_number, @line, Reset.err_msg(:negative, "Room VNUM")) if @vnum < 0
       else
-        err(@line_number, @line, Reset.err_msg(:invalid_vnum) % "room")
+        err(@line_number, @line, Reset.err_msg(:invalid_vnum, "room"))
       end
 
       if number_of_exits =~ /^-?\d+\*?$/
@@ -397,7 +397,7 @@ class Reset
         err(@line_number, @line, Reset.err_msg(:bad_number_of_exits))
       end
     else
-      err(@line_number, @line, Reset.err_msg(:not_enough_tokens) % "random")
+      err(@line_number, @line, Reset.err_msg(:not_enough_tokens, "random"))
     end
   end
 

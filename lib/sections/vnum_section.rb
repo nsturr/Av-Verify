@@ -26,7 +26,7 @@ class VnumSection < Section
 
       unless child_vnum
         # invalid vnums won't be added (sorry!)
-        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_vnum) % self.id.upcase)
+        err(@current_line, child[/\A.*$/], VnumSection.err_msg(:invalid_vnum, self.id.upcase))
         invalid == true
       end
       unless child =~ /\A#\w+\s*$/
@@ -71,7 +71,7 @@ class VnumSection < Section
     split_children(self.valid_vnum?)
 
     if self.children.empty?
-      err(self.line_number, nil, VnumSection.err_msg(:empty) % self.class.name)
+      err(self.line_number, nil, VnumSection.err_msg(:empty, self.class.name))
       @parsed = true
     end
 
@@ -81,8 +81,10 @@ class VnumSection < Section
       existing_entry = self[entry.vnum]
       unless existing_entry.equal?(entry)
         err(
-          entry.line_number, nil, VnumSection.err_msg(:duplicate) %
-          [entry.class.name.downcase, entry.vnum, existing_entry.line_number]
+          entry.line_number, nil,
+          VnumSection.err_msg(
+            :duplicate, entry.class.name.downcase, entry.vnum, existing_entry.line_number
+          )
         )
       end
 
@@ -90,11 +92,11 @@ class VnumSection < Section
     end
 
     if @delimiter.nil?
-      err(@current_line, nil, VnumSection.err_msg(:no_delimiter) % self.id.upcase)
+      err(@current_line, nil, VnumSection.err_msg(:no_delimiter, self.id.upcase))
     else
       unless @delimiter.rstrip =~ /#{self.class.delimiter(:start)}\z/
         line_num, bad_line = invalid_text_after_delimiter(@current_line, @delimiter)
-        err(line_num, bad_line, VnumSection.err_msg(:continues_after_delimiter) % self.id.updase)
+        err(line_num, bad_line, VnumSection.err_msg(:continues_after_delimiter, self.id.upcase))
       end
     end
     self.children

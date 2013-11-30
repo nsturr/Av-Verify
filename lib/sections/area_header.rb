@@ -6,8 +6,6 @@ class AreaHeader < Section
     bad_range: "Level range should be 8 chars long, including braces",
     no_braces: "Level range not enclosed in braces { }",
     multi_line: "#AREA section spans more than one line",
-    # extra_tilde: "#AREA section contains more than one ~",
-    # missing_tilde: "#AREA section contains no ~"
   }
 
   attr_reader :name, :level, :author

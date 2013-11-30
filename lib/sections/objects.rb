@@ -35,10 +35,6 @@ class Objekt < LineByLineObject
   @ERROR_MESSAGES = {
     visible_tab: "Visible text contains a tab character",
     invalid_text_after: "Invalid text after %s",
-    # tilde_absent: "%s has no terminating ~",
-    # tilde_absent_or_spans: "%s has no terminating ~ or spans multiple lines",
-    # tilde_invalid_text: "Invalid text after terminating ~",
-    # tilde_not_alone: "%s's terminating ~ should be on its own line",
     short_desc_spans: "Object short desc spans multiple lines",
     long_desc_spans: "Long desc has more than one line of text",
     adesc_no_tilde: "Doesn't look like part of an adesc. Forget a ~ somewhere?",
@@ -83,7 +79,7 @@ class Objekt < LineByLineObject
   def parse
     super
     if @expectation == :multiline_edesc
-      err(@current_line, nil, Objekt.err_msg(:edesc_no_tilde) % [last_multiline, @current_line])
+      err(@current_line, nil, Objekt.err_msg(:edesc_no_tilde, last_multiline, @current_line))
     end
     self
   end
@@ -102,11 +98,6 @@ class Objekt < LineByLineObject
       line_number: @current_line,
       might_span_lines: true
     )
-    # if has_tilde? line
-    #   err(@current_line, line, Objekt.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
-    # else
-    #   err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Object name")
-    # end
     @name = parse_quoted_keywords(line[/\A[^~]*/], line, true, "object")
     expect :short_desc
   end
@@ -121,11 +112,6 @@ class Objekt < LineByLineObject
         line_number: @current_line,
         might_span_lines: true
       )
-      # if has_tilde? line
-      #   err(@current_line, line, Objekt.err_msg(:tilde_invalid_text)) unless trailing_tilde? line
-      # else
-      #   err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Short desc")
-      # end
       @short_desc = line[/\A[^~]*/]
       expect :long_desc
     end
@@ -182,8 +168,8 @@ class Objekt < LineByLineObject
       @type = m[1].to_i
       @extra = Bits.new(m[2])
       @wear = Bits.new(m[3])
-      err(@current_line, line, Objekt.err_msg(:bad_bit) % "Extra flag") if @extra.error?
-      err(@current_line, line, Objekt.err_msg(:bad_bit) % "Wear flag") if @wear.error?
+      err(@current_line, line, Objekt.err_msg(:bad_bit, "Extra flag")) if @extra.error?
+      err(@current_line, line, Objekt.err_msg(:bad_bit, "Wear flag")) if @wear.error?
     else
       err(@current_line, line, Objekt.err_msg(:type_extra_wear_matches))
     end
@@ -201,7 +187,7 @@ class Objekt < LineByLineObject
         elsif value =~ Bits.pattern
           @values[i] = Bits.new(value)
         else
-          err(@current_line, line, Objekt.err_msg(:bad_value) % i)
+          err(@current_line, line, Objekt.err_msg(:bad_value, i))
         end
       end
     else
@@ -217,8 +203,8 @@ class Objekt < LineByLineObject
     @weight, @worth, zero = line.split(" ", 3)
     # err(@current_line, line, "Too many items in weight/worth line") if items.length > 3
     unless [@weight, @worth, zero].any? { |el| el.nil? } || zero !~ /\A\d+\z/
-      err(@current_line, line, Objekt.err_msg(:bad_field) % "weight") unless @weight =~ /^\d+$/
-      err(@current_line, line, Objekt.err_msg(:bad_field) % "worth") unless @worth =~ /^\d+$/
+      err(@current_line, line, Objekt.err_msg(:bad_field, "weight")) unless @weight =~ /^\d+$/
+      err(@current_line, line, Objekt.err_msg(:bad_field, "worth")) unless @worth =~ /^\d+$/
     else
       err(@current_line, line, Objekt.err_msg(:weight_worth_matches))
     end
@@ -242,14 +228,14 @@ class Objekt < LineByLineObject
       end
     when "Q"
       if line =~ /^Q +\d+/
-        err(@current_line, line, Objekt.err_msg(:invalid_text_after) % "quality") unless line =~ /^Q +\d+$/
+        err(@current_line, line, Objekt.err_msg(:invalid_text_after, "quality")) unless line =~ /^Q +\d+$/
       elsif line =~ /^Q +-\d+/
-        err(@current_line, line, Objekt.err_msg(:negative) % "Quality")
+        err(@current_line, line, Objekt.err_msg(:negative, "Quality"))
       else
-        err(@current_line, line, Objekt.err_msg(:bad_field) % "quality")
+        err(@current_line, line, Objekt.err_msg(:bad_field, "quality"))
       end
     when "E"
-      err(@current_line, line, Objekt.err_msg(:invalid_text_after) % "E") if line.length > 1
+      err(@current_line, line, Objekt.err_msg(:invalid_text_after, "E")) if line.length > 1
       expect :edesc_keyword
     else
       err(@current_line, line, Objekt.err_msg(:invalid_extra_field))
@@ -268,13 +254,6 @@ class Objekt < LineByLineObject
       line_number: @current_line,
       might_span_lines: true
     )
-    # unless has_tilde? line
-    #   err(@current_line, line, Objekt.err_msg(:tilde_absent_or_spans) % "Edesc keywords")
-    # else
-    #   if !trailing_tilde? line
-    #     err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
-    #   end
-    # end
 
     keywords = parse_quoted_keywords(line[/[^~]*/], line)
 
@@ -298,12 +277,6 @@ class Objekt < LineByLineObject
         should_be_alone: true,
         present: false
       )
-      # unless trailing_tilde? line
-      #   err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
-      # end
-      # unless isolated_tilde? line
-      #   ugly(@current_line, line, Objekt.err_msg(:tilde_not_alone) % "Edesc body")
-      # end
     end
 
     @edesc[@recent_keywords] << line[/[^~]*/] << "\n"

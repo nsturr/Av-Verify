@@ -73,7 +73,7 @@ class Specials < Section
       vnum = special.vnum
       existing_entry = self[vnum]
       unless existing_entry.equal? special
-        warn(special.line_number, special.line, Specials.err_msg(:duplicate_spec) % self[vnum].spec)
+        warn(special.line_number, special.line, Specials.err_msg(:duplicate_spec, self[vnum].spec))
       end
       @errors += special.errors
     end

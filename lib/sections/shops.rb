@@ -109,7 +109,7 @@ class Shop < LineByLineObject
         when :profit then "protit"
         when :hours then "business hours"
         end
-      err(@current_line, nil, Shop.err_msg(:missing_line) % expectation.to_s)
+      err(@current_line, nil, Shop.err_msg(:missing_line, expectation.to_s))
     end
     self
   end
@@ -139,7 +139,7 @@ class Shop < LineByLineObject
         end
       end
     else
-      err(@current_line, line, Shop.err_msg(:not_enough_tokens) % "shop type")
+      err(@current_line, line, Shop.err_msg(:not_enough_tokens, "shop type"))
     end
 
     expect :profit
@@ -163,7 +163,7 @@ class Shop < LineByLineObject
         err(@current_line, line, Shop.err_msg(:invalid_profit_margin))
       end
     else
-      err(@current_line, line, Shop.err_msg(:not_enough_tokens) % "profit")
+      err(@current_line, line, Shop.err_msg(:not_enough_tokens, "profit"))
     end
 
     expect :hours
@@ -187,7 +187,7 @@ class Shop < LineByLineObject
         err(@current_line, line, Shop.err_msg(:bad_hour))
       end
     else
-      err(@current_line, line, Shop.err_msg(:not_enough_tokens) % "hours")
+      err(@current_line, line, Shop.err_msg(:not_enough_tokens, "hours"))
     end
 
     expect :vnum

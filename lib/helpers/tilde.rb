@@ -49,13 +49,13 @@ module TheTroubleWithTildes
 
     if options[:present] && !has_tilde?(line)
       message = options[:might_span_lines] ? :absent_or_spans : :absent
-      err(line_number, line, TheTroubleWithTildes.err_msg(message) % name)
+      err(line_number, line, TheTroubleWithTildes.err_msg(message, name))
     elsif line.count("~") > 1
-      err(line_number, line, TheTroubleWithTildes.err_msg(:extra) % name)
+      err(line_number, line, TheTroubleWithTildes.err_msg(:extra, name))
     elsif !trailing_tilde?(line)
-      err(line_number, line, TheTroubleWithTildes.err_msg(:extra_text) % name)
+      err(line_number, line, TheTroubleWithTildes.err_msg(:extra_text, name))
     elsif options[:should_be_alone] && !isolated_tilde?(line)
-      ugly(line_number, line, TheTroubleWithTildes.err_msg(:not_alone) % name)
+      ugly(line_number, line, TheTroubleWithTildes.err_msg(:not_alone, name))
     end
   end
 
