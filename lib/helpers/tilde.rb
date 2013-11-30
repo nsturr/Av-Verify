@@ -1,19 +1,17 @@
 module TheTroubleWithTildes
 
   # Let's add some error messages for Tildes
-  class << self
-    ERROR_MESSAGES = {
-      absent: "%s has no terminating ~",
-      absent_between: "%s has no terminating ~ between lines %d and %d",
-      absent_or_spans: "%s has no terminating ~ or spans multiple lines",
-      extra_text: "Invalid text after terminating ~",
-      extra: "Misplaced tilde on line",
-      not_alone: "Terminating ~ should be on its own line"
-    }
+  ERROR_MESSAGES = {
+    absent: "%s has no terminating ~",
+    absent_between: "%s has no terminating ~ between lines %d and %d",
+    absent_or_spans: "%s has no terminating ~ or spans multiple lines",
+    extra_text: "Invalid text after terminating ~",
+    extra: "Misplaced tilde on line",
+    not_alone: "Terminating ~ should be on its own line"
+  }
 
-    def err_msg(sym, desc="Line", line_start=1, line_end=2)
-      ERROR_MESSAGES[sym] % [desc, line_start, line_end]
-    end
+  def self.err_msg(sym, desc="Line", line_start=1, line_end=2)
+    ERROR_MESSAGES[sym] % [desc, line_start, line_end]
   end
 
   def has_tilde? line
