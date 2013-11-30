@@ -109,7 +109,7 @@ class Shop < LineByLineObject
         when :profit then "protit"
         when :hours then "business hours"
         end
-      err(@current_line, nil, Shop.err_msg(:missing_line, expectation.to_s))
+      err(@current_line, nil, Shop.err_msg(:missing_line, expectation))
     end
     self
   end
