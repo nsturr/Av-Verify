@@ -21,9 +21,9 @@ describe Mobile do
 
   # Test LineByLineObject separately
 
-  # it_should_behave_like LineByLineObject do
-  #   let(:item) { mobile }
-  # end
+  it_should_behave_like LineByLineObject do
+    let(:item) { mobile }
+  end
 
   context "parsing text fields" do
     let(:mobile) do
@@ -72,9 +72,6 @@ describe Mobile do
       mobiles_section.split_children
       mobiles_section.children.first
     end
-
-    # let(:line_begin) { mobile.contents.index(/^\d+(?:|\d+)* \d+(?:|\d+)* -?\d+ ?S\s*?$/) }
-    # let(:act) { mobile.contents.index(/\d+/)] }
 
     it "detects a missing 'S'" do
       mobile.contents[/S$/] = ""
@@ -168,31 +165,86 @@ describe Mobile do
       mobiles_section.children.first
     end
 
-    it "detects an out-of-range race"
+    it "detects an out-of-range race" do
+      mobile.contents[/^R \d+/] = "R 1050"
+      expect_one_error(mobile, Mobile.err_msg(:race_out_of_bounds))
+    end
 
-    it "detects an invalid race"
+    it "detects an invalid race" do
+      mobile.contents[/^R \d+/] = "R abcdefg"
+      expect_one_error(mobile, Mobile.err_msg(:non_numeric, "race"))
+    end
 
-    it "detects invalid text after the race field"
+    it "detects invalid text after the race field" do
+      line = mobile.contents[/^R \d+/]
+      mobile.contents[line] = line + " hey babe, what's up?"
 
-    it "detects a duplicated race field"
+      expect_one_error(mobile, Mobile.err_msg(:invalid_text_after, "race"))
+    end
 
-    it "detects an out-of-range class"
+    it "detects a duplicated race field" do
+      line = mobile.contents[/^R \d+/]
+      i = mobile.contents.index(line)
+      mobile.contents.insert(i, line+"\n")
 
-    it "detects an invalid class"
+      expect_one_error(mobile, Mobile.err_msg(:race_duplicated))
+    end
 
-    it "detects invalid text after the class field"
+    it "detects an out-of-range class" do
+      mobile.contents[/^C \d+/] = "C 1050"
+      expect_one_error(mobile, Mobile.err_msg(:class_out_of_bounds))
+    end
 
-    it "detects a duplicated class field"
+    it "detects an invalid class" do
+      mobile.contents[/^C \d+/] = "C abcdefg"
+      expect_one_error(mobile, Mobile.err_msg(:non_numeric, "class"))
+    end
 
-    it "detects an out-of-range team"
+    it "detects invalid text after the class field" do
+      line = mobile.contents[/^C \d+/]
+      mobile.contents[line] = line + " hey babe, what's up?"
 
-    it "detects an invalid team"
+      expect_one_error(mobile, Mobile.err_msg(:invalid_text_after, "class"))
+    end
 
-    it "detects invalid text after the team field"
+    it "detects a duplicated class field" do
+      line = mobile.contents[/^C \d+/]
+      i = mobile.contents.index(line)
+      mobile.contents.insert(i, line+"\n")
 
-    it "detects a duplicated team field"
+      expect_one_error(mobile, Mobile.err_msg(:class_duplicated))
+    end
 
-    it "detects an invalid misc field"
+    it "detects an out-of-range team" do
+      mobile.contents[/^L \d+/] = "L 1050"
+      expect_one_error(mobile, Mobile.err_msg(:team_out_of_bounds))
+    end
+
+    it "detects an invalid team" do
+      mobile.contents[/^L \d+/] = "L abcdefg"
+      expect_one_error(mobile, Mobile.err_msg(:non_numeric, "team"))
+    end
+
+    it "detects invalid text after the team field" do
+      line = mobile.contents[/^L \d+/]
+      mobile.contents[line] = line + " hey babe, what's up?"
+
+      expect_one_error(mobile, Mobile.err_msg(:invalid_text_after, "team"))
+    end
+
+    it "detects a duplicated team field" do
+      line = mobile.contents[/^L \d+/]
+      i = mobile.contents.index(line)
+      mobile.contents.insert(i, line+"\n")
+
+      expect_one_error(mobile, Mobile.err_msg(:team_duplicated))
+    end
+
+    it "detects an invalid misc field" do
+      mobile.contents.rstrip!
+      mobile.contents << "\nTOTALLY INVALID\n"
+      expect_one_error(mobile, Mobile.err_msg(:invalid_extra_field))
+    end
 
   end
 
@@ -204,7 +256,15 @@ describe Mobile do
       mobiles_section.children.first
     end
 
-    it "detects a duplicated kspawn field"
+    it "detects a duplicated kspawn field" do
+      line = mobile.contents[/^K \d+ \d+ -?\d+ -?\d+ .*?~/]
+      i = mobile.contents.index(line)
+      mobile.contents.insert(i, line+"\n")
+
+      expect_one_error(mobile, Mobile.err_msg(:kspawn_duplicated))
+    end
+
+    # test for invalid after tilde, for real
 
     it "detects invalid kspawn syntax"
 
