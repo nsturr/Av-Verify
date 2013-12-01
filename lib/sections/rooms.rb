@@ -157,7 +157,7 @@ class Room < LineByLineObject
     return if invalid_blank_line? line
 
     zero, roomflags, sector, error = line.strip.split
-    if error || zero != "0"
+    if error || zero =~ /\D/
       err(@current_line, line, Room.err_msg(:bad_roomflag_line))
     end
     if roomflags =~ Bits.pattern
