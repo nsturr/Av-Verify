@@ -116,11 +116,6 @@ class Room < LineByLineObject
       line_number: @current_line,
       might_span_lines: true
     )
-    # if has_tilde? line
-    #   err(@current_line, line, tilde(:extra_text, "Room name")) unless trailing_tilde? line
-    # else
-    #   err(@current_line, line, tilde(:absent_or_spans, "Room name"))
-    # end
     @name = line[/\A[^~]*/]
     expect :description
   end
@@ -145,11 +140,6 @@ class Room < LineByLineObject
         should_be_alone: true
       )
       expect :roomflags_sector
-      # if trailing_tilde? line
-      #   ugly(@current_line, line, tilde(:not_alone)) unless isolated_tilde? line
-      # else
-      #   err(@current_line, line, tilde(:extra_text, "Description"))
-      # end
     end
   end
 
@@ -244,8 +234,6 @@ class Room < LineByLineObject
         should_be_alone: true,
         present: false
       )
-      # err(@current_line, line, tilde(:extra_text, "Door desc")) unless trailing_tilde? line
-      # ugly(@current_line, line, tilde(:not_alone, "Door desc")) unless isolated_tilde? line
     end
   end
 
@@ -259,13 +247,6 @@ class Room < LineByLineObject
       line_number: @current_line,
       might_span_lines: true
     )
-    # if line =~ /^[^~]*~$/
-    #   #
-    # elsif line =~ /~./
-    #   err(@current_line, line, "Invalid text after terminating ~")
-    # else
-    #   err(@current_line, line, "Door keywords lack terminating ~ or spans multiple lines")
-    # end
 
     expect :door_locks
   end
@@ -337,8 +318,6 @@ class Room < LineByLineObject
         present: false,
         should_be_alone: true
       )
-      # err(@current_line, line, tilde(:extra_text, "Edesc body")) unless trailing_tilde? line
-      # ugly(@current_line, line, tilde(:not_alone, "Edesc body")) unless isolated_tilde? line
     end
   end
 
