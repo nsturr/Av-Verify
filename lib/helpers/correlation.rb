@@ -94,7 +94,7 @@ class Correlation
     return if shops.nil?
 
     if mobiles.nil?
-      warn(shops.line_number, nil, "No MOBILES section in area, #{shops.length} mob references in SHOPS skipped")
+      nb(shops.line_number, nil, "No MOBILES section in area, #{shops.length} mob references in SHOPS skipped")
       return
     end
     shops.each do |shop|

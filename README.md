@@ -25,7 +25,7 @@ Sections are accessible in Area#main_sections.
 
 `verify_all` simply runs an each loop on self.main_sections that calls the section's `parse` method, then add the section's resulting errors (if any) to the area's errors.
 
-`correlate_all` runs a different set of checks that compares vnum references between sections, the obvious example being #RESETS. It is a shorthand method for separately running `correlate_rooms`, `_resets`, `_specials`, and `_shops`.
+`correlate_all` runs a different set of checks that compares vnum references between sections, the obvious example being #RESETS. It is a shorthand method for separately running `correlate_rooms`, `_resets`, `_specials`, and `_shops`. See the section on the `Correlation` class below for more info.
 
 #### Section
 Includes `Parsable` module. Most sections that are a collection of smaller things (so anything except `AreaHeader` and `AreaData`) present a hash-like interface, in which they have `[]`, `each`, `length`, and `key?` methods. Keyed by VNUM where appropriate. These are not inherited, though they should be (a task for later improvement)
@@ -62,7 +62,7 @@ Includes `Parsable`, `HasQuotedKeywords`, and `TheTroubleWithTildes` modules.
 
 Includes `Parsable` module. A reset can be of type mob, inventory, equipment, object, container, door, or random. Its visible attributes are `Reset#vnum`, `Reset#target`, `Reset#slot`, and `Reset#limit`. Vnum is typically the identifier (references the room, object, or mob that it's placing), and target is typically another vnum (the one it's loading into or onto, etc). Limit and slot are not always used.
 
-Resets have no knowledge of the rest of the area, so they can't tell whether or not the items they're referencing exist. That's what Area#correlate_resets is for.
+Resets have no knowledge of the rest of the area, so they can't tell whether or not the items they're referencing exist.
 
 #### Special
 
@@ -84,6 +84,22 @@ Inherits from `Array`, and has the following methods for dealing with bit fields
 An error contains the line number on which it occurred, a copy of that line of text, its type (`:error`, `:warning`, `:nb`, or `:ugly`), and a copy of its error message.
 
 Has a `to_s` method which, if passed true, disables color output.
+
+### Correlation
+Accepts a hash of options (`area`, `mobiles`, `objects`, `rooms`, `resets`, `shops`, `specials`. The individual sections, if present, override the sections from the area).
+
+`correlate_doors` detects doors whose destinations rooms aren't in the area.
+
+`correlate_shops` and `correlate_specials` detects shops and specials whose vnums don't correspond to mobiles in the area.
+
+`correlate_resets` is a macro for a bunch of checks specific to the type of reset, but basically consist of ensuring that mobs, objects, and rooms referenced as vnums actually exist in the area.
+
+All errors raised here are warnings, and errors raised from doors not matching up with rooms are notices which means they're suppresed by default (since obviously an area will have detinations out of the area). Also, if a required section isn't passed to the correlation instance, it will only raise a single notice like
+
+```
+Line 2694: No MOBILES section in area, 46 mob references in RESETS skipped
+```
+where the line number is where `RESETS` section started.
 
 ### Modules
 
