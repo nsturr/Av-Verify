@@ -38,8 +38,7 @@ class Section
     @errors = []
 
     # Do a quick verification of the section header on the first line, if any
-    m = contents.match(/\A#([a-z]+)\b/i)
-    if m
+    contents.match(/\A#([a-z]+)\b/i) do |m|
       # Throw an error if the section name in the first line doesn't
       # match self.id. It would probably be caused by a user instantiating
       # a section with the wrong content, because varea wouldn't.
