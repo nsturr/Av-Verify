@@ -75,13 +75,17 @@ class Helps < Section
         expect_header = false
       elsif line.include? "~"
         expect_header = true
-        self.children << HelpFile.new(help_body, line_number)
+        self.children << HelpFile.new(
+          contents: help_body, line_number: line_number
+        )
         help_body = ""
       end
 
     end
     # One more Help file just in case it lacked a tilde and wasn't pushed on before
-    self.children << HelpFile.new(help_body, line_number) unless help_body.empty?
+    self.children << HelpFile.new(
+      contents: help_body, line_number: line_number
+    ) unless help_body.empty?
 
   end
 
@@ -113,10 +117,10 @@ class HelpFile
 
   attr_reader :level, :keywords, :body, :line_number, :contents
 
-  def initialize(contents, line_number=1)
-    @line_number = line_number
-    @current_line = line_number
-    @contents = contents.dup.rstrip
+  def initialize(options)
+    @line_number = options[:line_number] || 1
+    @current_line = @line_number
+    @contents = options[:contents].dup.rstrip
     @errors = []
   end
 
