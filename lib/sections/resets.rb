@@ -139,9 +139,9 @@ class Reset
   attr_reader :line_number, :line, :vnum, :type, :target, :limit, :slot, :errors,
     :attachments
 
-  def initialize(line, line_number=1)
-    @line = line
-    @line_number = line_number
+  def initialize(options)
+    @line = options[:contents]
+    @line_number = options[:line_number]
     @type = case line.lstrip[0]
       when "M" then :mobile
       when "G" then :inventory

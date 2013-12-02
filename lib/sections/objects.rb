@@ -59,8 +59,8 @@ class Objekt < LineByLineObject
 
   attr_reader :line_number, *ATTRIBUTES
 
-  def initialize(contents, line_number)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
 
     # Need the following instantiated as we'll be adding to them later
     @long_desc = ""

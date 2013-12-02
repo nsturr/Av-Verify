@@ -94,9 +94,9 @@ class Special
 
   attr_reader :line, :line_number, :vnum, :spec, :errors
 
-  def initialize(line, line_number=1)
-    @line = line
-    @line_number = line_number
+  def initialize(options)
+    @line = options[:contents]
+    @line_number = options[:line_number]
     @errors = []
   end
 

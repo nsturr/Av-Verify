@@ -71,8 +71,8 @@ class Mobile < LineByLineObject
 
   attr_reader(:line_number, *ATTRIBUTES)
 
-  def initialize(contents, line_number=1)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
     @long_line = 0 # For determining how many lines the long_desc spans
 
     # Need the following instantiated as we'll be adding to them later

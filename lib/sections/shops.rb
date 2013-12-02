@@ -88,8 +88,8 @@ class Shop < LineByLineObject
 
   attr_reader :line_number, *ATTRIBUTES
 
-  def initialize(contents, line_number=1)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
     @section_end = false
   end
 

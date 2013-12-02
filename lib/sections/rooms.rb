@@ -63,8 +63,8 @@ class Room < LineByLineObject
 
   attr_reader :line_number, *ATTRIBUTES
 
-  def initialize(contents, line_number)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
 
     @description = ""
     @doors = {}

@@ -10,10 +10,10 @@ class LineByLineObject
 
   attr_reader :contents, :line_number
 
-  def initialize(contents, line_number=1)
-    @contents = contents.rstrip
-    @line_number = line_number
-    @current_line = line_number
+  def initialize(options)
+    @contents = options[:contents].rstrip
+    @line_number = options[:line_number]
+    @current_line = @line_number
     @errors = []
   end
 

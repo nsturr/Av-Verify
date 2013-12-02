@@ -55,13 +55,13 @@ end
 describe Reset do
 
   it "detects invalid reset types" do
-    invalid = Reset.new("This probably should have been a comment, right?")
+    invalid = Reset.new(contents: "This probably should have been a comment, right?")
 
     expect_one_error(invalid, Reset.err_msg(:invalid_reset))
   end
 
   it "ignores comments starting with *" do
-    valid = Reset.new("M 0 11400 1 11406* Questmaster -> Northern Forge")
+    valid = Reset.new(contents: "M 0 11400 1 11406* Questmaster -> Northern Forge")
     valid.parse
 
     expect(valid.errors).to be_empty
@@ -69,7 +69,7 @@ describe Reset do
 
   context "when parsing a mob reset" do
 
-    let(:reset) { Reset.new("M 0 11400 1 11406 * Questmaster -> Northern Forge") }
+    let(:reset) { Reset.new(contents: "M 0 11400 1 11406 * Questmaster -> Northern Forge") }
     let(:i_zero) { reset.line.index("0") }
     let(:i_mob) { reset.line.index("11400") }
     let(:i_limit) { reset.line.index(/\b1\b/) }
@@ -118,7 +118,7 @@ describe Reset do
 
   context "when parsing an inventory reset" do
 
-    let(:reset) { Reset.new("G 0 11431 0          Red glowing dust, inventory") }
+    let(:reset) { Reset.new(contents: "G 0 11431 0          Red glowing dust, inventory") }
     let(:i_limit) { reset.line.index("0") }
     let(:i_vnum) { reset.line.index("11431") }
     let(:i_zero) { reset.line.rindex("0") }
@@ -160,7 +160,7 @@ describe Reset do
 
   context "when parsing an equipment reset" do
 
-    let(:reset) { Reset.new("E 0 11400 0 16       Hand axe, wield") }
+    let(:reset) { Reset.new(contents: "E 0 11400 0 16       Hand axe, wield") }
     let(:i_limit) { reset.line.index("0") }
     let(:i_vnum) { reset.line.index("11400") }
     let(:i_zero) { reset.line.rindex("0") }
@@ -215,7 +215,7 @@ describe Reset do
 
   context "when parsing an object reset" do
 
-    let(:reset) { Reset.new("O 0 11455 0 11406   Inscription to imms") }
+    let(:reset) { Reset.new(contents: "O 0 11455 0 11406   Inscription to imms") }
     let(:i_zero) { reset.line.index("0") }
     let(:i_object) { reset.line.index("11455") }
     let(:i_room) { reset.line.index("11406") }
@@ -257,7 +257,7 @@ describe Reset do
 
   context "when parsing a container reset" do
 
-    let(:reset) { Reset.new("P 0 11431 0 11444   You know how it is") }
+    let(:reset) { Reset.new(contents: "P 0 11431 0 11444   You know how it is") }
     let(:i_zero) { reset.line.index("0") }
     let(:i_object) { reset.line.index("11431") }
     let(:i_container) { reset.line.index("11444") }
@@ -299,7 +299,7 @@ describe Reset do
 
   context "when parsing a door reset" do
 
-    let(:reset) { Reset.new("D 0 11442 2 1        Gate south from crater rim to entrance (unlocked)") }
+    let(:reset) { Reset.new(contents: "D 0 11442 2 1        Gate south from crater rim to entrance (unlocked)") }
     let(:i_zero) { reset.line.index("0") }
     let(:i_vnum) { reset.line.index("11442") }
     let(:i_dir) { reset.line.rindex("2") }
@@ -359,7 +359,7 @@ describe Reset do
 
   context "when parsing a random reset" do
 
-    let(:reset) { Reset.new("R 0 11450 3       * Only randomize the first 3 exits (west remains untouched)") }
+    let(:reset) { Reset.new(contents: "R 0 11450 3       * Only randomize the first 3 exits (west remains untouched)") }
     let(:i_zero) { reset.line.index("0") }
     let(:i_vnum) { reset.line.index("11450") }
     let(:i_exits) { reset.line.index(/\b3\b/) }

@@ -42,7 +42,7 @@ end
 
 describe Special do
 
-  let(:spec_fun) { Special.new("M 11467 SPEC_PRIEST_LITE") }
+  let(:spec_fun) { Special.new(contents: "M 11467 SPEC_PRIEST_LITE") }
   let(:i_vnum) { spec_fun.line.index(/\b11467\b/) }
   let(:i_spec) { spec_fun.line.index(/\bSPEC\w+\b/) }
 

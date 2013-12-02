@@ -82,7 +82,9 @@ class Section
       # valid_entry both returns true/false to determine if the entry can be
       # added to children, and also raises errors/warnings if applicable
       if valid_child.nil? || valid_child.call(entry)
-        self.children << self.child_class.new(entry, @current_line)
+        self.children << self.child_class.new(
+          contents: entry, line_number: @current_line
+        )
       end
       @current_line += entry.count("\n")
     end
