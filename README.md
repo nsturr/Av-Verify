@@ -85,7 +85,7 @@ An error contains the line number on which it occurred, a copy of that line of t
 
 Has a `to_s` method which, if passed true, disables color output.
 
-### Correlation
+#### Correlation
 Accepts a hash of options (`area`, `mobiles`, `objects`, `rooms`, `resets`, `shops`, `specials`. The individual sections, if present, override the sections from the area).
 
 `correlate_doors` detects doors whose destinations rooms aren't in the area.
