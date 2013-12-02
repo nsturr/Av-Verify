@@ -32,8 +32,8 @@ class Resets < Section
     end
   end
 
-  def initialize(contents, line_number=1)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
 
     @children = []
     @reset_counts = Hash.new(0)

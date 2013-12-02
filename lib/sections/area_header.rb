@@ -14,8 +14,8 @@ class AreaHeader < Section
 
   attr_reader :name, :level, :author
 
-  def initialize(contents, line_number=1)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
   end
 
   def id

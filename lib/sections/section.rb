@@ -30,10 +30,11 @@ class Section
     end
   end
 
-  def initialize(contents, line_number=1)
-    @line_number = line_number
-    @current_line = line_number
-    @contents = contents.rstrip
+  # def initialize(contents, line_number=1)
+  def initialize(options)
+    @line_number = options[:line_number] || 1
+    @current_line = @line_number
+    @contents = options[:contents].rstrip
     @errors = []
 
     # Do a quick verification of the section header on the first line, if any

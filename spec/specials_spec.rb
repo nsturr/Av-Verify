@@ -5,7 +5,7 @@ data = File.read("./spec/test-specials.are")
 
 describe Specials do
 
-  let(:specials) { Specials.new(data) }
+  let(:specials) { Specials.new(contents: data) }
 
   it_should_behave_like Section do
     let(:section) { specials }

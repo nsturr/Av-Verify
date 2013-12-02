@@ -18,8 +18,8 @@ class Mobiles < VnumSection
     /^(?=#\d\S*)/
   end
 
-  def initialize(contents, line_number=1)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
   end
 
   def to_s

@@ -17,8 +17,8 @@ class Objects < VnumSection
     /^(?=#\d\S*)/
   end
 
-  def initialize(contents, line_number)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
   end
 
   def to_s

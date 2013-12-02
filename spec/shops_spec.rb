@@ -5,7 +5,7 @@ data = File.read("./spec/test-shops.are")
 
 describe Shops do
 
-  let(:shops) { Shops.new(data) }
+  let(:shops) { Shops.new(contents: data) }
 
   it_should_behave_like Section do
     let(:section) { shops }
@@ -28,7 +28,7 @@ end
 describe Shop do
 
   let(:shop) do
-    shops = Shops.new(data)
+    shops = Shops.new(contents: data)
     shops.split_children
     shops.children.first
   end

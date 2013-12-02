@@ -5,7 +5,7 @@ help = File.read("./spec/test-helps.are")
 
 describe Helps do
 
-  let(:helps) { Helps.new(help.dup) }
+  let(:helps) { Helps.new(contents: help.dup) }
 
   it_should_behave_like Section do
     let(:section) { helps }
@@ -28,7 +28,7 @@ end
 describe HelpFile do
 
   let (:help_file) do
-    help_section = Helps.new(help.dup)
+    help_section = Helps.new(contents: help.dup)
     help_section.split_children
     help_section.children.first
   end

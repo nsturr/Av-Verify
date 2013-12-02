@@ -198,23 +198,23 @@ class Area
 
     case name
     when "area"
-      AreaHeader.new(content, line_num)
+      AreaHeader.new(contents: content, line_number: line_num)
     when "areadata"
-      AreaData.new(content, line_num)
+      AreaData.new(contents: content, line_number: line_num)
     when "helps"
-      Helps.new(content, line_num)
+      Helps.new(contents: content, line_number: line_num)
     when "mobiles"
-      Mobiles.new(content, line_num)
+      Mobiles.new(contents: content, line_number: line_num)
     when "objects"
-      Objects.new(content, line_num)
+      Objects.new(contents: content, line_number: line_num)
     when "rooms"
-      Rooms.new(content, line_num)
+      Rooms.new(contents: content, line_number: line_num)
     when "resets"
-      Resets.new(content, line_num)
+      Resets.new(contents: content, line_number: line_num)
     when "shops"
-      Shops.new(content, line_num)
+      Shops.new(contents: content, line_number: line_num)
     when "specials"
-      Specials.new(content, line_num)
+      Specials.new(contents: content, line_number: line_num)
     end
   end
 

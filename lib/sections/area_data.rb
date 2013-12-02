@@ -27,8 +27,8 @@ class AreaData < Section
 
   attr_reader :plane, :zone, :flags, :outlaw, :kspawn, :modifiers, :group_exp
 
-  def initialize(contents, line_number=1)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
     @used_lines = []
     @kspawn_multiline = false
   end

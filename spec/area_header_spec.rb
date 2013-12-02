@@ -3,12 +3,12 @@ require "./lib/sections/area_header"
 
 describe AreaHeader do
 
-  let(:valid_header) { AreaHeader.new("#AREA {*HERO*} Scevine The Forge~") }
-  let(:missing_tilde) { AreaHeader.new("#AREA {51  51} Quietus Shadow Keep") }
-  let(:extra_tilde) { AreaHeader.new("#AREA {51  51} Quietus~ Shadow Keep~") }
-  let(:multi_line) { AreaHeader.new("#AREA {51  51}\nScevine Pariah's Paradise~") }
-  let(:bad_range) { AreaHeader.new("#AREA {51 51} Quietus Shadow Keep~") }
-  let(:no_braces) { AreaHeader.new("#AREA {*HERO* Scevine The Forge~") }
+  let(:valid_header) { AreaHeader.new(contents: "#AREA {*HERO*} Scevine The Forge~") }
+  let(:missing_tilde) { AreaHeader.new(contents: "#AREA {51  51} Quietus Shadow Keep") }
+  let(:extra_tilde) { AreaHeader.new(contents: "#AREA {51  51} Quietus~ Shadow Keep~") }
+  let(:multi_line) { AreaHeader.new(contents: "#AREA {51  51}\nScevine Pariah's Paradise~") }
+  let(:bad_range) { AreaHeader.new(contents: "#AREA {51 51} Quietus Shadow Keep~") }
+  let(:no_braces) { AreaHeader.new(contents: "#AREA {*HERO* Scevine The Forge~") }
 
   it "lets valid headers pass" do
     valid_header.parse

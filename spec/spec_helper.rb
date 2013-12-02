@@ -57,7 +57,7 @@ shared_examples_for VnumSection do
 
   it "detects an empty section" do
     fake_class = section.class
-    fake_section = fake_class.new("##{section.id.upcase}\n#0\n")
+    fake_section = fake_class.new(contents: "##{section.id.upcase}\n#0\n")
     expect_one_error(fake_section, VnumSection.err_msg(:empty, fake_section.class))
   end
 

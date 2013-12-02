@@ -5,7 +5,7 @@ data = File.read("./spec/test-areadata.are")
 
 describe AreaData do
 
-  let(:area_data) { AreaData.new(data.rstrip) }
+  let(:area_data) { AreaData.new(contents: data.rstrip) }
 
   it "detects invalid text after its terminating S" do
     area_data.contents << "\nHi there"

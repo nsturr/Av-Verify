@@ -5,7 +5,7 @@ data = File.read("./spec/test-mobiles.are")
 
 describe Mobiles do
 
-  let(:mobiles) { Mobiles.new(data.dup) }
+  let(:mobiles) { Mobiles.new(contents: data.dup) }
 
   it_should_behave_like Section do
     let(:section) { mobiles }
@@ -27,7 +27,7 @@ describe Mobile do
 
   context "parsing text fields" do
     let(:mobile) do
-      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section = Mobiles.new(contents: data.dup)
       mobiles_section.split_children
       mobiles_section.children.first
     end
@@ -68,7 +68,7 @@ describe Mobile do
     # working for any valid mob.
 
     let(:mobile) do
-      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section = Mobiles.new(contents: data.dup)
       mobiles_section.split_children
       mobiles_section.children.first
     end
@@ -125,7 +125,7 @@ describe Mobile do
   context "parsing those boring middle lines" do
 
     let(:mobile) do
-      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section = Mobiles.new(contents: data.dup)
       mobiles_section.split_children
       mobiles_section.children.first
     end
@@ -160,7 +160,7 @@ describe Mobile do
   context "parsing misc fields" do
 
     let(:mobile) do
-      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section = Mobiles.new(contents: data.dup)
       mobiles_section.split_children
       mobiles_section.children.first
     end
@@ -251,7 +251,7 @@ describe Mobile do
   context "parsing a kspawn" do
 
     let(:mobile) do
-      mobiles_section = Mobiles.new(data.dup)
+      mobiles_section = Mobiles.new(contents: data.dup)
       mobiles_section.split_children
       mobiles_section.children.first
     end

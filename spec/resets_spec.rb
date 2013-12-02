@@ -5,7 +5,7 @@ data = File.read("./spec/test-resets.are")
 
 describe Resets do
 
-  let(:resets) { Resets.new(data) }
+  let(:resets) { Resets.new(contents: data) }
 
   it_should_behave_like Section do
     let(:section) { resets }

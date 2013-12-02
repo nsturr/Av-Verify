@@ -30,8 +30,8 @@ class Shops < Section
     /^(?=\d+\b[^\d]*$)/
   end
 
-  def initialize(contents, line_number=1)
-    super(contents, line_number)
+  def initialize(options)
+    super(options)
     @children = []
   end
 
