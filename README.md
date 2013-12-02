@@ -2,6 +2,8 @@
 
 Area and Prog verifiers for AVATAR Mud, implemented in Ruby.
 
+The file `test-air.are` is a lightly modified version of `air.are` distributed with [Merc 2.2](http://www.mudbytes.net/index.php?a=files&cid=9).
+
 ## vArea : the area verifier
 
 Usage: `ruby varea.rb filename.are [nowarning|cosmetic|nocolor]`
