@@ -48,7 +48,6 @@
 class Area
   include Parsable # bestows an errors getter
   include AreaAttributes # bestows getters for all its attributes
-  include CorrelateSections
 
   attr_reader :flags
 
@@ -122,13 +121,25 @@ class Area
     end
   end
 
+  def correlate_all
+    @correlation = Correlation.new(area: self)
+    @correlation.correlate_all
+  end
+
   # Overrides the getter supplied by Parsable
   # Repeatedly calling verify_all won't pollute the area's errors array with
-  # duplicates (but correlating all repeatedly will. TODO)
+  # duplicates
   def errors
-    @section_errors = self.main_sections.inject([]) { |arr, s| arr += s.errors }
-    # @errors is populated by CorrelateSections's methods
-    @errors + @section_errors
+    section_errors = self.main_sections.inject([]) { |arr, s| arr += s.errors }
+    correlate_errors = @correlation.errors
+    @errors + section_errors + correlate_errors
+  end
+
+  # Taking a page from Rails
+  def try(message)
+    self.send(message)
+    rescue NoMethodError
+      nil
   end
 
   private
@@ -184,7 +195,6 @@ class Area
     if first_line.start_with?("#area ", "#area\t")
       name = "area"
     else
-      # first_line = content.slice(/\A.*(?:\n|\Z)/).rstrip
       name = first_line[/[a-zA-Z\$]+/]
 
       if first_line.include?(" ")

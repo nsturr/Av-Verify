@@ -1,16 +1,35 @@
 require_relative "avconstants"
+require_relative "parsable"
 
-module CorrelateSections
+# module CorrelateSections
+class Correlation
+  include Parsable
+
+  attr_accessor :mobiles, :objects, :rooms, :resets, :shops, :specials
+
+  # This can either be initialized with an area (I.e. the area passing self
+  # to it) or with individual sections.
+  def initialize(options)
+    area = options[:area]
+    @mobiles = options[:mobiles] || area.try(:mobiles)
+    @objects = options[:objects] || area.try(:objects)
+    @rooms = options[:rooms] || area.try(:rooms)
+    @resets = options[:resets] || area.try(:resets)
+    @shops = options[:shops] || area.try(:shops)
+    @specials = options[:specials] || area.try(:specials)
+
+    @errors = [] # Required by Parsable
+  end
 
   def correlate_all
-    correlate_doors(self.rooms)
-    correlate_resets(self.resets, self.mobiles, self.objects, self.rooms)
-    correlate_shops(self.shops, self.mobiles)
-    correlate_specials(self.specials, self.mobiles)
+    correlate_doors
+    correlate_resets
+    correlate_shops
+    correlate_specials
     nil
   end
 
-  def correlate_doors(rooms)
+  def correlate_doors
     return if rooms.nil?
     rooms.each do |room|
       room.doors.each_value do |door|
@@ -23,7 +42,7 @@ module CorrelateSections
     end
   end
 
-  def correlate_resets(resets, mobiles, objects, rooms)
+  def correlate_resets
     return if resets.nil?
 
     skipped_mobs, skipped_objects, skipped_rooms = 0, 0, 0
@@ -71,8 +90,9 @@ module CorrelateSections
     end
   end
 
-  def correlate_shops(shops, mobiles)
+  def correlate_shops
     return if shops.nil?
+
     if mobiles.nil?
       warn(shops.line_number, nil, "No MOBILES section in area, #{shops.length} mob references in SHOPS skipped")
       return
@@ -84,8 +104,9 @@ module CorrelateSections
     end
   end
 
-  def correlate_specials(specials, mobiles)
+  def correlate_specials
     return if specials.nil?
+
     if mobiles.nil?
       nb(specials.line_number, nil, "No MOBILES section in area, #{specials.length} mob references in SPECIALS skipped")
       return
