@@ -34,7 +34,7 @@
 # Require all the helper modules and classes
 %w{
   avconstants avcolors bits parsable
-  area_attributes correlate_sections
+  area_attributes correlation
 }.each { |helper| require_relative "helpers/#{helper}" }
 
 # Require all the sections
