@@ -10,7 +10,12 @@ class Section
     continues_after_delimiter: "\#%s section continues after terminating %s"
   }
 
-  attr_reader :line_number, :id, :contents, :children
+  attr_reader :line_number, :contents, :children
+
+  # Only AreaHeader should be overriding this to return true
+  def self.is_just_one_line?
+    false
+  end
 
   def self.delimiter(option=nil)
     if @section_delimiter
@@ -25,6 +30,34 @@ class Section
     end
   end
 
+  def initialize(contents, line_number=1)
+    @line_number = line_number
+    @current_line = line_number
+    @contents = contents.rstrip
+    @errors = []
+
+    # Do a quick verification of the section header on the first line, if any
+    m = contents.match(/\A#([a-z]+)\b/i)
+    if m
+      # Throw an error if the section name in the first line doesn't
+      # match self.id. It would probably be caused by a user instantiating
+      # a section with the wrong content, because varea wouldn't.
+      unless self.id == m[1].downcase
+        raise ArgumentError.new("Section header #{m[1]} doesn't match class #{self.id} being instantiated")
+      end
+      unless self.class.is_just_one_line?
+        # slice_first_line!
+        # @current_line += 1
+      end
+    end
+    # If there's no first line matching /\A#[a-z]+/i, don't do anything.
+    # It can be passed headerless sections, no problem.
+  end
+
+  def id
+    self.class.name.downcase
+  end
+
   # Sections call this method directly so they don't have to all deal with
   # passing their the interpolated arguments to the error messages. This is the
   # single point of access for these error messages, even in the specs
@@ -35,13 +68,6 @@ class Section
     when :continues_after_delimiter
       Section.err_msg(:continues_after_delimiter, self.id.upcase, self.class.delimiter)
     end
-  end
-
-  def initialize(contents, line_number=1)
-    @line_number = line_number
-    @current_line = line_number
-    @contents = contents.rstrip
-    @errors = []
   end
 
   def split_children(valid_child=nil)
@@ -62,6 +88,8 @@ class Section
       @current_line += entry.count("\n")
     end
   end
+
+  private
 
   def slice_first_line!
     @contents.slice!(/\A.*(?:\n|\Z)/)

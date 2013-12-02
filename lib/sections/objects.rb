@@ -19,7 +19,6 @@ class Objects < VnumSection
 
   def initialize(contents, line_number)
     super(contents, line_number)
-    @id = "objects"
   end
 
   def to_s

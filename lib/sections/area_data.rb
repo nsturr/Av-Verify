@@ -29,11 +29,14 @@ class AreaData < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @id = "areadata"
 
     @used_lines = []
     @kspawn_multiline = false
     slice_first_line!
+  end
+
+  def id
+    "areadata"
   end
 
   def to_hash

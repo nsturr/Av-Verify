@@ -34,7 +34,6 @@ class Resets < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @id = "resets"
 
     @children = []
     @reset_counts = Hash.new(0)

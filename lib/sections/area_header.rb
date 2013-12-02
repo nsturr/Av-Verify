@@ -8,11 +8,18 @@ class AreaHeader < Section
     multi_line: "#AREA section spans more than one line",
   }
 
+  def self.is_just_one_line?
+    true
+  end
+
   attr_reader :name, :level, :author
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @id = "area"
+  end
+
+  def id
+    "area"
   end
 
   def parse

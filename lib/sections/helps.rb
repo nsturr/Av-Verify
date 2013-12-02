@@ -39,7 +39,6 @@ class Helps < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-    @id = "helps"
 
     @children = []
     slice_first_line!
