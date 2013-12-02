@@ -83,6 +83,8 @@ class Objekt < LineByLineObject
     self
   end
 
+  private
+
   def parse_vnum line
     m = line.match(/#(?<vnum>\d+)/)
     # To even be created, an Object has to have a valid vnum
@@ -153,10 +155,6 @@ class Objekt < LineByLineObject
       present: false
       )
       expect :type_extra_wear
-    #   expect :type_extra_wear
-    #   unless trailing_tilde? line
-    #     err(@current_line, line, Objekt.err_msg(:tilde_invalid_text))
-    #   end
     end
   end
 

@@ -89,6 +89,8 @@ class Mobile < LineByLineObject
     self
   end
 
+  private
+
   def parse_vnum line
     m = line.match(/#(?<vnum>\d+)/)
     # To even be created, a Mobile needs to have a valid vnum

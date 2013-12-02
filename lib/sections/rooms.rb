@@ -97,6 +97,8 @@ class Room < LineByLineObject
     self
   end
 
+  private
+
   def parse_vnum line
     m = line.match(/#(?<vnum>\d+)/)
     # To even be created, a Room needs to have a valid vnum
@@ -320,8 +322,6 @@ class Room < LineByLineObject
     err(@current_line, line, Room.err_msg(:continues_after_delimiter))
     return :break
   end
-
-  private
 
   def new_door direction
     {direction: direction, description: ""}
