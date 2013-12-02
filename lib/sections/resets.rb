@@ -41,8 +41,6 @@ class Resets < Section
     @recent_mob_reset
     @recent_container_reset
     @previous_reset_type = :null
-
-    slice_first_line!
   end
 
   def [](index)

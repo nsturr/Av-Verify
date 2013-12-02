@@ -33,8 +33,6 @@ class Shops < Section
   def initialize(contents, line_number=1)
     super(contents, line_number)
     @children = []
-
-    slice_first_line!
   end
 
   def length

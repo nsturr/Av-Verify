@@ -33,7 +33,6 @@ class Specials < Section
     super(contents, line_number)
 
     @children = []
-    slice_first_line!
   end
 
   def to_s

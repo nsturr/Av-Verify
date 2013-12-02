@@ -29,10 +29,8 @@ class AreaData < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-
     @used_lines = []
     @kspawn_multiline = false
-    slice_first_line!
   end
 
   def id
@@ -50,6 +48,10 @@ class AreaData < Section
     @parsed = true
 
     section_end = false
+
+    # It's easier to increment line number at the start of the each
+    # loop, so decrement it here first to compensate.
+    @current_line -= 1
 
     @contents.rstrip.each_line do |line|
       @current_line += 1

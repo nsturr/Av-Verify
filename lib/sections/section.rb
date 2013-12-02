@@ -43,11 +43,11 @@ class Section
       # match self.id. It would probably be caused by a user instantiating
       # a section with the wrong content, because varea wouldn't.
       unless self.id == m[1].downcase
-        raise ArgumentError.new("Section header #{m[1]} doesn't match class #{self.id} being instantiated")
+        raise ArgumentError.new("Section name #{m[1]} doesn't match class #{self.id.inspect} being instantiated")
       end
       unless self.class.is_just_one_line?
-        # slice_first_line!
-        # @current_line += 1
+        slice_first_line!
+        @current_line += 1
       end
     end
     # If there's no first line matching /\A#[a-z]+/i, don't do anything.
@@ -72,8 +72,6 @@ class Section
 
   def split_children(valid_child=nil)
     return if self.children.nil?
-
-    @current_line += 1
 
     slice_delimiter!
     slice_leading_whitespace!

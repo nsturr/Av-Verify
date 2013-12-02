@@ -39,9 +39,7 @@ class Helps < Section
 
   def initialize(contents, line_number=1)
     super(contents, line_number)
-
     @children = []
-    slice_first_line!
   end
 
   def to_s
@@ -61,6 +59,10 @@ class Helps < Section
     expect_header = true
     help_body = ""
     line_number = @current_line
+
+    # It's easier to increment line number at the start of the each
+    # loop, so decrement it here first to compensate.
+    @current_line -= 1
 
     @contents.each_line do |line|
       @current_line += 1
