@@ -92,7 +92,6 @@ class Helps < Section
   def parse
     @parsed = true
 
-    # split_help_files
     split_children
 
     self.children.each do |help_file|

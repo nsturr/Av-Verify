@@ -25,10 +25,6 @@ class Objects < VnumSection
     "#OBJECTS: #{self.objects.size} entries, line #{self.line_number}"
   end
 
-  def objects
-    @entries
-  end
-
 end
 
 class Objekt < LineByLineObject

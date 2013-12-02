@@ -27,8 +27,6 @@ class Specials < Section
     end
   end
 
-  attr_reader :specials
-
   def initialize(options)
     super(options)
 
@@ -75,7 +73,7 @@ class Specials < Section
     end
 
     verify_delimiter
-    self.specials
+    self.children
   end
 
 end

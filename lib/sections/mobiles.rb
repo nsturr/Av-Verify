@@ -26,10 +26,6 @@ class Mobiles < VnumSection
     "#MOBILES: #{self.mobiles.size} entries, line #{self.line_number}"
   end
 
-  def mobiles
-    @entries
-  end
-
 end
 
 class Mobile < LineByLineObject

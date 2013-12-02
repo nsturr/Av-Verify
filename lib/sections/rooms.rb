@@ -24,10 +24,6 @@ class Rooms < VnumSection
     "#ROOMS: #{self.rooms.size} entries, line #{self.line_number}"
   end
 
-  def rooms
-    @entries
-  end
-
 end
 
 class Room < LineByLineObject
