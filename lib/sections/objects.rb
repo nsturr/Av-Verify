@@ -13,10 +13,6 @@ class Objects < VnumSection
     Objekt
   end
 
-  def child_regex
-    /^(?=#\d\S*)/
-  end
-
   def initialize(options)
     super(options)
   end

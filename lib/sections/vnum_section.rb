@@ -15,7 +15,8 @@ class VnumSection < Section
   end
 
   def child_regex
-    /^(?=\d+\b[^\d]*$)/
+    # /^(?=\d+\b[^\d]*$)/
+    /^(?=#\d\S*)/
   end
 
   # A proc to pass to Section#split_children to determine whether or not to add
