@@ -17,7 +17,7 @@ class Specials < Section
     /^/
   end
 
-  def self.valid_special
+  def child_validator
     Proc.new do |special|
       line = special.lstrip
       skip_line = false
@@ -60,7 +60,7 @@ class Specials < Section
   def parse
     @parsed = true
 
-    split_children(Specials.valid_special)
+    split_children
 
     self.children.each do |special|
       special.parse

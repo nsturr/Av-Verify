@@ -20,7 +20,7 @@ class VnumSection < Section
 
   # A proc to pass to Section#split_children to determine whether or not to add
   # the the child to the instance var @children. Also raises errors
-  def valid_vnum?
+  def child_validator
     Proc.new do |child|
       child_vnum = child[/\A#\d+\b/]
       invalid = false
@@ -58,14 +58,14 @@ class VnumSection < Section
     self.children.each(&prc)
   end
 
-  def split_children(prc=nil)
-    super(prc)
+  def split_children
+    super
   end
 
   def parse
     @parsed = true
 
-    split_children(self.valid_vnum?)
+    split_children
 
     if self.children.empty?
       err(self.line_number, nil, VnumSection.err_msg(:empty, self.class.name))

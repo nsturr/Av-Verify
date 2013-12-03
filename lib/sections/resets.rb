@@ -22,7 +22,7 @@ class Resets < Section
     /^/
   end
 
-  def self.valid_reset
+  def child_validator
     Proc.new do |reset|
       line = reset.lstrip
       skip_line = false
@@ -62,7 +62,7 @@ class Resets < Section
   def parse
     @parsed = true
 
-    split_children(Resets.valid_reset)
+    split_children
 
     self.children.each do |reset|
 

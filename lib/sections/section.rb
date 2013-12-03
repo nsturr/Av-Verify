@@ -58,6 +58,15 @@ class Section
     self.class.name.downcase
   end
 
+  # To filter out data from becoming instantiated as a child object, sections
+  # should override this method to return a proc that accepts the block of text
+  # destined to become a new child object. If it returns false, the child won't
+  # be created. For example, VnumSection doesn't allow any children with
+  # malformed vnums to be instantiated.
+  def child_validator
+    nil
+  end
+
   # Sections call this method directly so they don't have to all deal with
   # passing their the interpolated arguments to the error messages. This is the
   # single point of access for these error messages, even in the specs
@@ -70,17 +79,24 @@ class Section
     end
   end
 
-  def split_children(valid_child=nil)
+  def split_children
     return if self.children.nil?
 
     slice_delimiter!
     slice_leading_whitespace!
 
     entries = self.contents.rstrip.split(self.child_regex)
+
+    valid_child = self.child_validator
+    # valid_child both returns true/false to determine if the entry can be
+    # added to children, and also raises errors/warnings if applicable
     entries.each do |entry|
-      # valid_entry both returns true/false to determine if the entry can be
-      # added to children, and also raises errors/warnings if applicable
       if valid_child.nil? || valid_child.call(entry)
+        # Probably do something like:
+        # self.children << self.child_parser_class.new(whatever)
+        # And then
+        # self.children.map(&:parse)
+        # will return either self (parsing failed) or self.child_class.new(whatever)
         self.children << self.child_class.new(
           contents: entry, line_number: @current_line
         )
