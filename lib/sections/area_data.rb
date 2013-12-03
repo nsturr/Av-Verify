@@ -58,25 +58,7 @@ class AreaData < Section
       line.rstrip!
 
       next if line.empty?
-
-      # If we're following a kspawn line without a tilde, then this line is purely
-      # text and shouldn't be parsed. If this line does contain a tilde, though,
-      # then the text ends.
-      if @kspawn_multiline
-        # I'm cool with letting this hit a No Method on Nilclass error, since the
-        # only way this could execute is if we already stuck text into the kspawn hash
-        @kspawn[:text] << line
-        if line.include?("~")
-          @kspawn_multiline = false
-          # However nothing but whitespace can follow that tilde!
-          validate_tilde(
-            line: line,
-            line_number: @current_line,
-            present: false
-          )
-        end
-        next
-      end
+      next if multiline_kspawn?(line)
 
       # If the "S" section has been parsed, then this line comes after the section
       # formally ends.
@@ -85,6 +67,8 @@ class AreaData < Section
         break #Only need to throw this error once
       end
 
+      # The first letter of the line determines the type, and there can only be
+      # one line per type in the #AREADATA section.
       if @used_lines.include? line[0]
         err(@current_line, line, AreaData.err_msg(:duplicate, line[0]))
       end
@@ -117,6 +101,28 @@ class AreaData < Section
   end # parse
 
   private
+
+  # If we're following a kspawn line without a tilde, then this line is purely
+  # text and shouldn't be parsed. If this line does contain a tilde, though,
+  # then the text ends.
+  def multiline_kspawn? line
+    if @kspawn_multiline
+      @kspawn[:text] << line
+      if line.include?("~")
+        @kspawn_multiline = false
+        # However nothing but whitespace can follow that tilde!
+        validate_tilde(
+          line: line,
+          line_number: @current_line,
+          present: false
+        )
+      end
+      true
+    else
+      false
+    end
+    # Returning true skips the rest of the parse method for this line
+  end
 
   def ensure_numeric(token, line, name)
     if token =~ /\A-?\d+\z/
