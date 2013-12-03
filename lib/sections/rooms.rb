@@ -12,6 +12,10 @@ class Rooms < VnumSection
     Room
   end
 
+  def child_parser
+    RoomParser
+  end
+
   def initialize(options)
     super(options)
   end
@@ -20,6 +24,9 @@ class Rooms < VnumSection
     "#ROOMS: #{self.rooms.size} entries, line #{self.line_number}"
   end
 
+end
+
+class RoomParser < LineByLineObject
 end
 
 class Room < LineByLineObject

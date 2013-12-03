@@ -33,8 +33,12 @@ class Helps < Section
     end
   end
 
-  def self.child_class
+  def child_class
     HelpFile
+  end
+
+  def child_parser
+    HelpFileParser
   end
 
   def initialize(options)
@@ -103,6 +107,9 @@ class Helps < Section
     self.children
   end
 
+end
+
+class HelpFileParser
 end
 
 class HelpFile

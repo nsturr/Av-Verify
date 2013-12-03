@@ -15,7 +15,6 @@ class VnumSection < Section
   end
 
   def child_regex
-    # /^(?=\d+\b[^\d]*$)/
     /^(?=#\d\S*)/
   end
 

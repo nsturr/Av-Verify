@@ -26,6 +26,10 @@ class Shops < Section
     Shop
   end
 
+  def child_parser
+    ShopParser
+  end
+
   def child_regex
     /^(?=\d+\b[^\d]*$)/
   end
@@ -69,6 +73,9 @@ class Shops < Section
     self.shops
   end
 
+end
+
+class ShopParser < LineByLineObject
 end
 
 class Shop < LineByLineObject

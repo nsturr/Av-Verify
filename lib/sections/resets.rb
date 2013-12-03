@@ -18,6 +18,10 @@ class Resets < Section
     Reset
   end
 
+  def child_parser
+    ResetParser
+  end
+
   def child_regex
     /^/
   end
@@ -107,6 +111,9 @@ class Resets < Section
     self.resets
   end
 
+end
+
+class ResetParser
 end
 
 class Reset

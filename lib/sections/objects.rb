@@ -13,6 +13,10 @@ class Objects < VnumSection
     Objekt
   end
 
+  def child_parser
+    ObjectParser
+  end
+
   def initialize(options)
     super(options)
   end
@@ -21,6 +25,9 @@ class Objects < VnumSection
     "#OBJECTS: #{self.objects.size} entries, line #{self.line_number}"
   end
 
+end
+
+class ObjectParser < LineByLineObject
 end
 
 class Objekt < LineByLineObject

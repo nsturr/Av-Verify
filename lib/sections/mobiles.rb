@@ -10,6 +10,10 @@ class Mobiles < VnumSection
 
   @section_delimiter = "#0" # N.B. some valid vnums regrettably begin with a 0
 
+  def child_parser
+    MobileParser
+  end
+
   def child_class
     Mobile
   end
@@ -22,6 +26,9 @@ class Mobiles < VnumSection
     "#MOBILES: #{self.mobiles.size} entries, line #{self.line_number}"
   end
 
+end
+
+class MobileParser < LineByLineObject
 end
 
 class Mobile < LineByLineObject

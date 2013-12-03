@@ -13,6 +13,10 @@ class Specials < Section
     Special
   end
 
+  def child_parser
+    SpecialParser
+  end
+
   def child_regex
     /^/
   end
@@ -76,6 +80,9 @@ class Specials < Section
     self.children
   end
 
+end
+
+class SpecialParser
 end
 
 class Special
