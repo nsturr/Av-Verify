@@ -28,6 +28,7 @@ C_TEXT = %w{
 	command4 command5 command6 command7 command8 command9
 	command_0 command_1 command_2 command_3 command_4
 	command_5 command_6 command_7 command_8 command_9
+	v0 v1 v2 v3 v4 v5 v6 v7 v8 v9
 	}
 
 # These conditions are used in fun progs. Script will flip out

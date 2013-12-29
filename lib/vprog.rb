@@ -19,8 +19,8 @@
 #   Handle $f0 variables in function CALLS when parsing the parameter
 #     Lower priority: determine if I care that much to do the above
 
-require './helpers/progconstants'
-require './helpers/avcolors'
+require_relative 'helpers/progconstants'
+require_relative 'helpers/avcolors'
 
 class MobProg
   attr_reader :name, :t_mob, :t_room, :t_fun, :errors
@@ -388,9 +388,10 @@ class MobProg
     # The following hash, keyed by last_line, will be interpolated into the error
     # string: "Invalid line, expected #{expected[last_line]}"
     expected = {
-      nothing: "comments starting with * or 'begin <vnum>'", 
+      nothing: "comments starting with * or 'begin <vnum>'",
       begin: "T <xx>",
-      t: "C or D conditions",
+      t: "value line, or C or D conditions",
+      v: "value line, or C or D conditions",
       c: "another C or & condition, |, F, action, or pause lines",
       amp: "&, |, F, action, or pause lines",
       pipe: "C condition",
@@ -404,9 +405,10 @@ class MobProg
 
     # Descriptions of the line that preceded the current one
     before = {
-      nothing: "the last prog ends", 
+      nothing: "the last prog ends",
       begin: "begin <vnum>",
       t: "trigger type",
+      v: "trigger value",
       c: "C condition",
       amp: "& condition",
       pipe: "pipe",
@@ -472,6 +474,14 @@ class MobProg
           break
         end
         last_line = :t
+      when "V"
+        # V <d>-<type> [options] can only follow a T or other V lines
+        unless [:t, :v].include?(last_line)
+          err(current_line, line, "Invalid line. After #{before[last_line]}, expected #{expected[last_line]}")
+          current_line += 1
+          next
+        end
+        # TODO: add a way to parse a v line
       when "C"
         # C can only follow a T, C, |, or E line
         unless [:t, :c, :pipe, :e].include?(last_line)
@@ -926,7 +936,9 @@ class MobProg
           #warn(current_line, line, "Command conditions don't need quotes unless trigger is KS") if value.start_with?("\"") && value.end_with?("\"")
         end
       end
-      err(current_line, line, "Wrong operator used with text comparison") if [">", "<"].include?(operator)
+      # Apparently I forgot that the < > operators actuall do work for
+      # text checks (for checking prefixes and suffixes)
+      # err(current_line, line, "Wrong operator used with text comparison") if [">", "<"].include?(operator)
     end
 
     return connection
