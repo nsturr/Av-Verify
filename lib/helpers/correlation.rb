@@ -33,7 +33,7 @@ class Correlation
     return if rooms.nil?
     rooms.each do |room|
       room.doors.each_value do |door|
-        next if door[:dest].between?(-1, 0)
+        next if door.fetch(:dest, -1).between?(-1, 0)
         unless rooms.include? door[:dest]
           rebuilt_line = "#{door[:lock]} #{door[:key]} #{door[:dest]}"
           nb(door[:lock_line_number], rebuilt_line, "Door destination room is not in the area")
