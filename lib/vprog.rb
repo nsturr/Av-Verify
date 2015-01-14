@@ -392,10 +392,11 @@ class MobProg
       begin: "T <xx>",
       t: "value line, or C or D conditions",
       v: "value line, or C or D conditions",
-      c: "another C or & condition, |, F, action, or pause lines",
-      amp: "&, |, F, action, or pause lines",
+      c: "another C or & condition, |, F, return, action, or pause lines",
+      amp: "&, |, F, return, action, or pause lines",
+      r: "F, action, or pause lines",
       pipe: "C condition",
-      d: "F, action, or pause lines",
+      d: "F, return, action, or pause lines",
       f: "action or pause lines",
       action: "another A or P line, or E",
       pause: "another A or P line",
@@ -410,6 +411,7 @@ class MobProg
       t: "trigger type",
       v: "trigger value",
       c: "C condition",
+      r: "R return line",
       amp: "& condition",
       pipe: "pipe",
       d: "D condition",
@@ -482,6 +484,7 @@ class MobProg
           next
         end
         # TODO: add a way to parse a v line
+        last_line = :v
       when "C"
         # C can only follow a T, C, |, or E line
         unless [:t, :c, :pipe, :e].include?(last_line)
@@ -518,10 +521,17 @@ class MobProg
         end
         err(current_line, line, "Invalid text after D condition") if line.split.length > 1
         last_line = :d
+      when "R"
+        unless [:c, :amp, :d].include?(last_line)
+          err(current_line, line, "Invalid line. After #{before[last_line]}, expected #{expected[last_line]}")
+          current_line += 1
+          next
+        end
+        last_line = :r
       when "F"
         if last_line == :t
           err(current_line, nil, "F flag immediately follows a trigger type line. Forget a D line?")
-        elsif [:action, :pause].include?(last_line)
+        elsif [:r, :action, :pause].include?(last_line)
           err(current_line, nil, "F flag can not be preceded by actions or pauses")
           current_line += 1
           next
@@ -536,7 +546,7 @@ class MobProg
         # Actions can only come after C, &, or D conditions, F lines, or other actions
         if last_line == :t
           err(current_line, line, "Action line immediately follows a trigger type line. Forget a D line?")
-        elsif ![:c, :amp, :d, :f, :action, :pause].include?(last_line)
+        elsif ![:r, :c, :amp, :d, :f, :action, :pause].include?(last_line)
           err(current_line, line, "Invalid action. After #{before[last_line]}, expected #{expected[last_line]}")
           current_line += 1
           next
@@ -545,7 +555,7 @@ class MobProg
         connection = parse_line(line, :a, last_line, current_line, trigger, section_type)
         last_line = :action
       when "P"
-        unless [:c, :amp, :d, :f, :action, :pause].include?(last_line)
+        unless [:r, :c, :amp, :d, :f, :action, :pause].include?(last_line)
           err(current_line, nil, "Invalid line. After #{before[last_line]}, expected #{expected[last_line]}")
           current_line += 1
           next
