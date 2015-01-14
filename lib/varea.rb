@@ -12,7 +12,7 @@
 # "Nowarning" suppresses non-critical errors, such as Loading a mob
 # or object not in the area, which might be intentional.
 #
-# "Cosmetic"displays any cosmetic errors such as text fields lacking
+# "Cosmetic" displays any cosmetic errors such as text fields lacking
 # a newline at the end, lines containing tabs, etc.
 #
 # "Nocolor" strips ANSI color codes from the output, which is handy

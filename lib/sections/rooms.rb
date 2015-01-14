@@ -57,6 +57,7 @@ class Room < LineByLineObject
     invalid_text_after: "Invalid text after room %s",
     invalid_alignment_line: "Invalid alignment restriction line",
     invalid_class_line: "Invalid class restriction line",
+    invalid_room_field: "Invalid room field",
     edesc_keywords_spans: "Edesc keywords span multiple lines"
   }
 
