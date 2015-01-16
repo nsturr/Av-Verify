@@ -224,6 +224,7 @@ class Room < LineByLineObject
   end
 
   def parse_door_desc line
+    return unless @recent_door
     @recent_door[:description] << line[/[^~]*/] << "\n"
     ugly(@current_line, line, Room.err_msg(:visible_tab)) if line.include?("\t")
 
@@ -239,6 +240,7 @@ class Room < LineByLineObject
   end
 
   def parse_door_keyword line
+    return unless @recent_door
     return if invalid_blank_line? line
 
     @recent_door[:keywords] = parse_quoted_keywords(line[/^[^~]*/], line)
@@ -253,6 +255,7 @@ class Room < LineByLineObject
   end
 
   def parse_door_locks line
+    return unless @recent_door
 
     locks, key, to_vnum, error = line.split
     # Make sure the right number of items are on the line
