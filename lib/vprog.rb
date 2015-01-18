@@ -487,7 +487,7 @@ class MobProg
         last_line = :v
       when "C"
         # C can only follow a T, C, |, or E line
-        unless [:t, :c, :pipe, :e].include?(last_line)
+        unless [:t, :v, :c, :pipe, :e].include?(last_line)
           err(current_line, line, "Invalid line. After #{before[last_line]}, expected #{expected[last_line]}")
           current_line += 1
           next
@@ -514,7 +514,7 @@ class MobProg
         err(current_line, line, "Invalid text after pipe") if line.split.length > 1
         last_line = :pipe
       when "D"
-        unless [:t, :e].include?(last_line)
+        unless [:t, :v, :e].include?(last_line)
           err(current_line, line, "Invalid line. After #{before[last_line]}, expected #{expected[last_line]}")
           current_line += 1
           next
