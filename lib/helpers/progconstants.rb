@@ -1,11 +1,11 @@
 # The three main sections. Script will flip out if it finds an
 # unidentified one in the file it's checking.
-SECTIONS = %w{ PROGS_MOB PROGS_ROOM PROGS_FUN }
+SECTIONS = %w{ PROGS_MOB PROGS_OBJ PROGS_ROOM PROGS_FUN }
 
 # The known trigger types. Script will not flip out if it finds
 # an unknown one, but it will throw a minor error (that is
 # suppressed by default)
-TRIGGERS = %w{ ER LR DO GO TI GG FO DS BO ST TE EC KS CC FA FC }
+TRIGGERS = %w{ ER LR DO GO TI GG FO DS BO ST TE EC KS CC FA FC CS C1 C2 }
 
 # These conditions are numeric. (The script will throw an error
 # if they aren't numeric.)
