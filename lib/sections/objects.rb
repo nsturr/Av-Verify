@@ -44,7 +44,7 @@ class Objekt < LineByLineObject
     bad_bit: "%s not a power of 2",
     bad_field: "Invalid %s field",
     type_extra_wear_matches: "Line should follow syntax: <type:#> <extraflag:#> <wearflag:#>",
-    weight_worth_matches: "Line should follow syntax: <weight:#> <worth:#> 0",
+    weight_worth_matches: "Line should follow syntax: <weight:#> <worth:#> <racial_loc:#> 0",
     bad_value: "Invalid format for object value%i",
     wrong_number_of_values: "Wrong number of values in value0-3 line",
     negative: "%s cannot be negative",
@@ -200,18 +200,18 @@ class Objekt < LineByLineObject
   def parse_weight_worth line
     return if invalid_blank_line? line
 
-    @weight, @worth, zero = line.split(" ", 3)
-    # err(@current_line, line, "Too many items in weight/worth line") if items.length > 3
-    unless [@weight, @worth, zero].any? { |el| el.nil? } || zero !~ /\A\d+\z/
+    @weight, @worth, @racial_loc, zero = line.split(" ", 4)
+    unless [@weight, @worth, @racial_loc, zero].any? { |el| el.nil? } || zero !~ /\A\d+\z/
       err(@current_line, line, Objekt.err_msg(:bad_field, "weight")) unless @weight =~ /^\d+$/
       err(@current_line, line, Objekt.err_msg(:bad_field, "worth")) unless @worth =~ /^\d+$/
+      err(@current_line, line, Objekt.err_msg(:bad_field, "racial location")) unless @racial_loc =~ /^#{Bits.insert}$/
     else
       err(@current_line, line, Objekt.err_msg(:weight_worth_matches))
     end
 
     # If we do this earlier, it'll turn invalid values to 0 and the validations
     # above won't catch them.
-    @weight, @worth = @weight.to_i, @worth.to_i
+    @weight, @worth, @racial_loc = @weight.to_i, @worth.to_i, Bits.new(@racial_loc)
 
     expect :misc
   end
