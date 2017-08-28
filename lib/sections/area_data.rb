@@ -9,13 +9,13 @@ require_relative '../helpers/bits'
 class AreaData < Section
 
   @ERROR_MESSAGES = {
-    invalid_line: "Invalid AREADATA line, expected P, F, O, K, M, G, S",
+    invalid_line: "Invalid AREADATA line, expected P, F, O, K, M, G, S, V",
     continues_after_delimiter: "Section continues after 'S' delimiter",
     no_delimiter: "#AREADATA lacks terminating S",
     duplicate: "Duplicate '%s' line in #AREADATA",
     invalid_extra_text: "Invalid text after #AREADATA %s",
     invalid_plane_0: "Invalid area plane: 0",
-    invalid_field: "Invalid (non-numeric) %s field",
+    invalid_field: "Invalid (non-numeric) %s field \"%s\"",
     plane_out_of_range: "Areadata plane out of bounds #{PLANE_MIN} to #{PLANE_MAX}",
     zone_out_of_range: "Areadata zone out of bounds 0 to #{ZONE_MAX}",
     bad_bit: "%s not a power of 2",
@@ -87,6 +87,8 @@ class AreaData < Section
         parse_modifiers_line line
       when "G"
         parse_group_exp_line line
+      when "V"
+        parse_vnum_min_max line
       when "S"
         section_end = true
       else
@@ -128,8 +130,8 @@ class AreaData < Section
     if token =~ /\A-?\d+\z/
       token = token.to_i
     else
+      err(@current_line, line, AreaData.err_msg(:invalid_field, name, token))
       token = nil
-      err(@current_line, line, AreaData.err_msg(:invalid_field, name))
     end
     token
   end
@@ -289,6 +291,26 @@ class AreaData < Section
       pct0: pct0, num1: num1, pct1: pct1, num2: num2, pct2: pct2,
       pct3: pct3, diversity: div
     }
+  end
+
+  def parse_vnum_min_max line
+    # Group exp should match: V # #
+    @used_lines << "V"
+
+    line_name = "vnum range"
+    vmin, vmax, error = line.split(" ", 4)[1..-1]
+
+    if error
+      err(@current_line, line, AreaData.err_msg(:invalid_extra_text, line_name))
+    elsif vmin.nil?
+      err(@current_line, line, AreaData.err_msg(:not_enough_tokens, line_name))
+    elsif vmax.nil?
+      err(@current_line, line, AreaData.err_msg(:not_enough_tokens, line_name))
+    else
+      vmin = ensure_numeric(vmin, line, line_name)
+      vmax = ensure_numeric(vmax, line, line_name)
+    end
+
   end
 
 end
