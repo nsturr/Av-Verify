@@ -966,4 +966,6 @@ if ARGV[0]
   else
     puts "#{ARGV[0]} not found, skipping."
   end
+else
+    puts "Usage: vprog filename.prg [nocolor|nowarning|showdeprecated|showunknown]"
 end
