@@ -62,7 +62,8 @@ class Mobile < LineByLineObject
     kspawn_no_tilde: "Killspawn lacks terminating ~ between lines %s and %s",
     non_numeric_or_neg: "Invalid (negative or non-numeric) %s",
     invalid_extra_field: "Invalid extra field (expecting R, C, L, A, or K)",
-    not_enough_tokens: "Not enough tokens in kspawn line"
+    not_enough_tokens: "Not enough tokens in kspawn line",
+    invalid_ascii: "Unprintable ascii character(s) found in %s section for mobile"
   }
 
   ATTRIBUTES = [:vnum, :name, :short_desc, :long_desc, :description, :act, :aff,
@@ -123,6 +124,7 @@ class Mobile < LineByLineObject
         line_number: @current_line,
         might_span_lines: true
       )
+      validate_ascii(line, "short description")
       @short_desc = line[/\A[^~]*/]
       expect :long_desc
     end
@@ -141,6 +143,7 @@ class Mobile < LineByLineObject
         line_number: @current_line,
         should_be_alone: true
       )
+      validate_ascii(@long_desc, "long description")
     elsif @long_line == 2
       ugly(@current_line, line, Mobile.err_msg(:long_desc_spans))
     end
@@ -160,6 +163,7 @@ class Mobile < LineByLineObject
     else
       @description << line << "\n"
     end
+
     if has_tilde? line
       expect :act_aff_align
       validate_tilde(
@@ -167,6 +171,10 @@ class Mobile < LineByLineObject
         line_number: @current_line,
         should_be_alone: true
       )
+
+      #Complain about non-ascii characters if any in the description
+      #at the end of the mobile's description parsing
+      validate_ascii(@description, "description")
     end
   end
 
@@ -342,6 +350,13 @@ class Mobile < LineByLineObject
     if has_tilde?(line)
       validate_tilde(line: line, line_number: @current_line, present: false)
       expect :misc
+    end
+  end
+
+  # Validates that everything in the string is printable ascii characters
+  def validate_ascii(body, section)
+    if !body.force_encoding("UTF-8").ascii_only?
+      err(line_number, body, Mobile.err_msg(:invalid_ascii, section))
     end
   end
 

@@ -58,7 +58,8 @@ class Room < LineByLineObject
     invalid_alignment_line: "Invalid alignment restriction line",
     invalid_class_line: "Invalid class restriction line",
     invalid_room_field: "Invalid room field",
-    edesc_keywords_spans: "Edesc keywords span multiple lines"
+    edesc_keywords_spans: "Edesc keywords span multiple lines",
+    invalid_ascii: "Unprintable ascii character(s) found in %s section for room"
   }
 
   attr_reader :line_number, *ATTRIBUTES
@@ -118,6 +119,7 @@ class Room < LineByLineObject
       might_span_lines: true
     )
     @name = line[/\A[^~]*/]
+    validate_ascii(@name, "name")
     expect :description
   end
 
@@ -140,6 +142,7 @@ class Room < LineByLineObject
         present: false,
         should_be_alone: true
       )
+      validate_ascii(@description, "description")
       expect :roomflags_sector
     end
   end
@@ -332,6 +335,13 @@ class Room < LineByLineObject
 
   def new_door direction
     {direction: direction, description: ""}
+  end
+
+  # Validates that everything in the string is printable ascii characters
+  def validate_ascii(body, section)
+    if !body.force_encoding("UTF-8").ascii_only?
+      err(line_number, body, Room.err_msg(:invalid_ascii, section))
+    end
   end
 
 end

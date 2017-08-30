@@ -20,7 +20,9 @@ require_relative '../helpers/has_quoted_keywords'
 
 class Helps < Section
 
-  @ERROR_MESSAGES = {}
+  @ERROR_MESSAGES = {
+    invalid_ascii: "Unprintable ascii character(s) found in %s section for help"
+  }
 
   def self.delimiter(option=nil)
     case option
@@ -166,7 +168,16 @@ class HelpFile
       line_number: @current_line,
       should_be_alone: true
     )
+
+    validate_ascii(@body, "body")
     self
+  end
+
+  # Validates that everything in the string is printable ascii characters
+  def validate_ascii(body, section)
+    if !body.force_encoding("UTF-8").ascii_only?
+      err(line_number, body, Helps.err_msg(:invalid_ascii, section))
+    end
   end
 
 end
