@@ -96,11 +96,11 @@ module Parsable
       error_list.each do |error|
         if error.type == :error
           puts error.to_s(nocolor)
-        elsif error.type == :warning && !@flags.include?(:nowarning)
+        elsif error.type == :warning
           puts error.to_s(nocolor)
-        elsif error.type == :nb && @flags.include?(:notices)
+        elsif error.type == :nb
           puts error.to_s(nocolor)
-        elsif error.type == :ugly && @flags.include?(:cosmetic)
+        elsif error.type == :ugly
           puts error.to_s(nocolor)
         else
           suppressed += 1
@@ -124,6 +124,13 @@ module Parsable
       ugly: :C
     }
 
+    TYPES = {
+      warning: "Warning",
+      error: "Error",
+      nb: "Notice",
+      ugly: "Cosmetic issue"
+    }
+
     def initialize(line, type, context, description)
       @line, @type, @context, @description = line, type, context, description
     end
@@ -133,7 +140,7 @@ module Parsable
       # Line NNNN: Description of error
       # --> The offending line [only displayed if error[:context] is not nil]
 
-      text_line = "Line #{self.line}:"
+      text_line = "#{TYPES[self.type]} on line #{self.line}:"
       text_indent = "-->"
       unless nocolor
         text_line.CC!(COLOR[self.type])

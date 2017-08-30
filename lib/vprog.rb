@@ -2,12 +2,8 @@
 
 # Mob/Room/Lobster/Fun/Balloon Prog verifier by Scevine
 #
-# Usage: ruby vprog.rb filename [nocolor, nowarning, showdeprecated, showunknown]
+# Usage: ruby vprog.rb filename [nocolor]
 #
-# 'showdeprecated' will raise a stink over the use of QSTART, QSTATE, etc.
-# 'showunknown' will raise warnings over any unknown trigger types
-# 'nowarning' will answer the speculative theramin quasit aspect to the
-#   downstairs quadrant neighborhood (n.b. it doesn't do that)
 # 'nocolor' drains color from your face, making you look like a vampire
 #   It DOES NOT give you fangs. use candy corns instead.
 #
@@ -212,13 +208,13 @@ class MobProg
       suppressed = 0
       @errors.each do |error|
         if error[:type] == :error
-          puts format_error(error, :BR)
-        elsif error[:type] == :warning && !@flags.include?(:nowarning)
-          puts format_error(error, :R)
-        elsif error[:type] == :deprecated && @flags.include?(:showdeprecated)
-          puts format_error(error, :Y)
-        elsif error[:type] == :unknown && @flags.include?(:showunknown)
-          puts format_error(error, :C)
+          puts format_error(error, "Error", :BR)
+        elsif error[:type] == :warning
+          puts format_error(error, "Warning", :R)
+        elsif error[:type] == :deprecated
+          puts format_error(error, "Notice", :Y)
+        elsif error[:type] == :unknown
+          puts format_error(error, "Cosmetic issue", :C)
         else
           suppressed += 1
         end
@@ -232,13 +228,13 @@ class MobProg
   private
   # returns 1 or 2 lines of formatted text describing the passed error
   # Color is an avatar color code in symbol form (:BW, :K, etc.)
-  def format_error(error, color)
+  def format_error(error, type, color)
     # Error reports will look like this by default:
 
     # Line NNNN: Description of error
     # --> The offending line [only displayed if error[:context] is not nil]
 
-    text_line = "Line #{error[:line]}:"
+    text_line = "#{type} on line #{error[:line]}:"
     text_indent = "-->"
     unless @flags.include?(:nocolor)
       text_line.CC!(color)

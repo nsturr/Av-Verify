@@ -7,13 +7,7 @@
 # own lines, text fields sticking to their own lines, etc. (You get
 # this from the area builder anyway, so it shouldn't be an issue.)
 #
-# Usage: ruby varea.rb areafile.are [nowarning|cosmetic|notices|nocolor]
-#
-# "Nowarning" suppresses non-critical errors, such as Loading a mob
-# or object not in the area, which might be intentional.
-#
-# "Cosmetic" displays any cosmetic errors such as text fields lacking
-# a newline at the end, lines containing tabs, etc.
+# Usage: ruby varea.rb areafile.are [nocolor]
 #
 # "Nocolor" strips ANSI color codes from the output, which is handy
 # if you're piping the output away from the console.
@@ -243,7 +237,7 @@ if __FILE__ == $PROGRAM_NAME
       puts "#{ARGV[0]} not found, skipping."
     end
   else
-    puts "Usage: varea filename.are [nocolor|cosmetic|notices|nowarning]"
+    puts "Usage: varea filename.are [nocolor]"
   end
 
 end
