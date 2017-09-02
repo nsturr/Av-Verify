@@ -108,7 +108,7 @@ module Parsable
       end
       puts "Suppressed #{suppressed} items." if suppressed > 0
     else
-      puts "No errors found."
+      puts "Nothing found to report."
     end
   end
 

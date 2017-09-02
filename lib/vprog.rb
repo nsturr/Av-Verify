@@ -221,7 +221,7 @@ class MobProg
       end
       puts "Suppressed #{suppressed} items." if suppressed > 0
     else
-      puts "No errors found."
+      puts "Nothing found to report."
     end
   end
 
@@ -960,8 +960,8 @@ if ARGV[0]
     new_prog.correlate
     new_prog.error_report
   else
-    puts "#{ARGV[0]} not found, skipping."
+    puts "File '#{ARGV[0]}' not found."
   end
 else
-    puts "Usage: vprog filename.prg [nocolor|nowarning|showdeprecated|showunknown]"
+  puts "Usage: #{$PROGRAM_NAME} filename [nocolor]"
 end

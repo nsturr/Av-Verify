@@ -42,7 +42,7 @@ class Mobile < LineByLineObject
     long_desc_spans: "Long desc has more than one line of text",
     description_no_tilde: "This doesn't look like part of a description. Forget a terminating ~ above?",
     no_terminating: "Line lacks terminating %s",
-    act_not_npc: "ACT_NPC is not set",
+    act_not_npc: "ACT_IS_NPC (1) is not set on a mobile",
     bad_bit: "%s flag is not a power of 2",
     bad_field: "Bad %s field",
     bad_align_range: "Alignment out of bounds -1000 to 1000",

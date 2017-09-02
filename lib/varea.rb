@@ -224,20 +224,15 @@ class Area
 
 end
 
-if __FILE__ == $PROGRAM_NAME
-
-  if ARGV[0]
-    if File.exist?(ARGV[0])
-      puts "Parsing #{ARGV[0]}..."
-      new_area = Area.new(ARGV[0], ARGV[1..-1])
-      new_area.verify_all
-      new_area.correlate_all # This can't be run before verify_all
-      new_area.error_report
-    else
-      puts "#{ARGV[0]} not found, skipping."
-    end
+if ARGV[0]
+  if File.exist?(ARGV[0])
+    new_area = Area.new(ARGV[0], ARGV[1..-1])
+    new_area.verify_all
+    new_area.correlate_all # This can't be run before verify_all
+    new_area.error_report
   else
-    puts "Usage: varea filename.are [nocolor]"
+    puts "File '#{ARGV[0]}' not found."
   end
-
+else
+  puts "Usage: #{$PROGRAM_NAME} filename [nocolor]"
 end
