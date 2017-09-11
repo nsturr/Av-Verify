@@ -20,12 +20,13 @@ class AreaData < Section
     zone_out_of_range: "Areadata zone out of bounds 0 to #{ZONE_MAX}",
     bad_bit: "%s not a power of 2",
     bad_line: "Bad %s line in #AREADATA",
-    not_enough_tokens: "Not enough tokens on #AREADATA %s line"
+    not_enough_tokens: "Not enough tokens on #AREADATA %s line",
+    vnum_range_missing: "Vnum range is required for mprogs and titans programming"
   }
 
   @section_delimiter = "S"
 
-  attr_reader :plane, :zone, :flags, :outlaw, :kspawn, :modifiers, :group_exp
+  attr_reader :plane, :zone, :flags, :outlaw, :kspawn, :modifiers, :group_exp, :vnum_range
 
   def initialize(options)
     super(options)
@@ -40,7 +41,8 @@ class AreaData < Section
   def to_hash
     {
       plane: @plane, zone: @zone, flags: @flags, outlaw: @outlaw,
-      kspawn: @kspawn, modifiers: @modifiers, group_exp: @group_exp
+      kspawn: @kspawn, modifiers: @modifiers, group_exp: @group_exp,
+      vnum_range: @vnum_range
     }
   end
 
@@ -48,6 +50,7 @@ class AreaData < Section
     @parsed = true
 
     section_end = false
+    vnum_range_set = false
 
     # It's easier to increment line number at the start of the each
     # loop, so decrement it here first to compensate.
@@ -89,6 +92,7 @@ class AreaData < Section
         parse_group_exp_line line
       when "V"
         parse_vnum_min_max line
+        vnum_range_set = true
       when "S"
         section_end = true
       else
@@ -98,6 +102,7 @@ class AreaData < Section
     end
     err(@current_line, nil, TheTroubleWithTildes.err_msg(:absent, "Kspawn")) if @kspawn_multiline
     err(@current_line, nil, AreaData.err_msg(:no_delimiter)) unless section_end
+    err(@current_line, nil, AreaData.err_msg(:vnum_range_missing)) unless vnum_range_set
 
     self
   end # parse
@@ -311,6 +316,9 @@ class AreaData < Section
       vmax = ensure_numeric(vmax, line, line_name)
     end
 
+    @vnum_range = {
+        vmin: vmin, vmax: vmax
+    }
   end
 
 end
